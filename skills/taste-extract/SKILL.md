@@ -65,6 +65,33 @@ as the definition of what counted.
 
 ---
 
+### Classify by role, never by shape
+
+The first version of this classified a container as a "lockup" when it held two
+or three children of which at most one was not text. That is a shape test, and
+it cannot tell a title with its subtitle from a paragraph with its button. It
+tightened a dozen actions to 8 across a real file, including several the
+designer had explicitly set minutes earlier.
+
+Classify by what the children **are**:
+
+| The container holds | It is | Distance |
+|---|---|---|
+| a text field | a form | the form rung |
+| only buttons | an action group | the bound value |
+| a button plus anything else | a reading flow | the separate value |
+| text and text alone | a lockup or a bound pair | the bound value |
+
+A button is never the second half of a lockup. If a shape test and a role test
+disagree, the role test is right.
+
+And re-verify after applying, on the whole file, not the screens you changed.
+A blanket rule is only safe if you can show every container now sits on the
+rung its role calls for. The pass that produced this section reported five
+remaining violations on the re-check, all of which the apply step had created.
+
+---
+
 ## Spacing
 
 Derive the unit first, per the `rhythm-model` skill: it is the body text's
