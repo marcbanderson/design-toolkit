@@ -50,6 +50,14 @@ for f in "$SRC"/agents/*.md; do
   say "install agent ${n%.md}"; run "cp '$f' '$DEST/agents/'"
 done
 
+# ── tools: executables the skills call ─────────────────────────────────────
+run "mkdir -p '$DEST/tools'"
+for t in "$SRC"/tools/*; do
+  [ -f "$t" ] || continue
+  say "install tool $(basename "$t")"
+  run "cp '$t' '$DEST/tools/' && chmod +x '$DEST/tools/$(basename "$t")'"
+done
+
 # ── the judgment record: never overwrite, it accumulates ───────────────────
 SRC_J="$SRC/judgment/$JUDGMENT.md"
 [ -e "$SRC_J" ] || { echo "No judgment file: $SRC_J" >&2
@@ -104,4 +112,8 @@ On a new project, first session:
   1. /design-contract   writes the contract, or adopts the file already there
   2. /session-state     writes STATUS.md
 Then /token-audit, /design-parity, /rhythm-pass and /ship-check as the work needs.
+
+Tools are at ~/.claude/tools/ and the skills call them by that path:
+  measure   rendered geometry at a fixed width
+  guard     prove a file survived a bulk edit
 DONE

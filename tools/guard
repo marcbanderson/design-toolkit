@@ -1,0 +1,200 @@
+#!/usr/bin/env python3
+"""guard: prove a file survived an edit.
+
+A file that parses is not a file that is intact. This checks the things that
+actually break during bulk edits, and compares against a snapshot taken before
+the edit so a silent catastrophe cannot pass.
+
+  guard snapshot FILE...      record the state before editing
+  guard check FILE...         structural checks only, no snapshot needed
+  guard verify [FILE...]      check, then compare to the snapshot
+
+  --max-delta PCT   fail if byte count moved more than this (default 20)
+  --changed         additionally fail any file that did NOT change
+  --require STR     fail if this string is missing (repeatable)
+  --json            machine-readable output
+
+Exit code is 0 when everything passes, 1 when anything fails.
+
+Built after a whole-file regex destroyed a stylesheet and was nearly committed,
+because the damage was caught three steps later by an unrelated probe rather
+than by looking at the file.
+"""
+import sys, os, re, json, hashlib, argparse
+from html.parser import HTMLParser
+
+SNAP = os.path.join(os.path.expanduser("~"), ".cache", "design-toolkit", "guard.json")
+VOID = {'area','base','br','col','embed','hr','img','input','link','meta',
+        'param','source','track','wbr'}
+
+
+class Tags(HTMLParser):
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.stack, self.bad = [], []
+
+    def handle_starttag(self, tag, attrs):
+        if tag not in VOID:
+            self.stack.append(tag)
+
+    def handle_endtag(self, tag):
+        if tag in VOID:
+            return
+        if not self.stack or self.stack[-1] != tag:
+            self.bad.append(tag)
+        else:
+            self.stack.pop()
+
+
+def inspect(path):
+    """Structural facts about one file. Never raises on content."""
+    raw = open(path, encoding="utf-8", errors="replace").read()
+    f = {
+        "path": path,
+        "bytes": len(raw.encode("utf-8")),
+        "lines": raw.count("\n") + 1,
+        "sha": hashlib.sha1(raw.encode("utf-8")).hexdigest()[:12],
+        "nulls": raw.count("\x00"),
+        "problems": [],
+    }
+    ext = os.path.splitext(path)[1].lower()
+
+    if ext in (".css", ".scss", ".less"):
+        stripped = re.sub(r"/\*.*?\*/", "", raw, flags=re.S)
+        f["brace_balance"] = stripped.count("{") - stripped.count("}")
+        f["comment_open"], f["comment_close"] = raw.count("/*"), raw.count("*/")
+        f["selectors"] = len(re.findall(r"(?m)^\s*[.#@:a-zA-Z\[][^{}\n]*\{", raw))
+        if f["brace_balance"]:
+            f["problems"].append(f"brace balance {f['brace_balance']:+d}")
+        if f["comment_open"] != f["comment_close"]:
+            f["problems"].append(
+                f"comment markers {f['comment_open']} open vs {f['comment_close']} close")
+
+    elif ext in (".html", ".htm", ".vue", ".svelte"):
+        p = Tags()
+        try:
+            p.feed(raw)
+        except Exception as e:
+            f["problems"].append(f"parser error: {e}")
+        f["unclosed"], f["mismatched"] = len(p.stack), len(p.bad)
+        f["comment_open"], f["comment_close"] = raw.count("<!--"), raw.count("-->")
+        if p.stack:
+            f["problems"].append(f"{len(p.stack)} unclosed: {', '.join(p.stack[:4])}")
+        if p.bad:
+            f["problems"].append(f"{len(p.bad)} mismatched: {', '.join(p.bad[:4])}")
+        if f["comment_open"] != f["comment_close"]:
+            f["problems"].append("unbalanced html comments")
+
+    elif ext in (".json",):
+        try:
+            json.loads(raw)
+        except Exception as e:
+            f["problems"].append(f"invalid json: {e}")
+
+    if f["nulls"]:
+        f["problems"].append(f"{f['nulls']} stray null bytes, a placeholder was left behind")
+    return f
+
+
+def load():
+    try:
+        return json.load(open(SNAP))
+    except Exception:
+        return {}
+
+
+def save(d):
+    os.makedirs(os.path.dirname(SNAP), exist_ok=True)
+    json.dump(d, open(SNAP, "w"), indent=1)
+
+
+def main():
+    ap = argparse.ArgumentParser(add_help=False)
+    ap.add_argument("cmd", choices=["snapshot", "check", "verify"])
+    ap.add_argument("files", nargs="*")
+    ap.add_argument("--max-delta", type=float, default=20.0)
+    ap.add_argument("--require", action="append", default=[])
+    ap.add_argument("--changed", action="store_true")
+    ap.add_argument("--json", action="store_true")
+    ap.add_argument("-h", "--help", action="store_true")
+    a = ap.parse_args()
+    if a.help:
+        print(__doc__)
+        return 0
+
+    prev = load()
+    files = a.files or sorted(prev.keys())
+    if not files:
+        print("guard: no files given and no snapshot to verify", file=sys.stderr)
+        return 1
+
+    if a.cmd == "snapshot":
+        snap = {f: inspect(f) for f in files}
+        save(snap)
+        if a.json:
+            print(json.dumps(snap, indent=1))
+        else:
+            for f, d in snap.items():
+                print(f"  snapshot {f}: {d['bytes']} bytes, {d['lines']} lines, {d['sha']}")
+        return 0
+
+    failed, report = False, []
+    for path in files:
+        if not os.path.exists(path):
+            report.append((path, ["file is gone"], {}))
+            failed = True
+            continue
+        now = inspect(path)
+        problems = list(now["problems"])
+
+        raw = open(path, encoding="utf-8", errors="replace").read()
+        for s in a.require:
+            if s not in raw:
+                problems.append(f"missing required string: {s!r}")
+
+        if a.cmd == "verify" and path in prev:
+            was = prev[path]
+            if was["sha"] == now["sha"]:
+                # not a failure: verifying a set where only some files changed is normal.
+                # It is worth saying, because an edit that silently did not apply looks
+                # exactly like an edit that worked.
+                now["unchanged"] = True
+                if a.changed:
+                    problems.append("unchanged since snapshot, the edit did not apply")
+            delta = (now["bytes"] - was["bytes"]) / max(was["bytes"], 1) * 100
+            now["delta_pct"] = round(delta, 1)
+            if abs(delta) > a.max_delta:
+                problems.append(
+                    f"byte count moved {delta:+.1f}%, over the {a.max_delta}% limit "
+                    f"({was['bytes']} to {now['bytes']})")
+            for k in ("selectors", "unclosed", "mismatched"):
+                if k in was and k in now and was[k] != now[k]:
+                    # selectors disappearing is the signature of a destroyed stylesheet
+                    if k == "selectors" and now[k] < was[k] * 0.9:
+                        problems.append(f"selector count fell {was[k]} to {now[k]}")
+                    elif k != "selectors":
+                        problems.append(f"{k} changed {was[k]} to {now[k]}")
+
+        if problems:
+            failed = True
+        report.append((path, problems, now))
+
+    if a.json:
+        print(json.dumps([{"path": p, "problems": pr, **d} for p, pr, d in report], indent=1))
+    else:
+        for path, problems, d in report:
+            if problems:
+                print(f"  FAIL {path}")
+                for p in problems:
+                    print(f"       {p}")
+            elif d.get("unchanged"):
+                print(f"  ok   {path} (unchanged since snapshot)")
+            else:
+                extra = f", {d['delta_pct']:+}%" if "delta_pct" in d else ""
+                print(f"  ok   {path} ({d['bytes']} bytes{extra})")
+        print("\nguard: " + ("FAILED" if failed else "all clear"))
+    return 1 if failed else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

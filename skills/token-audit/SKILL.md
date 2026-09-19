@@ -60,13 +60,17 @@ placeholders were restored in forward order.
 them. Split each remaining line on its comments and only touch the code
 segments. Change a value only when its property is one you are targeting.
 
-Then prove the file survived, every time, before looking at anything else:
+Then prove the file survived, every time, before looking at anything else.
+**Use the tool, do not rewrite the check:**
 
-- braces balance
-- `/*` count equals `*/` count
-- a known class still exists
-- no placeholder characters left behind
-- byte count moved by roughly what you expected
+```bash
+~/.claude/tools/guard snapshot path/to/file.css    # before the edit
+~/.claude/tools/guard verify                       # after
+```
+
+It checks brace balance, comment-marker pairing, stray placeholder bytes, byte
+delta against a limit, and a collapse in selector count, which is the signature
+of a destroyed stylesheet. It exits non-zero so it can gate a commit.
 
 A stylesheet that parses is not a stylesheet that is intact.
 

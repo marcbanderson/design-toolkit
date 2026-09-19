@@ -74,7 +74,21 @@ Work down in this order, because this is the order a designer notices things:
 - **State coverage.** Does the screen have a loading, empty and sparse
   treatment, or only the populated one?
 
-**4. Only now, measure.**
+**4. Only now, measure. Use the tool, do not rewrite the harness.**
+
+```bash
+~/.claude/tools/measure <url> --width 393 \
+  --setup "<js to drive the screen into state>" \
+  --gaps ".some-container" --box ".some-component" --overflow
+```
+
+It fixes the width explicitly, reads `columnGap` and `rowGap` rather than the
+`gap` shorthand, which does not round-trip a `var()`, and never reports page
+height as a proxy for change. Add `--json` to save a baseline and `--compare
+FILE` to diff a later run against it.
+
+Every one of those three details exists because writing the harness by hand got
+it wrong.
 
 Use computed styles or node properties to confirm what you saw and to catch
 regression in the same properties next time. Measurement supports the finding.

@@ -73,6 +73,7 @@ cd ~/design-toolkit && git add -A && git commit -m "..." && git push
 ## Layout
 
 ```
+tools/         executables the skills call, so a check is run rather than rewritten
 skills/        nine skills, the methods. Written neutrally.
 agents/        two read-only agents, so a sweep's output stays out of the thread
 judgment/      the only personal layer
@@ -98,6 +99,24 @@ the same for anyone, the criteria are not.
 | `design-parity` | Puts the build beside its Figma frame at matched width and looks |
 | `rhythm-pass` | Tightens spacing and hierarchy without redesigning anything |
 | `ship-check` | Verifies the thing on screen actually contains the work |
+
+## The tools
+
+Skills are instructions; tools are executables. The difference matters because a
+rewritten check is a check that can be wrong differently each time.
+
+| Tool | Does | Exists because |
+| --- | --- | --- |
+| `measure` | Rendered geometry at a fixed width, as JSON, with `--compare` to diff two runs | Three measurement errors in one day, all from hand-rolling the harness |
+| `guard` | Proves a file survived a bulk edit: braces, comment pairs, stray placeholders, byte delta, selector collapse | A whole-file regex destroyed a stylesheet and was nearly committed |
+
+They install to `~/.claude/tools/` and the skills call them by that path.
+`measure` drives headless Chrome over the DevTools protocol with no npm
+dependencies. Both exit non-zero on failure, so either can gate a commit.
+
+Their coverage is deliberately complementary. Revert a spacing rule and `guard`
+says the file is fine, because it is; `measure --compare` reports the three gaps
+that went from 24 to 12.
 
 ## The architecture
 

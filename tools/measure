@@ -1,0 +1,230 @@
+#!/usr/bin/env node
+/**
+ * measure: report rendered geometry at a fixed width, as JSON.
+ *
+ *   measure <url> [options]
+ *
+ *   --width N        viewport width, DEFAULT 393. Match the Figma frame.
+ *   --setup 'JS'     runs in the page before measuring, to drive app state
+ *   --wait MS        after setup, before measuring (default 900)
+ *   --gaps SEL       vertical gaps between the children of SEL
+ *   --box SEL        box of each match: top, left, width, height, borders
+ *   --overflow       elements wider than the viewport
+ *   --compare FILE   diff against a previous --json run
+ *   --json           raw JSON instead of a table
+ *
+ * Why this exists. Three measurement mistakes in one day, each from writing a
+ * throwaway harness instead of calling a reliable one:
+ *
+ *   1. measured at 1512 wide instead of 393, so the answer meant nothing
+ *   2. read getComputedStyle().gap, which does not round-trip a var() and
+ *      silently reported 6px where the real value was 8
+ *   3. used page height as the change metric, which is pinned by a fixed
+ *      bottom bar and reported "no change" whatever happened
+ *
+ * This tool cannot make those mistakes. The width is explicit and defaults to a
+ * phone frame, it reads columnGap and rowGap rather than the shorthand, and it
+ * never reports page height as a proxy for anything.
+ */
+const { spawn } = require("child_process");
+const fs = require("fs");
+const os = require("os");
+const path = require("path");
+
+const CHROME = [
+  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "/Applications/Chromium.app/Contents/MacOS/Chromium",
+  "/usr/bin/google-chrome", "/usr/bin/chromium",
+].find(p => { try { fs.accessSync(p); return true; } catch { return false; } });
+
+function args(argv) {
+  const o = { width: 393, wait: 900, url: null, setup: "", gaps: null,
+              box: null, overflow: false, json: false, compare: null };
+  for (let i = 0; i < argv.length; i++) {
+    const a = argv[i];
+    if (a === "--width") o.width = +argv[++i];
+    else if (a === "--wait") o.wait = +argv[++i];
+    else if (a === "--setup") o.setup = argv[++i];
+    else if (a === "--gaps") o.gaps = argv[++i];
+    else if (a === "--box") o.box = argv[++i];
+    else if (a === "--compare") o.compare = argv[++i];
+    else if (a === "--overflow") o.overflow = true;
+    else if (a === "--json") o.json = true;
+    else if (a === "-h" || a === "--help") o.help = true;
+    else if (!o.url) o.url = a;
+  }
+  return o;
+}
+
+// Runs inside the page. Everything here is deliberate; see the header.
+function probe(sel, wantGaps, wantBox, wantOverflow, vw) {
+  const seen = el => {
+    const r = el.getBoundingClientRect();
+    return r.width > 0 && r.height > 0 && el.offsetParent !== null;
+  };
+  const name = el => {
+    const c = (el.className && el.className.toString().trim()) || "";
+    return c ? "." + c.split(/\s+/).join(".") : el.tagName.toLowerCase();
+  };
+  const out = {};
+
+  if (wantGaps) {
+    out.gaps = [];
+    for (const parent of document.querySelectorAll(wantGaps)) {
+      if (!seen(parent)) continue;
+      const kids = [...parent.children].filter(seen);
+      const cs = getComputedStyle(parent);
+      // rowGap, never the `gap` shorthand: the shorthand does not round-trip a var()
+      const declared = cs.display.includes("flex") || cs.display.includes("grid")
+        ? Math.round(parseFloat(cs.rowGap) || 0) : null;
+      for (let i = 1; i < kids.length; i++) {
+        const a = kids[i - 1].getBoundingClientRect();
+        const b = kids[i].getBoundingClientRect();
+        out.gaps.push({
+          parent: name(parent), from: name(kids[i - 1]), to: name(kids[i]),
+          gap: Math.round(b.top - a.bottom), declaredRowGap: declared,
+        });
+      }
+    }
+  }
+
+  if (wantBox) {
+    out.boxes = [...document.querySelectorAll(wantBox)].filter(seen).map(el => {
+      const r = el.getBoundingClientRect(), cs = getComputedStyle(el);
+      return {
+        sel: name(el),
+        top: Math.round(r.top), left: Math.round(r.left),
+        width: Math.round(r.width), height: Math.round(r.height),
+        border: cs.borderTopWidth, padTop: cs.paddingTop, padBottom: cs.paddingBottom,
+        // both, because the shorthand lies when the value came from a variable
+        colGap: cs.columnGap, rowGap: cs.rowGap,
+        text: (el.textContent || "").trim().slice(0, 30),
+      };
+    });
+  }
+
+  if (wantOverflow) {
+    out.overflow = [...document.querySelectorAll("*")].filter(el => {
+      if (!seen(el)) return false;
+      return el.getBoundingClientRect().right > vw + 1;
+    }).map(el => ({ sel: name(el), right: Math.round(el.getBoundingClientRect().right) }));
+  }
+
+  const visible = [...document.querySelectorAll("*")].filter(seen);
+  out.visibleElements = visible.length;
+  // Text that renders with no height is almost always a real defect. It must be
+  // counted only among VISIBLE elements: counting hidden ones returns hundreds
+  // of meaningless hits, which is what the first version of this did.
+  out.collapsedText = visible.filter(el =>
+    el.children.length === 0 && (el.textContent || "").trim() &&
+    el.getBoundingClientRect().height < 2).length;
+  return out;
+}
+
+async function cdp(o) {
+  const port = 9000 + Math.floor(Math.random() * 900);
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "measure-"));
+  const chrome = spawn(CHROME, [
+    "--headless=new", `--remote-debugging-port=${port}`,
+    `--user-data-dir=${dir}`, `--window-size=${o.width},1400`,
+    "--no-first-run", "--no-default-browser-check", "--disable-gpu",
+  ], { stdio: "ignore" });
+
+  const kill = () => { try { chrome.kill(); } catch {}
+                       try { fs.rmSync(dir, { recursive: true, force: true }); } catch {} };
+  process.on("exit", kill);
+
+  let target;
+  for (let i = 0; i < 60; i++) {
+    try {
+      const r = await fetch(`http://127.0.0.1:${port}/json/list`);
+      const list = await r.json();
+      target = list.find(t => t.type === "page");
+      if (target) break;
+    } catch {}
+    await new Promise(r => setTimeout(r, 100));
+  }
+  if (!target) { kill(); throw new Error("Chrome did not start"); }
+
+  const ws = new WebSocket(target.webSocketDebuggerUrl);
+  await new Promise((res, rej) => { ws.onopen = res; ws.onerror = rej; });
+  let id = 0; const pending = new Map();
+  ws.onmessage = e => {
+    const m = JSON.parse(e.data);
+    if (m.id && pending.has(m.id)) { pending.get(m.id)(m); pending.delete(m.id); }
+  };
+  const send = (method, params = {}) => new Promise(res => {
+    const i = ++id; pending.set(i, res);
+    ws.send(JSON.stringify({ id: i, method, params }));
+  });
+  const evaluate = async expr => {
+    const r = await send("Runtime.evaluate",
+      { expression: expr, awaitPromise: true, returnByValue: true });
+    if (r.result?.exceptionDetails) throw new Error(r.result.exceptionDetails.text);
+    return r.result?.result?.value;
+  };
+
+  await send("Page.enable");
+  await send("Runtime.enable");
+  await send("Emulation.setDeviceMetricsOverride",
+    { width: o.width, height: 1400, deviceScaleFactor: 1, mobile: true });
+  await send("Page.navigate", { url: o.url });
+  await new Promise(r => setTimeout(r, 1500));
+  if (o.setup) { await evaluate(`(async()=>{ ${o.setup} })()`); }
+  await new Promise(r => setTimeout(r, o.wait));
+
+  const result = await evaluate(
+    `(${probe.toString()})(null, ${JSON.stringify(o.gaps)}, ${JSON.stringify(o.box)}, ${o.overflow}, ${o.width})`);
+  ws.close(); kill();
+  return { url: o.url, width: o.width, ...result };
+}
+
+function table(r) {
+  const L = [];
+  L.push(`  ${r.url}  at ${r.width}px`);
+  L.push(`  ${r.visibleElements} visible elements, ${r.collapsedText} with collapsed text`);
+  if (r.gaps?.length) {
+    L.push("\n  gaps");
+    for (const g of r.gaps)
+      L.push(`    ${String(g.gap).padStart(4)}  ${g.from} -> ${g.to}`);
+  }
+  if (r.boxes?.length) {
+    L.push("\n  boxes");
+    for (const b of r.boxes)
+      L.push(`    ${b.sel}  ${b.width}x${b.height} at ${b.left},${b.top}  border ${b.border}  gap ${b.colGap}`);
+  }
+  if (r.overflow?.length) {
+    L.push(`\n  overflowing ${r.width}px`);
+    for (const o of r.overflow) L.push(`    ${o.sel} to ${o.right}`);
+  }
+  return L.join("\n");
+}
+
+(async () => {
+  const o = args(process.argv.slice(2));
+  if (o.help || !o.url) {
+    console.log(fs.readFileSync(__filename, "utf8").split("*/")[0].replace(/^\/\*\*?|^ \* ?/gm, ""));
+    process.exit(o.url ? 0 : 1);
+  }
+  if (!CHROME) { console.error("measure: no Chrome found"); process.exit(1); }
+  const r = await cdp(o);
+
+  if (o.compare) {
+    const was = JSON.parse(fs.readFileSync(o.compare, "utf8"));
+    const diffs = [];
+    const key = g => `${g.parent}|${g.from}|${g.to}`;
+    const before = new Map((was.gaps || []).map(g => [key(g), g.gap]));
+    for (const g of r.gaps || []) {
+      const b = before.get(key(g));
+      if (b !== undefined && b !== g.gap) diffs.push(`${g.from} -> ${g.to}: ${b} to ${g.gap}`);
+    }
+    const dEl = r.visibleElements - was.visibleElements;
+    const dCol = r.collapsedText - was.collapsedText;
+    console.log(o.json ? JSON.stringify({ diffs, dEl, dCol }, null, 1)
+      : `  elements ${dEl >= 0 ? "+" : ""}${dEl} | collapsed text ${dCol >= 0 ? "+" : ""}${dCol}\n` +
+        (diffs.length ? "  changed gaps\n" + diffs.map(d => "    " + d).join("\n")
+                      : "  no gap changed"));
+    process.exit(dCol > 0 ? 1 : 0);
+  }
+  console.log(o.json ? JSON.stringify(r, null, 1) : table(r));
+})().catch(e => { console.error("measure:", e.message); process.exit(1); });
