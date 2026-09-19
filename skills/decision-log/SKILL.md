@@ -58,6 +58,44 @@ then delete the row. The log records the change; the contract records the state.
 
 ---
 
+### Whose decision is it
+
+A project has more than one decider. The two layers treat that differently, and
+getting it wrong corrupts the more valuable one.
+
+**The state layer records every decision that binds the project, whoever made
+it, with the name attached.** A colleague's call on a build pipeline belongs in
+the log; leaving it out makes the log wrong. Add a "Decided by" column when a
+project has more than one decider, and never quietly reattribute.
+
+**The judgment layer takes only Marc's criteria.** It is a model of how *he*
+decides, used to pre-empt what he will want. Absorbing someone else's reasoning
+into it poisons exactly the thing it exists for: you would start proposing work
+shaped by a criterion he does not hold, and the file would confirm it.
+
+Four cases, because the middle two are easy to get wrong:
+
+| What happened | State log | Judgment |
+|---|---|---|
+| Marc decides | yes, his name | **yes** |
+| A colleague decides, Marc is not involved | yes, their name | no |
+| Marc relays a colleague's constraint and accepts it | yes, attributed to them, noted that Marc endorsed it | **no**, this is a constraint he accepted, not a criterion he holds |
+| Marc overrides a colleague | yes, both positions | **yes**, an override is his criterion in its clearest form |
+
+The third row is the trap. "Base every branch on current main, from Michael"
+reads like a rule Marc holds. It is a rule Marc agreed to. If it enters the
+judgment layer you will later defend it as though it were his, when he might
+drop it the day the constraint does.
+
+The fourth row is the most valuable entry type in the whole file. When he
+overrides someone, the reason he gives is a criterion stated under pressure,
+which is the least ambiguous form it ever takes.
+
+**When you cannot tell whose it was, ask, or leave it out of the judgment
+layer.** A missing entry costs nothing. A wrong one is believed.
+
+---
+
 ## Layer 2: judgment, portable
 
 `~/.claude/design-judgment.md` records how Marc decides, so the next proposal
