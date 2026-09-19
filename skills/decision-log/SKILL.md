@@ -110,7 +110,7 @@ When a colleague's decision blocks something of the designer's, that belongs in 
 with them as the owner, not in Settled. the designer reads Open first because it is the
 part he can push on.
 
-The third row is the trap. "Base every branch on current main, from Michael"
+The third row is the trap. "Base every branch on current main", relayed from a teammate,
 reads like a rule the designer holds. It is a rule the designer agreed to. If it enters the
 judgment layer you will later defend it as though it were his, when he might
 drop it the day the constraint does.
