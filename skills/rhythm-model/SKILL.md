@@ -64,7 +64,14 @@ Six roles sit on it. At default density:
 | A control's own space beneath it | 1/2 u | 12 |
 | A list row, top and bottom | 2/3 u | 16 |
 | Between blocks and sections | 1 u | 24 |
+| **Content to the action that acts on it** | **1 u** | **24** |
 | Header to first content, turn to turn | 4/3 u | 32 |
+
+**The action row is the one most often got wrong.** A button following a
+paragraph is not "inside a group". At 1/3 u it reads as the paragraph's last
+line; at a full unit it reads as a thing to do. An icon beside its label is
+tight because they are one object. A control that acts on content is a separate
+object and takes a full unit. This cost a real correction on a real screen.
 
 **Print and screen differ here, and the difference is principled.** The book puts
 whole blank lines between fields, because print holds a baseline grid and text
@@ -73,6 +80,30 @@ baseline alignment is rarely kept. So: **whole units between blocks, where the
 book's rule holds exactly, and fractions of a unit inside a group, where screen
 departs from print.** Note that the default table above does exactly this. One
 unit between blocks, thirds and halves within.
+
+## 3a. Bind by pushing out, never by pulling in
+
+When something must read as belonging to what it follows, **increase the
+distance to everything else.** Do not reduce the gap inside the pair.
+
+Both produce the differential. Only one of them respects the rule that tight
+reads as broken and loose reads as unfinished. A designer who has never asked
+for less space will not accept a grouping bought by taking space away, even when
+the ratio is correct.
+
+Worked example, from the correction that produced this section. A button sat
+evenly between the insight above it and the next block below.
+
+- Wrong fix: pull the button to 1/3 u from its text, leaving the next block at
+  1 u. The ratio is 3x and the screen is tighter than it was.
+- Right fix: leave the button at 1 u from its text and push the next block to
+  2 u. The ratio is 2x and nothing lost room.
+
+**Corollary: scale moves with content density, the ratio does not.** A sparse
+screen runs 1 u inside a block and 2 u between. A dense one runs 1/3 u and 1 u.
+Carry the ratio between screens, re-pick the scale.
+
+---
 
 ## 4. Density is an index shift, not a multiplier
 
@@ -134,6 +165,25 @@ strong, the third is weak but legal. A heading at 36 gives 2:3, at 48 gives 2:1.
 
 Prefer the smallest `N` and `M` you can get away with. A 4:3 relationship is
 technically aligned and visually invisible.
+
+## 5a. Put the air on the component, not the parent
+
+A Section Head owns the space beneath it. Express that as the head's own bottom
+padding, not as the parent container's gap.
+
+Three reasons, in order of how often they bite:
+
+- The space travels with the component to every screen, instead of being retyped
+  in each layout that uses it.
+- A parent that forgets to set a gap still renders correctly.
+- A component's spacing becomes reviewable in one place, so changing it is one
+  edit rather than a sweep.
+
+The parent's gap then expresses only what is genuinely a relationship *between*
+two things at that level. When a rendered gap is padding plus gap, say which is
+which when reporting it, or the numbers will not reconcile.
+
+---
 
 ## 6. Quantise last
 

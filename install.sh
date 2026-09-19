@@ -90,6 +90,10 @@ Installed.
 Skills and agents register when a session starts, so open a new session before
 using them.
 
+Re-run this after adding a skill. Repo installs link each skill directory
+individually, so a repo installed earlier will not see a new one until you
+re-run with the same --repo.
+
 On a new project, first session:
   1. /design-contract   writes the contract, or adopts the file already there
   2. /session-state     writes STATUS.md
