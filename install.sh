@@ -5,6 +5,7 @@
 #   ./install.sh --repo PATH  also symlink into one repo, ignored locally, never committed
 #   ./install.sh --copy --repo PATH   independent per-project copies instead of symlinks
 #   ./install.sh --dry-run    show what would happen, change nothing
+#   ./install.sh --judgment NAME   which judgment/<NAME>.md to install (default: marc)
 #
 # Safe to re-run. Existing files are backed up before being replaced, and the
 # CLAUDE.md section is appended only if it is not already there.
@@ -12,13 +13,14 @@
 set -euo pipefail
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DEST="$HOME/.claude"
-MODE="link"; REPO=""; DRY=0
+MODE="link"; REPO=""; DRY=0; JUDGMENT="marc"
 
 while [ $# -gt 0 ]; do
   case "$1" in
     --repo) REPO="${2:?--repo needs a path}"; shift 2 ;;
     --copy) MODE="copy"; shift ;;
     --dry-run) DRY=1; shift ;;
+    --judgment) JUDGMENT="${2:?--judgment needs a name}"; shift 2 ;;
     -h|--help) sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "unknown option: $1" >&2; exit 1 ;;
   esac
@@ -49,10 +51,14 @@ for f in "$SRC"/agents/*.md; do
 done
 
 # ── the judgment record: never overwrite, it accumulates ───────────────────
+SRC_J="$SRC/judgment/$JUDGMENT.md"
+[ -e "$SRC_J" ] || { echo "No judgment file: $SRC_J" >&2
+  echo "Available: $(ls "$SRC/judgment" | sed 's/\.md$//' | tr '\n' ' ')" >&2; exit 1; }
 if [ -e "$DEST/design-judgment.md" ]; then
   echo "  keeping existing design-judgment.md (it accumulates; not overwritten)"
 else
-  say "install design-judgment.md"; run "cp '$SRC/design-judgment.md' '$DEST/'"
+  say "install judgment/$JUDGMENT.md as design-judgment.md"
+  run "cp '$SRC_J' '$DEST/design-judgment.md'"
 fi
 
 # ── the enforcement section, appended once ─────────────────────────────────

@@ -1,17 +1,17 @@
 ---
 name: decision-log
-description: Record and read design decisions, open gaps and to-dos for a project, and capture what those decisions reveal about how Marc judges design. Use when a decision gets made or reversed, when Marc asks what is still open or what we decided, at the end of a working session, or when picking up a project after time away.
+description: Record and read design decisions, open gaps and to-dos for a project, and capture what those decisions reveal about how the designer judges design. Use when a decision gets made or reversed, when the designer asks what is still open or what we decided, at the end of a working session, or when picking up a project after time away.
 ---
 
 # Decision log
 
-Two layers, because Marc asked for two things: the state of the work, and the
+Two layers, because the designer asked for two things: the state of the work, and the
 judgment behind it.
 
 | Layer | Lives in | Scope | Answers |
 |---|---|---|---|
 | **State** | the project's contract file | one repo | What did we decide, what is still open, what is owed |
-| **Judgment** | `~/.claude/design-judgment.md` | every project | How Marc decides, so the next proposal is right first time |
+| **Judgment** | `~/.claude/design-judgment.md` | every project | How the designer decides, so the next proposal is right first time |
 
 Keep them apart. State goes stale and gets closed out. Judgment accumulates and
 gets sharper. Mixing them buries the durable thing inside the perishable one.
@@ -34,7 +34,7 @@ file.** If it only has "Open decisions", widen it to three parts.
 ### Open
 | Raised | Question | Blocked on | Owner |
 |---|---|---|---|
-| 2026-09-10 | Spotlight at 1, 3, 6, 12+ cards | Marc picking one of four proposals | Marc |
+| 2026-09-10 | Spotlight at 1, 3, 6, 12+ cards | the designer picking one of four proposals | the designer |
 
 ### Owed
 | Since | What | Why it is not done |
@@ -68,7 +68,7 @@ it, with the name attached.** A colleague's call on a build pipeline belongs in
 the log; leaving it out makes the log wrong. Add a "Decided by" column when a
 project has more than one decider, and never quietly reattribute.
 
-**The judgment layer takes only Marc's criteria.** It is a model of how *he*
+**The judgment layer takes only the designer's criteria.** It is a model of how *he*
 decides, used to pre-empt what he will want. Absorbing someone else's reasoning
 into it poisons exactly the thing it exists for: you would start proposing work
 shaped by a criterion he does not hold, and the file would confirm it.
@@ -77,10 +77,10 @@ Four cases, because the middle two are easy to get wrong:
 
 | What happened | State log | Judgment |
 |---|---|---|
-| Marc decides | yes, his name | **yes** |
-| A colleague decides, Marc is not involved | yes, their name | no |
-| Marc relays a colleague's constraint and accepts it | yes, attributed to them, noted that Marc endorsed it | **no**, this is a constraint he accepted, not a criterion he holds |
-| Marc overrides a colleague | yes, both positions | **yes**, an override is his criterion in its clearest form |
+| the designer decides | yes, his name | **yes** |
+| A colleague decides, the designer is not involved | yes, their name | no |
+| the designer relays a colleague's constraint and accepts it | yes, attributed to them, noted that the designer endorsed it | **no**, this is a constraint he accepted, not a criterion he holds |
+| the designer overrides a colleague | yes, both positions | **yes**, an override is his criterion in its clearest form |
 
 ### Other people's entries are read-only
 
@@ -90,7 +90,7 @@ entry still looks authoritative.
 
 - **Never change the wording of someone else's decision**, including tightening
   it, summarising it, or fixing what looks like an error. Their phrasing is the
-  record. If you think it is wrong, say so to Marc and leave the file alone.
+  record. If you think it is wrong, say so to the designer and leave the file alone.
 - **Never change a "Decided by".** Not to add yourself, not to generalise it to
   the team.
 - **Never delete or overwrite one because it was superseded.** Add a new row
@@ -106,12 +106,12 @@ log, and other people's are referenced into it with a pointer to wherever they
 actually live. The log then tells you everything that binds the project without
 claiming authorship of any of it.
 
-When a colleague's decision blocks something of Marc's, that belongs in **Open**
-with them as the owner, not in Settled. Marc reads Open first because it is the
+When a colleague's decision blocks something of the designer's, that belongs in **Open**
+with them as the owner, not in Settled. the designer reads Open first because it is the
 part he can push on.
 
 The third row is the trap. "Base every branch on current main, from Michael"
-reads like a rule Marc holds. It is a rule Marc agreed to. If it enters the
+reads like a rule the designer holds. It is a rule the designer agreed to. If it enters the
 judgment layer you will later defend it as though it were his, when he might
 drop it the day the constraint does.
 
@@ -126,7 +126,7 @@ layer.** A missing entry costs nothing. A wrong one is believed.
 
 ## Layer 2: judgment, portable
 
-`~/.claude/design-judgment.md` records how Marc decides, so the next proposal
+`~/.claude/design-judgment.md` records how the designer decides, so the next proposal
 lands right rather than getting corrected.
 
 **The test for an entry: would knowing this have changed what I did?** If the
@@ -152,21 +152,21 @@ Merge into an existing entry rather than adding a near-duplicate.
 
 `~/.claude/ai-design-vision.md` is for writing: thought pieces, talks,
 positioning. A thesis about design systems goes there. An executable rule about
-what Marc will want next goes in `design-judgment.md`. When something is both,
+what the designer will want next goes in `design-judgment.md`. When something is both,
 put the argument there and the rule here, and do not paste it into both.
 
 ---
 
 ## Reading the log
 
-When picking up a project after time away, or when Marc asks what is open, read
+When picking up a project after time away, or when the designer asks what is open, read
 the state layer and report:
 
 - What moved since the last entry
 - What is open and who it is waiting on
 - What is owed and why it is still owed
 
-Lead with anything **blocked on Marc**, because that is the only part he can
+Lead with anything **blocked on the designer**, because that is the only part he can
 clear.
 
 ## When to write

@@ -14,7 +14,7 @@ without the change existing in Figma, and never leave a Figma change unmirrored.
 A fix that exists in only one place is new drift, not a repair.
 
 **Never claim done, live, or shipped without running `ship-check`.** Name the
-artifact Marc is looking at, confirm it contains the change, and say plainly what
+artifact the designer is looking at, confirm it contains the change, and say plainly what
 was not exercised. This is the most repeated frustration in this working
 relationship and it is a verification failure every time, not a design failure.
 
@@ -38,14 +38,14 @@ gap between unrelated blocks is the failure mode even when the value is on scale
 Tool output, not conversation, is what fills a context window. Measured on one
 real session: 1,744 tool results totalling 29.5MB against 278KB of actual
 discussion. Tool output was 99% of everything, and single results ran past half
-a megabyte. None of it was the answer Marc wanted.
+a megabyte. None of it was the answer the designer wanted.
 
 **Delegate the sweep, keep the judgment.** Send work to a subagent when it will
 touch more than three files, more than two screens, or a whole Figma page.
 `token-auditor` and `figma-parity` exist for exactly this and are read-only.
 What comes back is the finding list, and that is what belongs in the thread.
 
-Do not delegate the decision that follows. Marc wants the judgment in the main
+Do not delegate the decision that follows. the designer wants the judgment in the main
 conversation where he can argue with it.
 
 **Read narrowly.** Never read a large file whole to find one rule: grep for the
@@ -58,4 +58,4 @@ not the data it derived them from. A scan of 6,000 declarations should emit
 twenty lines.
 
 **Say the number, not the list.** "862 raw values, mostly gap and height" beats
-862 lines. Marc asks for the list when he wants the list.
+862 lines. the designer asks for the list when he wants the list.

@@ -1,11 +1,11 @@
 ---
 name: rhythm-pass
-description: Tighten spacing, alignment and hierarchy across a project without redesigning it, and bind every value to a token. Use when Marc asks for a tuning pass, a spacing pass, a rhythm pass, or says things look squished, cramped, tight or loose.
+description: Tighten spacing, alignment and hierarchy across a project without redesigning it, and bind every value to a token. Use when the designer asks for a tuning pass, a spacing pass, a rhythm pass, or says things look squished, cramped, tight or loose.
 ---
 
 # Rhythm pass
 
-This is Marc's own brief, made permanent. He wrote it and pasted it by hand; it
+This is one real brief, made permanent. He wrote it and pasted it by hand; it
 does not need retyping again:
 
 > You are an expert product designer with a strong eye for spacing, rhythm,
@@ -31,7 +31,7 @@ change list rather than the per-node output.
 
 Read the values from the project contract (see below). What transfers between projects is
 the **spread**, roughly 3x between "inside a thought" and "between thoughts".
-In Marc's own system that is 8 inside a group against 24 between groups. The
+In one real system that is 8 inside a group against 24 between groups. The
 numbers 8/12/16/24/32 are incidental and happen to be the common ones.
 
 The rhythm that reads as rhythm is hierarchical, never uniform: tight inside a
@@ -59,7 +59,7 @@ with Carousel at 12, then stack the four resulting blocks at 24.
 
 ## The air belongs to the component
 
-Marc's fix for tight spacing is structural, not visual. A section title owns the
+the designer's fix for tight spacing is structural, not visual. A section title owns the
 space beneath it. A row owns its 16 above and below. Do not solve a gap by
 typing a margin onto one instance; solve it in the component, so every instance
 inherits it and the next screen is right before anyone looks at it.

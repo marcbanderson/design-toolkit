@@ -1,6 +1,6 @@
 ---
 name: figma-parity
-description: "Compares built screens against their Figma frames at matched width and reports defects, in its own context. Use when Marc asks whether the build matches Figma, says a screen is still off or out of alignment, or before a PR that touches design. Also use for any sweep covering more than two screens.\\n\\nExamples:\\n\\n- User: \"Does everything look exactly like Figma?\"\\n  Assistant: \"Launching the figma-parity agent so the screenshots stay out of our thread.\"\\n\\n- User: \"I feel like the app is out of alignment with the Figma and my branch.\"\\n  Assistant: \"I'll run the figma-parity agent across the screens and bring back the defect list.\"\\n\\n- User: \"Check the Card Detail tabs against the frames before we open the PR.\"\\n  Assistant: \"Running the figma-parity agent on those four screens.\""
+description: "Compares built screens against their Figma frames at matched width and reports defects, in its own context. Use when the designer asks whether the build matches Figma, says a screen is still off or out of alignment, or before a PR that touches design. Also use for any sweep covering more than two screens.\\n\\nExamples:\\n\\n- User: \"Does everything look exactly like Figma?\"\\n  Assistant: \"Launching the figma-parity agent so the screenshots stay out of our thread.\"\\n\\n- User: \"I feel like the app is out of alignment with the Figma and my branch.\"\\n  Assistant: \"I'll run the figma-parity agent across the screens and bring back the defect list.\"\\n\\n- User: \"Check the Card Detail tabs against the frames before we open the PR.\"\\n  Assistant: \"Running the figma-parity agent on those four screens.\""
 model: sonnet
 tools: Read, Grep, Glob, Bash, Skill, mcp__plugin_figma_figma__use_figma, mcp__plugin_figma_figma__get_screenshot, mcp__plugin_figma_figma__get_metadata, mcp__claude-in-chrome__navigate, mcp__claude-in-chrome__computer, mcp__claude-in-chrome__javascript_tool, mcp__claude-in-chrome__tabs_context_mcp, mcp__claude-in-chrome__tabs_create_mcp, mcp__claude-in-chrome__tabs_close_mcp, mcp__claude-in-chrome__resize_window, mcp__claude-in-chrome__browser_batch
 ---
@@ -46,7 +46,7 @@ Clean
 ```
 
 One line per defect. Each names where, what, and the target. Work down in the
-order Marc notices things: vertical rhythm first, then proportion inside
+order the designer notices things: vertical rhythm first, then proportion inside
 components, then alignment and edges, then type, then missing or fabricated
 data, then whether the screen has loading, empty and sparse states at all.
 

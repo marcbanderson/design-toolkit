@@ -1,17 +1,17 @@
 ---
 name: token-audit
-description: Find every value that should be bound to a token but is not, in code, in Figma, or both, and check that the two sides agree. Use when Marc asks whether everything is tokenized, asks for a variable or styles audit, says values should be tokens, or before adopting a design system into a new codebase.
+description: Find every value that should be bound to a token but is not, in code, in Figma, or both, and check that the two sides agree. Use when the designer asks whether everything is tokenized, asks for a variable or styles audit, says values should be tokens, or before adopting a design system into a new codebase.
 ---
 
 # Token audit
 
-Three phases. Run all three by default. Run one when Marc names it.
+Three phases. Run all three by default. Run one when the designer names it.
 
 1. **Code.** Raw values in a styling position.
 2. **Figma.** Unbound fills, strokes, text, effects, spacing and radius.
 3. **Reconcile.** Do the two token sets actually describe the same system?
 
-Phase 3 is the point. Marc's standard, stated 2026-08-06:
+Phase 3 is the point. The standard this phase serves:
 
 > "Do you have a full understanding of the design system tokens as well as the
 > design system as it is expressed and tokenized within Figma? The two of those
@@ -24,7 +24,7 @@ Run in a subagent. The scan output is large and only the findings matter.
 ## Two failures that make this skill worse than useless
 
 Read these before writing any detector. Both were hit while validating this
-skill, on Marc's own project.
+skill, on a real project.
 
 **1. A detector that silently finds nothing.** A first pass over his stylesheet
 reported **0** raw values. The real number was **862**. The regex used `\b`,
@@ -39,7 +39,7 @@ denominator is not a report.
 
 **2. An audit that cries wolf.** The first Figma pass returned 81 off-scale
 spacing values. Every single one was inside a vendored Apple iOS tab bar
-component. Marc's authored components had **zero**. Had that shipped as "81
+component. the authored components had **zero**. Had that shipped as "81
 defects", the real signal would have been invisible and the audit would have
 been ignored once and never run again.
 
@@ -118,7 +118,7 @@ rather than trusting the file names:
 | SwiftUI / Compose | `Spacing.md`, `Color("Ink")` | modifier arguments and literal `Color(...)` |
 | React Native | `tokens.space.md` | `StyleSheet.create` objects and inline `style={{...}}` |
 
-A repo may hold two layers at once, and one of Marc's does: a generated layer
+A repo may hold two layers at once, and one of one does: a generated layer
 mirroring Figma one for one, and an alias layer that components consume. Both are legitimate, and the
 rule differs by layer: the generated layer **holds** literals by design, the
 alias layer must only ever alias, and components must consume the alias and
@@ -144,7 +144,7 @@ Everything else is reportable. **Component sizes are reportable.** A `height:
 
 ### Near misses are the most valuable finding
 
-Marc's instruction, 2026-08-07:
+A designer's instruction, worth generalising:
 
 > "If something is a gap of 10, it should probably be the token for 12, and if
 > it's a value of 9, it should be the token for 8."
@@ -153,7 +153,7 @@ For every raw value, snap to the nearest scale step and report both. A value one
 or two off the scale is not a rounding error, it is a signal that someone
 bypassed the system, and it is usually a real visual defect too.
 
-**Four rules keep snapping honest.** A trial run on Marc's own stylesheet broke
+**Four rules keep snapping honest.** A trial run on a real stylesheet broke
 all four and produced nonsense like `-200px -> 0` and `100px -> 32`, which is
 how a report loses a reader's trust in one line.
 
@@ -224,7 +224,7 @@ and the code token set, normalise the names, and compare:
 - **Same value, different name.** Two names for one decision, which will drift
   the moment one of them changes.
 
-Report these as pairs with both values side by side. This is the section Marc
+Report these as pairs with both values side by side. This is the section the designer
 will read first.
 
 ### A number in code that Figma derives is not a missing token
@@ -235,7 +235,7 @@ correct; it is the wrong kind of value.
 
 Figma auto-layout frames that HUG have no chosen height. The height is content
 plus padding. When the code pins that height instead, three things follow, and
-all three were found on Marc's chips in one pass:
+all three were found on one real component set in one pass:
 
 - The pin restates a token. `height: 18px` on a chip whose line-height token is
   already 18 is a literal copy of a token, and it will not follow if the token

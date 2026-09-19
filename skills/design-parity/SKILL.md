@@ -1,17 +1,17 @@
 ---
 name: design-parity
-description: Check a built screen against its Figma frame by putting them side by side at the same width and looking. Use when Marc asks whether the build matches Figma, says a screen is "still off" or "out of alignment", or before opening a PR that touches design. Reports defects, never a score.
+description: Check a built screen against its Figma frame by putting them side by side at the same width and looking. Use when the designer asks whether the build matches Figma, says a screen is "still off" or "out of alignment", or before opening a PR that touches design. Reports defects, never a score.
 ---
 
 # Design parity
 
 Run this in a subagent whenever the sweep covers more than two screens. The
-per-screen tool output is large and Marc does not need it in the main thread.
+per-screen tool output is large and the designer does not need it in the main thread.
 Return the defect list only.
 
 ## The rule this exists to enforce
 
-**Never report a percentage as an answer to a visual question.** Marc was handed
+**Never report a percentage as an answer to a visual question.** the designer was handed
 a parity sweep reporting per-tier percentages and asked instead: *"Does
 everything look exactly like Figma?"* He was right, and it was measurable: a
 sweep across 14 properties and 1141 units reported the sportscard components
@@ -41,7 +41,7 @@ If nothing exists, load the `design-contract` skill and write one.
 
 **1. Match the width before you compare anything.**
 
-Marc's own correction: *"Can you just make the Playground 393? Why so you get a
+A correction worth remembering: *"Can you just make the Playground 393? Why so you get a
 one-to-one comparison?"* A comparison at two different widths is not a
 comparison. Render the build at the Figma frame's exact width. If the frame is
 393, the viewport is 393.
@@ -58,7 +58,7 @@ comparison. Render the build at the Figma frame's exact width. If the frame is
 
 **3. Look at them side by side, and name what is wrong.**
 
-Work down in this order, because this is the order Marc notices things:
+Work down in this order, because this is the order a designer notices things:
 
 - **Vertical rhythm.** He reads tight spacing as a defect before anything else.
   Check the gaps against the contract's ladder. A pair that should be grouped
@@ -93,7 +93,7 @@ Wantlist / Wants      Chart legend sits 24 from its chart. It reads the chart,
 ```
 
 No score. No percentage. If you found nothing, say you found nothing and name
-what you looked at, so Marc knows the coverage of the claim.
+what you looked at, so the designer knows the coverage of the claim.
 
 ## What counts as done
 

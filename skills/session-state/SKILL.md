@@ -1,11 +1,11 @@
 ---
 name: session-state
-description: Read or write the project's STATUS.md, the file that records where work stands right now. Use at the start of a session to pick up where things left off, when Marc asks where we are or to catch him up, and at the end of a working session or whenever position changes.
+description: Read or write the project's STATUS.md, the file that records where work stands right now. Use at the start of a session to pick up where things left off, when the designer asks where we are or to catch him up, and at the end of a working session or whenever position changes.
 ---
 
 # Session state
 
-Marc's goal, in his words: **restart the session and lose nothing in terms of
+The goal: **restart the session and lose nothing in terms of
 context and understanding.**
 
 That fails today because every file in a project records what is *true* and none
@@ -22,13 +22,13 @@ This is why it is a separate file rather than a section in the contract.
 | Changes | File | Holds |
 |---|---|---|
 | Never | `~/.claude/CLAUDE.md` | the rules that bind every session |
-| Rarely | `~/.claude/design-judgment.md` | how Marc decides |
+| Rarely | `~/.claude/design-judgment.md` | how the designer decides |
 | Occasionally | the project contract | what is true in this project |
 | Every session | `STATUS.md` | where we are right now |
 
 **A fast-changing fact inside a slow-changing document makes the whole document
 look stale, and then none of it is trusted.** That is exactly what happened to
-the "Open decisions" list in Marc's own contract: it was written once, went out
+the "Open decisions" list in one real contract: it was written once, went out
 of date, and stopped being read. Keep the clocks apart.
 
 Corollary: if something in `STATUS.md` stops changing, it has graduated. Move it
@@ -38,7 +38,7 @@ starts changing every session, it was never a rule. Move it here.
 ## Reading it
 
 First action in a session on a project that has one, before any other file.
-Then tell Marc, in three lines or fewer:
+Then tell the designer, in three lines or fewer:
 
 - Where we are, and anything that changed since it was written (check the branch
   and the PR state yourself; do not trust the file for facts a command can
@@ -73,7 +73,7 @@ is never rediscovered as news.
 
 - Decisions and their reasoning. Those belong in the contract's decision log,
   via the `decision-log` skill. This file says where we are, not what we chose.
-- How Marc judges design. That is `~/.claude/design-judgment.md`.
+- How the designer judges design. That is `~/.claude/design-judgment.md`.
 - Anything a command can answer more reliably. Do not write a commit SHA that
   `git log` will tell you. Write the ones that carry meaning, like a stack of
   local commits that need rebasing, and verify them on read.

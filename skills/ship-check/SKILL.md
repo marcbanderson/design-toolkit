@@ -1,13 +1,13 @@
 ---
 name: ship-check
-description: Verify that what Marc is looking at is actually the work that was done, before claiming anything shipped. Use before saying a change is live or done, when Marc says he is still seeing the old version, or when he asks whether a deployed site matches his branch.
+description: Verify that what the designer is looking at is actually the work that was done, before claiming anything shipped. Use before saying a change is live or done, when the designer says he is still seeing the old version, or when he asks whether a deployed site matches his branch.
 ---
 
 # Ship check
 
 The most repeated frustration in this working relationship is not a design
 failure. It is a **verification failure**: the work was described as done while
-Marc was looking at something that did not contain it.
+the designer was looking at something that did not contain it.
 
 > "You say you are making these changes but they are not appearing in playground"
 >
@@ -24,7 +24,7 @@ before any claim that something is done, live, fixed or shipped.
 
 ## The four questions
 
-**1. Which artifact is Marc looking at?**
+**1. Which artifact is the designer looking at?**
 
 Name it explicitly, by URL or port. There are usually several in play at once:
 a local server, a static preview, a deployed staging site, production, and a
@@ -73,6 +73,6 @@ unexercised. One click on staging would close it.
 ## The standing rule
 
 Never say done, live, or shipped without having checked. If you cannot check,
-say what you could not check and why. Marc would far rather have an honest gap
+say what you could not check and why. a designer would far rather have an honest gap
 named than discover it himself in a screenshot, because discovering it himself
 costs him a round trip and costs the claim its credibility.
