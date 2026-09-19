@@ -82,6 +82,34 @@ Four cases, because the middle two are easy to get wrong:
 | Marc relays a colleague's constraint and accepts it | yes, attributed to them, noted that Marc endorsed it | **no**, this is a constraint he accepted, not a criterion he holds |
 | Marc overrides a colleague | yes, both positions | **yes**, an override is his criterion in its clearest form |
 
+### Other people's entries are read-only
+
+Track them, never touch them. Recording a colleague's decision is required;
+editing one is not yours to do, and the damage is quiet because a rewritten
+entry still looks authoritative.
+
+- **Never change the wording of someone else's decision**, including tightening
+  it, summarising it, or fixing what looks like an error. Their phrasing is the
+  record. If you think it is wrong, say so to Marc and leave the file alone.
+- **Never change a "Decided by".** Not to add yourself, not to generalise it to
+  the team.
+- **Never delete or overwrite one because it was superseded.** Add a new row
+  that says what changed and when, and leave theirs standing. The pair is the
+  useful artefact; the survivor alone is not.
+- **Do not copy a decision that already lives somewhere else.** If a colleague's
+  call is written up in a shared doc, reference that doc. A copy is a second
+  source, and two sources drift. This is the same rule as never creating a rival
+  contract file.
+
+The practical shape in a shared repo: your own decisions are written into the
+log, and other people's are referenced into it with a pointer to wherever they
+actually live. The log then tells you everything that binds the project without
+claiming authorship of any of it.
+
+When a colleague's decision blocks something of Marc's, that belongs in **Open**
+with them as the owner, not in Settled. Marc reads Open first because it is the
+part he can push on.
+
 The third row is the trap. "Base every branch on current main, from Michael"
 reads like a rule Marc holds. It is a rule Marc agreed to. If it enters the
 judgment layer you will later defend it as though it were his, when he might
