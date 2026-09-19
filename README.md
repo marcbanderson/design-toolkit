@@ -7,32 +7,68 @@ It exists because a designer's standards get hand-carried into every session as
 pasted prompts, and a pasted prompt is a literal. This makes them tokens:
 written once, applied everywhere, improved in one place.
 
-## Use it in a project
+## Install
+
+First time on a machine:
 
 ```bash
-git -C ~/design-toolkit pull        # get the latest
-~/design-toolkit/install.sh         # into ~/.claude, every project on this machine
+git clone https://github.com/marcbanderson/design-toolkit.git ~/design-toolkit
+~/design-toolkit/install.sh
 ```
 
-That is usually all you need: `~/.claude` is personal scope, so the skills are
-live in every repo. Install into a specific repo only when you want repo-local
-copies or a machine that cannot see your home directory:
+That is usually all you need. `~/.claude` is personal scope, so the skills are
+live in every repo on the machine. Install into a specific repo only when you
+want repo-local copies, or when a session runs somewhere that cannot see your
+home directory:
 
 ```bash
 ./install.sh --repo /path/to/repo          # symlinks, local only, never committed
 ./install.sh --copy --repo /path/to/repo   # independent copies you can diverge
-./install.sh --dry-run                     # show what would happen
+./install.sh --judgment TEMPLATE           # install without the personal judgment file
+./install.sh --dry-run                     # show what would happen, change nothing
 ```
 
 Repo installs register the path in `.git/info/exclude`, which is per-clone and
 never pushed. Your team sees nothing.
 
-**Re-run after adding a skill.** Repo installs link each skill directory
-individually, so a repo installed earlier will not see a new one until you
-re-run with the same `--repo`.
+## Pulling updates
 
-Skills and agents register when a session **starts**, so open a new session
-after installing.
+The toolkit changes as it learns. To take the latest:
+
+```bash
+git -C ~/design-toolkit pull
+~/design-toolkit/install.sh
+```
+
+Then **open a new session**. Skills and agents register when a session starts,
+so a running session will not see the update.
+
+Three things worth knowing about how updates propagate:
+
+- **A default install copies.** `~/.claude/skills/` holds copies, so pulling
+  alone changes nothing until you re-run `install.sh`.
+- **A repo install symlinks.** A repo installed with `--repo` points at
+  `~/.claude/skills/`, so once you re-run the installer, every linked repo sees
+  the edit at the same time. `--copy` installs do not; they are deliberately
+  frozen until you re-run with `--copy` again.
+- **New skills need the installer re-run per repo.** Repo installs link each
+  skill directory individually, so a repo set up earlier will not see a skill
+  added later until you re-run with the same `--repo`. Edits to existing skills
+  propagate on their own; only new ones need this.
+
+Re-running is always safe. It backs up anything it would replace and never
+overwrites `design-judgment.md`, because that file accumulates and is the one
+part worth more than everything around it.
+
+## Contributing back
+
+The judgment file and the skills both sharpen through use. When a session
+records a new criterion or fixes a method, commit it here and push, so the next
+project starts from what the last one learned:
+
+```bash
+cd ~/design-toolkit && git add -A && git commit -m "..." && git push
+```
 
 ## Layout
 
