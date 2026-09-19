@@ -48,6 +48,46 @@ component is not yours to tokenize. Report it as a separate, quieter line.
 
 ---
 
+## Never regex the whole stylesheet
+
+Three separate passes over one real stylesheet caused damage, each a
+different bug, each nearly shipped: a brace scanner that destroyed every
+selector inside a media query, a trim that chopped comments at their commas,
+and a stash-and-restore that reinserted dead markers because nested
+placeholders were restored in forward order.
+
+**Work line by line.** Mark the token-definition blocks by line number and skip
+them. Split each remaining line on its comments and only touch the code
+segments. Change a value only when its property is one you are targeting.
+
+Then prove the file survived, every time, before looking at anything else:
+
+- braces balance
+- `/*` count equals `*/` count
+- a known class still exists
+- no placeholder characters left behind
+- byte count moved by roughly what you expected
+
+A stylesheet that parses is not a stylesheet that is intact.
+
+---
+
+## The rhythm test, which the spacing test cannot see
+
+If the project uses the `rhythm-model`, audit against **fractions of the body
+line**, not only against the spacing scale. They are different questions:
+
+- A value can be off the spacing scale and still be a clean fraction. It is not
+  drift; the scale is short a step.
+- A value can be on the spacing scale and not be a clean fraction. It was never
+  justified, and no spacing audit will ever flag it.
+
+Report both tests. On one real system the fraction test found 29 gaps at 4 and
+19 at 6 doing a single job, which the spacing test could not see because both
+values were legal.
+
+---
+
 ## Phase 1: code
 
 ### Does this work across codebases? Only if you discover the dialect first.
