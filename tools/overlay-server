@@ -15,9 +15,14 @@
  *   <script src="http://localhost:8766/overlay.js"></script>
  *
  * The script loads its manifest from this server, so the pickers hold the
- * contract's ladder and ramp, and Send to session posts the export here. Each
- * export is written to .toolkit/inbox/ as a markdown file the session applies
- * and then moves to .toolkit/applied/. No npm dependencies.
+ * contract's ladder and ramp. A change whose winning declaration sits in a
+ * stylesheet this server can find on disk is applied here, deterministically:
+ * POST /locate maps the sheet URL to a file and the rule to a line, POST /apply
+ * rewrites that declaration to the token binding (or inserts a longhand after
+ * a shorthand), runs guard on the file and returns the before and after lines.
+ * What cannot be located goes to the session: POST /export writes the prompt
+ * to .toolkit/inbox/ as a markdown file the session applies and then moves to
+ * .toolkit/applied/. No npm dependencies.
  */
 const http = require("http");
 const fs = require("fs");
@@ -70,8 +75,54 @@ function manifest() {
   return cache;
 }
 
+// ---------- locating a declaration on disk ----------
+const SKIP_DIRS = new Set(["node_modules", ".git", "dist", "build", ".next", ".toolkit", "coverage"]);
+function fileForHref(href) {
+  let pathname; try { pathname = decodeURIComponent(new URL(href).pathname); } catch (e) { return null; }
+  if (pathname.endsWith("/")) pathname += "index.html";
+  const rel = pathname.replace(/^\/+/, "");
+  const tries = [rel, path.join("public", rel), path.join("src", rel), path.join("app", rel), path.join("static", rel)];
+  for (const t of tries) { const f = path.join(opt.root, t); if (fs.existsSync(f) && fs.statSync(f).isFile()) return f; }
+  // last resort: a unique file with that basename anywhere in the project
+  const base = path.basename(rel); const hits = [];
+  (function walk(dir, depth) {
+    if (depth > 6 || hits.length > 2) return;
+    let ents; try { ents = fs.readdirSync(dir, { withFileTypes: true }); } catch (e) { return; }
+    for (const e of ents) { if (e.isDirectory()) { if (!SKIP_DIRS.has(e.name) && !e.name.startsWith(".")) walk(path.join(dir, e.name), depth + 1); } else if (e.name === base) hits.push(path.join(dir, e.name)); }
+  })(opt.root, 0);
+  return hits.length === 1 ? hits[0] : null;
+}
+function selectorRegex(sel) {
+  // CSSOM normalises selector text; match the authored form with loose whitespace
+  const esc = sel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s*([>+~,])\s*/g, "\\s*$1\\s*").replace(/\s+/g, "\\s+");
+  return new RegExp("(^|[}\\s;])(" + esc + ")\\s*\\{", "g");
+}
+function locateIn(text, selector, prop, value) {
+  const re = selectorRegex(selector); let m;
+  while ((m = re.exec(text))) {
+    const open = m.index + m[0].length; const close = text.indexOf("}", open); if (close < 0) break;
+    const block = text.slice(open, close);
+    const dre = new RegExp("(^|[;{\\s])(" + prop.replace(/-/g, "\\-") + ")\\s*:\\s*([^;}]*?)(\\s*!important)?\\s*(;|$)", "m");
+    const d = dre.exec(block);
+    if (!d) continue;
+    const authored = d[3].trim();
+    if (norm(authored) !== norm(value)) continue;
+    const abs = open + d.index + d[1].length;
+    const lineStart = text.lastIndexOf("\n", abs) + 1; const lineEnd = text.indexOf("\n", abs);
+    return { start: abs, end: abs + d[0].length - d[1].length - (d[5] ? d[5].length : 0), valueStart: abs + d[2].length + (d[0].slice(d[1].length).indexOf(d[3])), value: d[3], important: !!d[4], line: text.slice(0, abs).split("\n").length, lineText: text.slice(lineStart, lineEnd < 0 ? text.length : lineEnd), indent: (text.slice(lineStart, abs).match(/^\s*/) || [""])[0] };
+  }
+  return null;
+}
+function norm(v) { return v.replace(/\s+/g, " ").replace(/\s*,\s*/g, ",").trim().toLowerCase(); }
+function readBody(req) { return new Promise((resolve, reject) => { let data = ""; req.on("data", c => { data += c; if (data.length > 2e6) req.destroy(); }); req.on("end", () => { try { resolve(JSON.parse(data)); } catch (e) { reject(e); } }); }); }
+function guardCheck(file) {
+  const g = path.join(HERE, "guard"); if (!fs.existsSync(g)) return { ran: false };
+  try { execFileSync(g, ["check", file, "--json"], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }); return { ran: true, ok: true }; }
+  catch (e) { return { ran: true, ok: false, out: String(e.stdout || e.stderr || "").trim().slice(0, 400) }; }
+}
+
 function send(res, code, type, body, extra) {
-  res.writeHead(code, Object.assign({ "Content-Type": type, "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "Content-Type", "Access-Control-Allow-Methods": "GET, POST, OPTIONS", "Cache-Control": "no-store" }, extra || {}));
+  res.writeHead(code, Object.assign({ "Content-Type": type, "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "Content-Type", "Access-Control-Allow-Methods": "GET, POST, OPTIONS", "Access-Control-Expose-Headers": "X-Toolkit-Overlay-Server", "X-Toolkit-Overlay-Server": "1", "Cache-Control": "no-store" }, extra || {}));
   res.end(body);
 }
 function stamp() { return new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19); }
@@ -84,6 +135,44 @@ const server = http.createServer((req, res) => {
   if (url.pathname === "/manifest.js") return send(res, 200, "application/javascript", "window.__designTokens = " + manifest().body + ";");
   if (url.pathname === "/include") return send(res, 200, "text/plain", `<script src="http://localhost:${opt.port}/overlay.js"></script>\n`);
   if (url.pathname === "/inbox") return send(res, 200, "application/json", JSON.stringify(fs.readdirSync(INBOX).sort()));
+  if (url.pathname === "/locate" && req.method === "POST") {
+    readBody(req).then(b => {
+      const file = fileForHref(b.href); if (!file) return send(res, 200, "application/json", JSON.stringify({ error: "no file for " + new URL(b.href).pathname }));
+      const text = fs.readFileSync(file, "utf8"); const loc = locateIn(text, b.selector, b.prop, b.value);
+      if (!loc) return send(res, 200, "application/json", JSON.stringify({ error: `rule not found in ${path.relative(opt.root, file)}` }));
+      send(res, 200, "application/json", JSON.stringify({ file: path.relative(opt.root, file), line: loc.line, text: loc.lineText.trim() }));
+    }).catch(() => send(res, 400, "application/json", JSON.stringify({ error: "bad json" })));
+    return;
+  }
+  if (url.pathname === "/apply" && req.method === "POST") {
+    readBody(req).then(b => {
+      const file = fileForHref(b.href); if (!file) return send(res, 200, "application/json", JSON.stringify({ error: "no file for " + new URL(b.href).pathname }));
+      const text = fs.readFileSync(file, "utf8"); const loc = locateIn(text, b.selector, b.prop, b.value);
+      if (!loc) return send(res, 200, "application/json", JSON.stringify({ error: `rule not found in ${path.relative(opt.root, file)}` }));
+      let out, before = loc.lineText, after, line = loc.line;
+      if (b.shorthand && b.longhand && b.longhand !== b.prop) {
+        // keep the shorthand, add the longhand right after it so the cascade takes the new value
+        const declEnd = text.indexOf(";", loc.start); const insertAt = declEnd < 0 ? loc.end : declEnd + 1;
+        const closeBrace = text.indexOf("}", insertAt);
+        const oneLine = closeBrace > -1 && !text.slice(insertAt, closeBrace).includes("\n");
+        const ins = oneLine ? ` ${b.longhand}: ${b.newValue};` : `\n${loc.indent}${b.longhand}: ${b.newValue};`;
+        out = text.slice(0, insertAt) + ins + text.slice(insertAt);
+        after = oneLine ? text.slice(text.lastIndexOf("\n", insertAt) + 1, insertAt) + ins + text.slice(insertAt, text.indexOf("\n", insertAt) < 0 ? undefined : text.indexOf("\n", insertAt)) : `${loc.indent}${b.longhand}: ${b.newValue};`;
+        line = oneLine ? loc.line : loc.line + 1;
+      } else {
+        const vs = loc.valueStart;
+        out = text.slice(0, vs) + b.newValue + text.slice(vs + loc.value.length);
+        after = before.replace(loc.value, b.newValue);
+      }
+      const bak = path.join(opt.root, ".toolkit", "backup"); fs.mkdirSync(bak, { recursive: true });
+      fs.writeFileSync(path.join(bak, stamp() + "-" + path.basename(file)), text);
+      fs.writeFileSync(file, out);
+      const guard = guardCheck(file);
+      console.log(`apply   ${path.relative(opt.root, file)}:${line}  ${b.longhand || b.prop}: ${b.value} -> ${b.newValue}${guard.ran && !guard.ok ? "  GUARD FAILED" : ""}`);
+      send(res, 200, "application/json", JSON.stringify({ file: path.relative(opt.root, file), line, before, after, guard }));
+    }).catch(() => send(res, 400, "application/json", JSON.stringify({ error: "bad json" })));
+    return;
+  }
   if (url.pathname === "/export" && req.method === "POST") {
     let data = "";
     req.on("data", c => { data += c; if (data.length > 2e6) req.destroy(); });
@@ -109,7 +198,7 @@ const server = http.createServer((req, res) => {
     });
     return;
   }
-  if (url.pathname === "/") return send(res, 200, "text/plain", `overlay-server\n  GET /overlay.js  GET /tokens.json  GET /manifest.js  GET /include  GET /inbox  POST /export\n`);
+  if (url.pathname === "/") return send(res, 200, "text/plain", `overlay-server\n  GET /overlay.js  GET /tokens.json  GET /manifest.js  GET /include  GET /inbox  POST /locate  POST /apply  POST /export\n`);
   send(res, 404, "text/plain", "not found");
 });
 

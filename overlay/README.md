@@ -19,11 +19,25 @@ and prints the include line. Put that line in the dev build only:
 ```
 
 That is the whole integration. The script fetches the contract's ladder and
-ramp from the server, the panel header says "session connected", and Export
-gains a Send to session button. Each send lands in `.toolkit/inbox/` as a
-markdown file; the session applies it, verifies with measure, mirrors to Figma,
-records the decisions and moves the file to `.toolkit/applied/`. The server
-adds `.toolkit/` to the repo's local git exclude so none of it is committed.
+ramp from the server and the panel header says "connected". Each change you
+make then lands one of three ways, and the Changes list says which:
+
+| Tier | When | What happens |
+| --- | --- | --- |
+| 1 | The winning declaration is in a stylesheet the server can find on disk | `Apply to source` rewrites that line to the token binding (or adds a longhand after a shorthand), reloads the sheet, drops the preview override and checks the rendered value against the target. Guard runs on the file. A backup goes to `.toolkit/backup/`. No model involved. |
+| 2 | Same, but the rule is shared by other elements | One question, `Apply to all N`, then tier 1. |
+| 3 | Inline style, cross-origin sheet, CSS-in-JS, text styles, or the rule cannot be found | The change goes into the prompt for the session. |
+
+Export writes the prompt: what was applied (for the Figma mirror and the
+decision log), what is still to apply, and the decisions all of it codifies.
+Send to session lands it in `.toolkit/inbox/` as a markdown file; the session
+applies what is left, verifies with measure, mirrors to Figma, records the
+decisions and moves the file to `.toolkit/applied/`. The server adds
+`.toolkit/` to the repo's local git exclude so none of it is committed.
+
+Plain CSS and custom properties are nearly all tier 1. Utility classes such as
+Tailwind and CSS-in-JS are tier 3 today; the class-swap path is the next thing
+to build.
 
 `Alt+Shift+D` hides and shows the panel. `Escape` clears the selection.
 
@@ -48,7 +62,7 @@ a paragraph off the ramp, so every judgment lint fires.
 
 ## What it does not do yet
 
-- Map an element to its source rule. The prompt carries the component name, a
-  short selector path and the text, and the session does the mapping.
+- Swap utility classes or edit CSS-in-JS. Those changes go to the session with
+  the component name, a short selector path and the text.
 - Know the Figma frame. The prompt asks for the mirror and says not to skip it
   silently.

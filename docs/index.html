@@ -154,8 +154,8 @@ td code { font-size: 14px; }
       <li><b>9</b> skills</li>
       <li><b>2</b> agents</li>
       <li><b>4</b> executables</li>
-      <li><b>14</b> commits</li>
-      <li>last commit <b>2026-09-21</b> 6760bce  token-audit learns the shadowed alias; judgment learns to measure the pair</li>
+      <li><b>15</b> commits</li>
+      <li>last commit <b>2026-09-22</b> 085d6c5  Add the overlay: on-screen token-only editing, wired into the toolkit</li>
       <li>built 2026-09-22</li>
     </ul>
   </header>
@@ -2919,15 +2919,16 @@ if __name__ == &quot;__main__&quot;:
 <article class="entry" id="tool-overlay-server">
   <header class="entry-head">
     <h3>overlay-server<span class="badge">executable</span></h3>
-    <p class="tagline">Serves the overlay to a dev build and receives its exports</p>
+    <p class="tagline">Serves the overlay to a dev build, applies its changes to source, receives what it cannot</p>
   </header>
-  <p class="does">A dependency-free local server run from the project root. It reads the contract through tokens-manifest, serves overlay.js and the manifest, and prints the one include line for the dev build. Send to session in the overlay posts here, and each export is written to .toolkit/inbox/ as a markdown file for the session to apply; the server adds .toolkit/ to the repo&#x27;s local git exclude so nothing is committed.</p>
+  <p class="does">A dependency-free local server run from the project root. It reads the contract through tokens-manifest, serves overlay.js and the manifest, and prints the one include line for the dev build. A change whose winning declaration sits in a stylesheet it can find on disk is applied here deterministically: locate maps the sheet URL to a file and the rule to a line, apply rewrites that declaration to the token binding or inserts a longhand after a shorthand, runs guard, keeps a backup, and the overlay checks the render against the target. What cannot be located is sent as a prompt to .toolkit/inbox/ for the session.</p>
   <pre class="usage"><code>overlay-server [--port 8766] [--root DIR]
 --manifest FILE  serve this manifest instead of reading the contract
 --css FILE       passed to tokens-manifest
-GET /overlay.js  GET /tokens.json  GET /include  POST /export</code></pre>
-  <dl class="kv"><div><dt>Exists because</dt><dd>The paste step between changing something on screen and the session applying it.</dd></div><div><dt>Checks</dt><dd><ul class='plain'><li>/overlay.js, the script</li><li>/tokens.json, the contract&#x27;s tokens</li><li>/include, the line for the dev build</li><li>/export, writes .toolkit/inbox/&lt;stamp&gt;-overlay.md</li></ul></dd></div></dl>
-  <details class="src"><summary>Read tools/overlay-server<span class="len">125 lines</span></summary><pre><code>#!/usr/bin/env node
+GET /overlay.js  GET /tokens.json  GET /include
+POST /locate  POST /apply  POST /export</code></pre>
+  <dl class="kv"><div><dt>Exists because</dt><dd>The paste step between changing something on screen and the session applying it.</dd></div><div><dt>Checks</dt><dd><ul class='plain'><li>/locate, sheet URL to file, rule to line</li><li>/apply, rewrite the declaration, guard the file, back it up</li><li>/export, writes .toolkit/inbox/&lt;stamp&gt;-overlay.md</li><li>/tokens.json, the contract tokens for the pickers</li></ul></dd></div></dl>
+  <details class="src"><summary>Read tools/overlay-server<span class="len">214 lines</span></summary><pre><code>#!/usr/bin/env node
 /**
  * overlay-server: serve the overlay to a dev build and receive its exports.
  *
@@ -2944,9 +2945,14 @@ GET /overlay.js  GET /tokens.json  GET /include  POST /export</code></pre>
  *   &lt;script src=&quot;http://localhost:8766/overlay.js&quot;&gt;&lt;/script&gt;
  *
  * The script loads its manifest from this server, so the pickers hold the
- * contract&#x27;s ladder and ramp, and Send to session posts the export here. Each
- * export is written to .toolkit/inbox/ as a markdown file the session applies
- * and then moves to .toolkit/applied/. No npm dependencies.
+ * contract&#x27;s ladder and ramp. A change whose winning declaration sits in a
+ * stylesheet this server can find on disk is applied here, deterministically:
+ * POST /locate maps the sheet URL to a file and the rule to a line, POST /apply
+ * rewrites that declaration to the token binding (or inserts a longhand after
+ * a shorthand), runs guard on the file and returns the before and after lines.
+ * What cannot be located goes to the session: POST /export writes the prompt
+ * to .toolkit/inbox/ as a markdown file the session applies and then moves to
+ * .toolkit/applied/. No npm dependencies.
  */
 const http = require(&quot;http&quot;);
 const fs = require(&quot;fs&quot;);
@@ -2999,8 +3005,54 @@ function manifest() {
   return cache;
 }
 
+// ---------- locating a declaration on disk ----------
+const SKIP_DIRS = new Set([&quot;node_modules&quot;, &quot;.git&quot;, &quot;dist&quot;, &quot;build&quot;, &quot;.next&quot;, &quot;.toolkit&quot;, &quot;coverage&quot;]);
+function fileForHref(href) {
+  let pathname; try { pathname = decodeURIComponent(new URL(href).pathname); } catch (e) { return null; }
+  if (pathname.endsWith(&quot;/&quot;)) pathname += &quot;index.html&quot;;
+  const rel = pathname.replace(/^\/+/, &quot;&quot;);
+  const tries = [rel, path.join(&quot;public&quot;, rel), path.join(&quot;src&quot;, rel), path.join(&quot;app&quot;, rel), path.join(&quot;static&quot;, rel)];
+  for (const t of tries) { const f = path.join(opt.root, t); if (fs.existsSync(f) &amp;&amp; fs.statSync(f).isFile()) return f; }
+  // last resort: a unique file with that basename anywhere in the project
+  const base = path.basename(rel); const hits = [];
+  (function walk(dir, depth) {
+    if (depth &gt; 6 || hits.length &gt; 2) return;
+    let ents; try { ents = fs.readdirSync(dir, { withFileTypes: true }); } catch (e) { return; }
+    for (const e of ents) { if (e.isDirectory()) { if (!SKIP_DIRS.has(e.name) &amp;&amp; !e.name.startsWith(&quot;.&quot;)) walk(path.join(dir, e.name), depth + 1); } else if (e.name === base) hits.push(path.join(dir, e.name)); }
+  })(opt.root, 0);
+  return hits.length === 1 ? hits[0] : null;
+}
+function selectorRegex(sel) {
+  // CSSOM normalises selector text; match the authored form with loose whitespace
+  const esc = sel.replace(/[.*+?^${}()|[\]\\]/g, &quot;\\$&amp;&quot;).replace(/\s*([&gt;+~,])\s*/g, &quot;\\s*$1\\s*&quot;).replace(/\s+/g, &quot;\\s+&quot;);
+  return new RegExp(&quot;(^|[}\\s;])(&quot; + esc + &quot;)\\s*\\{&quot;, &quot;g&quot;);
+}
+function locateIn(text, selector, prop, value) {
+  const re = selectorRegex(selector); let m;
+  while ((m = re.exec(text))) {
+    const open = m.index + m[0].length; const close = text.indexOf(&quot;}&quot;, open); if (close &lt; 0) break;
+    const block = text.slice(open, close);
+    const dre = new RegExp(&quot;(^|[;{\\s])(&quot; + prop.replace(/-/g, &quot;\\-&quot;) + &quot;)\\s*:\\s*([^;}]*?)(\\s*!important)?\\s*(;|$)&quot;, &quot;m&quot;);
+    const d = dre.exec(block);
+    if (!d) continue;
+    const authored = d[3].trim();
+    if (norm(authored) !== norm(value)) continue;
+    const abs = open + d.index + d[1].length;
+    const lineStart = text.lastIndexOf(&quot;\n&quot;, abs) + 1; const lineEnd = text.indexOf(&quot;\n&quot;, abs);
+    return { start: abs, end: abs + d[0].length - d[1].length - (d[5] ? d[5].length : 0), valueStart: abs + d[2].length + (d[0].slice(d[1].length).indexOf(d[3])), value: d[3], important: !!d[4], line: text.slice(0, abs).split(&quot;\n&quot;).length, lineText: text.slice(lineStart, lineEnd &lt; 0 ? text.length : lineEnd), indent: (text.slice(lineStart, abs).match(/^\s*/) || [&quot;&quot;])[0] };
+  }
+  return null;
+}
+function norm(v) { return v.replace(/\s+/g, &quot; &quot;).replace(/\s*,\s*/g, &quot;,&quot;).trim().toLowerCase(); }
+function readBody(req) { return new Promise((resolve, reject) =&gt; { let data = &quot;&quot;; req.on(&quot;data&quot;, c =&gt; { data += c; if (data.length &gt; 2e6) req.destroy(); }); req.on(&quot;end&quot;, () =&gt; { try { resolve(JSON.parse(data)); } catch (e) { reject(e); } }); }); }
+function guardCheck(file) {
+  const g = path.join(HERE, &quot;guard&quot;); if (!fs.existsSync(g)) return { ran: false };
+  try { execFileSync(g, [&quot;check&quot;, file, &quot;--json&quot;], { encoding: &quot;utf8&quot;, stdio: [&quot;ignore&quot;, &quot;pipe&quot;, &quot;pipe&quot;] }); return { ran: true, ok: true }; }
+  catch (e) { return { ran: true, ok: false, out: String(e.stdout || e.stderr || &quot;&quot;).trim().slice(0, 400) }; }
+}
+
 function send(res, code, type, body, extra) {
-  res.writeHead(code, Object.assign({ &quot;Content-Type&quot;: type, &quot;Access-Control-Allow-Origin&quot;: &quot;*&quot;, &quot;Access-Control-Allow-Headers&quot;: &quot;Content-Type&quot;, &quot;Access-Control-Allow-Methods&quot;: &quot;GET, POST, OPTIONS&quot;, &quot;Cache-Control&quot;: &quot;no-store&quot; }, extra || {}));
+  res.writeHead(code, Object.assign({ &quot;Content-Type&quot;: type, &quot;Access-Control-Allow-Origin&quot;: &quot;*&quot;, &quot;Access-Control-Allow-Headers&quot;: &quot;Content-Type&quot;, &quot;Access-Control-Allow-Methods&quot;: &quot;GET, POST, OPTIONS&quot;, &quot;Access-Control-Expose-Headers&quot;: &quot;X-Toolkit-Overlay-Server&quot;, &quot;X-Toolkit-Overlay-Server&quot;: &quot;1&quot;, &quot;Cache-Control&quot;: &quot;no-store&quot; }, extra || {}));
   res.end(body);
 }
 function stamp() { return new Date().toISOString().replace(/[:.]/g, &quot;-&quot;).slice(0, 19); }
@@ -3013,6 +3065,44 @@ const server = http.createServer((req, res) =&gt; {
   if (url.pathname === &quot;/manifest.js&quot;) return send(res, 200, &quot;application/javascript&quot;, &quot;window.__designTokens = &quot; + manifest().body + &quot;;&quot;);
   if (url.pathname === &quot;/include&quot;) return send(res, 200, &quot;text/plain&quot;, `&lt;script src=&quot;http://localhost:${opt.port}/overlay.js&quot;&gt;&lt;/script&gt;\n`);
   if (url.pathname === &quot;/inbox&quot;) return send(res, 200, &quot;application/json&quot;, JSON.stringify(fs.readdirSync(INBOX).sort()));
+  if (url.pathname === &quot;/locate&quot; &amp;&amp; req.method === &quot;POST&quot;) {
+    readBody(req).then(b =&gt; {
+      const file = fileForHref(b.href); if (!file) return send(res, 200, &quot;application/json&quot;, JSON.stringify({ error: &quot;no file for &quot; + new URL(b.href).pathname }));
+      const text = fs.readFileSync(file, &quot;utf8&quot;); const loc = locateIn(text, b.selector, b.prop, b.value);
+      if (!loc) return send(res, 200, &quot;application/json&quot;, JSON.stringify({ error: `rule not found in ${path.relative(opt.root, file)}` }));
+      send(res, 200, &quot;application/json&quot;, JSON.stringify({ file: path.relative(opt.root, file), line: loc.line, text: loc.lineText.trim() }));
+    }).catch(() =&gt; send(res, 400, &quot;application/json&quot;, JSON.stringify({ error: &quot;bad json&quot; })));
+    return;
+  }
+  if (url.pathname === &quot;/apply&quot; &amp;&amp; req.method === &quot;POST&quot;) {
+    readBody(req).then(b =&gt; {
+      const file = fileForHref(b.href); if (!file) return send(res, 200, &quot;application/json&quot;, JSON.stringify({ error: &quot;no file for &quot; + new URL(b.href).pathname }));
+      const text = fs.readFileSync(file, &quot;utf8&quot;); const loc = locateIn(text, b.selector, b.prop, b.value);
+      if (!loc) return send(res, 200, &quot;application/json&quot;, JSON.stringify({ error: `rule not found in ${path.relative(opt.root, file)}` }));
+      let out, before = loc.lineText, after, line = loc.line;
+      if (b.shorthand &amp;&amp; b.longhand &amp;&amp; b.longhand !== b.prop) {
+        // keep the shorthand, add the longhand right after it so the cascade takes the new value
+        const declEnd = text.indexOf(&quot;;&quot;, loc.start); const insertAt = declEnd &lt; 0 ? loc.end : declEnd + 1;
+        const closeBrace = text.indexOf(&quot;}&quot;, insertAt);
+        const oneLine = closeBrace &gt; -1 &amp;&amp; !text.slice(insertAt, closeBrace).includes(&quot;\n&quot;);
+        const ins = oneLine ? ` ${b.longhand}: ${b.newValue};` : `\n${loc.indent}${b.longhand}: ${b.newValue};`;
+        out = text.slice(0, insertAt) + ins + text.slice(insertAt);
+        after = oneLine ? text.slice(text.lastIndexOf(&quot;\n&quot;, insertAt) + 1, insertAt) + ins + text.slice(insertAt, text.indexOf(&quot;\n&quot;, insertAt) &lt; 0 ? undefined : text.indexOf(&quot;\n&quot;, insertAt)) : `${loc.indent}${b.longhand}: ${b.newValue};`;
+        line = oneLine ? loc.line : loc.line + 1;
+      } else {
+        const vs = loc.valueStart;
+        out = text.slice(0, vs) + b.newValue + text.slice(vs + loc.value.length);
+        after = before.replace(loc.value, b.newValue);
+      }
+      const bak = path.join(opt.root, &quot;.toolkit&quot;, &quot;backup&quot;); fs.mkdirSync(bak, { recursive: true });
+      fs.writeFileSync(path.join(bak, stamp() + &quot;-&quot; + path.basename(file)), text);
+      fs.writeFileSync(file, out);
+      const guard = guardCheck(file);
+      console.log(`apply   ${path.relative(opt.root, file)}:${line}  ${b.longhand || b.prop}: ${b.value} -&gt; ${b.newValue}${guard.ran &amp;&amp; !guard.ok ? &quot;  GUARD FAILED&quot; : &quot;&quot;}`);
+      send(res, 200, &quot;application/json&quot;, JSON.stringify({ file: path.relative(opt.root, file), line, before, after, guard }));
+    }).catch(() =&gt; send(res, 400, &quot;application/json&quot;, JSON.stringify({ error: &quot;bad json&quot; })));
+    return;
+  }
   if (url.pathname === &quot;/export&quot; &amp;&amp; req.method === &quot;POST&quot;) {
     let data = &quot;&quot;;
     req.on(&quot;data&quot;, c =&gt; { data += c; if (data.length &gt; 2e6) req.destroy(); });
@@ -3038,7 +3128,7 @@ const server = http.createServer((req, res) =&gt; {
     });
     return;
   }
-  if (url.pathname === &quot;/&quot;) return send(res, 200, &quot;text/plain&quot;, `overlay-server\n  GET /overlay.js  GET /tokens.json  GET /manifest.js  GET /include  GET /inbox  POST /export\n`);
+  if (url.pathname === &quot;/&quot;) return send(res, 200, &quot;text/plain&quot;, `overlay-server\n  GET /overlay.js  GET /tokens.json  GET /manifest.js  GET /include  GET /inbox  POST /locate  POST /apply  POST /export\n`);
   send(res, 404, &quot;text/plain&quot;, &quot;not found&quot;);
 });
 
@@ -3062,7 +3152,7 @@ server.listen(opt.port, &quot;127.0.0.1&quot;, () =&gt; {
         <p>Appended to <code>~/.claude/CLAUDE.md</code> by the installer, so they bind every session on the machine whether or not a skill is invoked.</p>
       </header>
       <ol class="rules"><li>**Find the project&#x27;s contract first.** Read it before changing anything, and never create a second one beside it.</li><li>**Figma is authored first, code follows, in the same session.** A fix that exists in only one place is new drift, not a repair.</li><li>**Never claim done, live, or shipped without running `ship-check`.** Name the artifact the designer is looking at, confirm it contains the change, and say what was not exercised.</li><li>**Never answer a visual question with a number.** Put the renders side by side at matched width and look.</li><li>**Measure the result before reporting it.** A change that reasons correctly can still render wrong.</li><li>**A raw value in a styling position is a defect.** Bind it, or say why it is exempt.</li><li>**Spacing is hierarchical, never uniform.** Group first, then stack; a flat gap between unrelated blocks is the failure mode even when the value is on scale.</li><li>**Delegate the sweep, keep the judgment.** Send work touching more than three files, two screens or a whole Figma page to a read-only subagent, and keep the decision in the main conversation.</li><li>**Read narrowly.** Grep for the selector and read the lines around it; never dump a Figma subtree or screenshot a full page for one property.</li><li>**Return narrowly.** A script that produces findings prints the findings, not the data it derived them from.</li><li>**Say the number, not the list.** &quot;862 raw values, mostly gap and height&quot; beats 862 lines.</li></ol>
-      <details class="src"><summary>Read claude-md-section.md<span class="len">75 lines</span></summary><pre><code>
+      <details class="src"><summary>Read claude-md-section.md<span class="len">76 lines</span></summary><pre><code>
 ## Design workflow
 
 A personal toolkit of skills lives in `~/.claude/skills/`: `design-contract`,
@@ -3101,8 +3191,9 @@ change spacing and text on the render, to tokens only, and send the result to
 the session. Never ship it in a production build.
 
 **An overlay export in `.toolkit/inbox/` is a set of decisions, applied the
-same session.** Read the file, apply each change to the rule that sets the
-property rather than to instances, run `guard verify` on the files touched,
+same session.** Read the file. What it marks as already applied is in the
+source: verify it renders and mirror it. Apply what is left to the rule that
+sets the property rather than to instances, run `guard verify` on the files touched,
 run `measure --compare` at the export&#x27;s width against its targets, mirror the
 token changes to Figma, record each decision with `decision-log`, then move the
 file to `.toolkit/applied/`. Report any target that was not reached.
@@ -3313,7 +3404,7 @@ Pre-existing defects, so they are never rediscovered as news.
       <pre class="usage"><code>git -C ~/design-toolkit pull
 ~/design-toolkit/install.sh
 # then open a new session: skills register at start</code></pre>
-      <details class="src"><summary>Read README.md<span class="len">223 lines</span></summary><pre><code># Design toolkit
+      <details class="src"><summary>Read README.md<span class="len">236 lines</span></summary><pre><code># Design toolkit
 
 A toolkit for running design work with Claude Code, between Figma and a
 codebase. One repo, pulled into any project.
@@ -3390,6 +3481,8 @@ cd ~/design-toolkit &amp;&amp; git add -A &amp;&amp; git commit -m &quot;...&quo
 ```
 tools/         executables the skills call, so a check is run rather than rewritten
 overlay/       the on-screen editor: overlay.js, a demo screen, and its README
+docs/          the web view (index.html) and the overlay demo (demo/), one
+               self-contained page each, served by GitHub Pages
 skills/        nine skills, the methods. Written neutrally.
 agents/        two read-only agents, so a sweep&#x27;s output stays out of the thread
 judgment/      the only personal layer
@@ -3401,6 +3494,15 @@ claude-md-section.md   the enforcement rules, appended to ~/.claude/CLAUDE.md
 
 Everything except `judgment/` is impersonal. That is the point: the methods are
 the same for anyone, the criteria are not.
+
+## The web view
+
+`docs/index.html` is one self-contained page: every skill, agent and executable
+with what it does and its full source, plus the judgment file rendered as prose.
+Open it in a browser, or through GitHub Pages. Rebuild after a change with
+`python3 docs/build.py`; add `--vision` to include the vision
+record section, which is left out of the committed copy because that file is
+not in this repo.
 
 ## The skills
 
@@ -3476,7 +3578,9 @@ In the dev build, and only the dev build:
 
 Send to session writes `.toolkit/inbox/&lt;stamp&gt;-overlay.md`, which is local
 only. The standing rule in `claude-md-section.md` says what a session does with
-it. `overlay/demo.html` is a sample screen with seeded defects to try it on.
+it. `overlay/demo.html` is a sample screen with seeded defects to try it on, and
+`docs/demo/` is the same page for anyone viewing the repo: preview and export
+work there, apply needs the server.
 
 ## The architecture
 

@@ -208,20 +208,21 @@
   },
   {
    "name": "overlay-server",
-   "tagline": "Serves the overlay to a dev build and receives its exports",
-   "does": "A dependency-free local server run from the project root. It reads the contract through tokens-manifest, serves overlay.js and the manifest, and prints the one include line for the dev build. Send to session in the overlay posts here, and each export is written to .toolkit/inbox/ as a markdown file for the session to apply; the server adds .toolkit/ to the repo's local git exclude so nothing is committed.",
+   "tagline": "Serves the overlay to a dev build, applies its changes to source, receives what it cannot",
+   "does": "A dependency-free local server run from the project root. It reads the contract through tokens-manifest, serves overlay.js and the manifest, and prints the one include line for the dev build. A change whose winning declaration sits in a stylesheet it can find on disk is applied here deterministically: locate maps the sheet URL to a file and the rule to a line, apply rewrites that declaration to the token binding or inserts a longhand after a shorthand, runs guard, keeps a backup, and the overlay checks the render against the target. What cannot be located is sent as a prompt to .toolkit/inbox/ for the session.",
    "usage": [
     "overlay-server [--port 8766] [--root DIR]",
     "--manifest FILE  serve this manifest instead of reading the contract",
     "--css FILE       passed to tokens-manifest",
-    "GET /overlay.js  GET /tokens.json  GET /include  POST /export"
+    "GET /overlay.js  GET /tokens.json  GET /include",
+    "POST /locate  POST /apply  POST /export"
    ],
    "because": "The paste step between changing something on screen and the session applying it.",
    "checks": [
-    "/overlay.js, the script",
-    "/tokens.json, the contract's tokens",
-    "/include, the line for the dev build",
-    "/export, writes .toolkit/inbox/<stamp>-overlay.md"
+    "/locate, sheet URL to file, rule to line",
+    "/apply, rewrite the declaration, guard the file, back it up",
+    "/export, writes .toolkit/inbox/<stamp>-overlay.md",
+    "/tokens.json, the contract tokens for the pickers"
    ]
   }
  ],

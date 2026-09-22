@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Build the toolkit web view: site/index.html, one self-contained page.
+"""Build the toolkit web view: docs/index.html, one self-contained page, and refresh docs/demo/overlay.js.
 
-  python3 site/build.py              rebuild from summary.json and the repo files
-  python3 site/build.py --vision     also include the vision record section, which
+  python3 docs/build.py              rebuild from summary.json and the repo files
+  python3 docs/build.py --vision     also include the vision record section, which
                                      quotes ~/.claude/ai-design-vision.md and is
                                      left out of the committed page by default
 
@@ -429,6 +429,8 @@ head_end = page.index("</head>")
 pre = page[page.index("<title>"):page.index("</head>")]
 page = page[:page.index("<title>")] + page[page.index("</head>"):]
 page = page.replace("<head>\n<meta charset=\"utf-8\">", "<head>\n<meta charset=\"utf-8\">\n" + pre.strip(), 1)
+import shutil
+shutil.copy(os.path.join(ROOT, "overlay", "overlay.js"), os.path.join(HERE, "demo", "overlay.js"))
 out = os.path.join(HERE, "index.html")
 open(out, "w", encoding="utf-8").write(page)
 print(out, len(page), "bytes")

@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Toolkit Overlay</title>
+</head>
+<body>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --u: 24px;
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-6: 24px; --space-8: 32px; --space-12: 48px;
+  --ground: #F3F5F4; --surface: #FFFFFF; --sunk: #E9EDEB; --ink: #18201E; --ink-2: #55625E; --ink-3: #8A9793; --line: #D5DCD9; --accent: #0F6B5A; --accent-tint: #DCEEE8;
+  --sans: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif; --mono: "IBM Plex Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ground: #101514; --surface: #182120; --sunk: #0C1110; --ink: #E6ECEA; --ink-2: #A9B5B1; --ink-3: #77847F; --line: #2A3431; --accent: #5CC7AA; --accent-tint: #173129; } }
+:root[data-theme="dark"] { --ground: #101514; --surface: #182120; --sunk: #0C1110; --ink: #E6ECEA; --ink-2: #A9B5B1; --ink-3: #77847F; --line: #2A3431; --accent: #5CC7AA; --accent-tint: #173129; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--ground); color: var(--ink); font: 400 16px/24px var(--sans); }
+h1, h2, h3, p { margin: 0; }
+.stage { display: grid; grid-template-columns: 1fr; gap: var(--space-12); padding: var(--space-12) var(--space-6) var(--space-12); margin-right: 344px; max-width: 1100px; }
+@media (min-width: 1000px) { .stage { grid-template-columns: minmax(280px, 380px) 393px; column-gap: var(--space-12); } }
+.guide { display: flex; flex-direction: column; gap: var(--space-6); }
+.guide h1 { font-size: 28px; line-height: 36px; font-weight: 600; letter-spacing: -0.01em; }
+.guide p { color: var(--ink-2); max-width: 46ch; }
+.guide ol { margin: 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: var(--space-2); color: var(--ink-2); }
+.guide code { font: 400 14px/20px var(--mono); }
+.guide .eyebrow { font: 500 12px/16px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); } .guide .eyebrow a { color: inherit; }
+.guide h2 { font-size: 16px; line-height: 24px; font-weight: 600; }
+.guide button { align-self: flex-start; font: 500 14px/20px var(--sans); padding: 6px 12px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+.guide button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.seeded { list-style: none; padding: 0; }
+.seeded li { padding-left: 0; }
+
+/* the sample screen, 393 wide */
+.phone { width: 393px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; align-self: start; }
+.bar { display: flex; justify-content: space-between; padding: var(--space-3) var(--space-4); font: 500 13px/20px var(--mono); color: var(--ink-3); border-bottom: 1px solid var(--line); }
+.screen { display: flex; flex-direction: column; gap: var(--space-12); padding: var(--space-6) var(--space-4) var(--space-12); }
+.section-head { display: flex; flex-direction: column; gap: var(--space-1); padding-bottom: var(--space-3); }
+.section-head h2 { font-size: 20px; line-height: 24px; font-weight: 600; }
+.section-head .kicker { font: 500 12px/16px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+.insight { display: flex; flex-direction: column; gap: var(--space-2); }         /* seeded: button sits at 8 under its text */
+.insight p { color: var(--ink-2); }
+.insight .btn { align-self: flex-start; font: 500 14px/20px var(--sans); padding: 6px 12px; border-radius: 8px; background: var(--accent); color: #fff; border: 0; }
+.stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }                /* seeded: 10 is off ladder */
+.stat { display: flex; flex-direction: column; gap: var(--space-1); padding: 14px; background: var(--sunk); border-radius: 12px; }   /* seeded: 14 is off ladder */
+.stat b { font: 600 24px/32px var(--sans); font-variant-numeric: tabular-nums; }
+.stat span { font: 400 12px/16px var(--sans); color: var(--ink-3); }
+.copy { display: flex; flex-direction: column; gap: var(--space-3); }             /* seeded: middle rung between paragraphs */
+.copy p { color: var(--ink-2); }
+.copy p.off { font-size: 15px; line-height: 22px; }                                /* seeded: off the ramp */
+.rows { display: flex; flex-direction: column; }
+.row { display: grid; grid-template-columns: 40px 1fr auto; gap: var(--space-3); align-items: center; padding: var(--space-3) 0; border-top: 1px solid var(--line); }
+.row .sw { width: 40px; height: 40px; border-radius: 8px; background: var(--sunk); }
+.row .t { display: flex; flex-direction: column; gap: 0; }
+.row .t small { font-size: 13px; line-height: 20px; color: var(--ink-3); }
+.row .v { font: 500 14px/20px var(--mono); color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.row:first-child { border-top: 0; padding-top: 0; }
+</style>
+
+<div class="stage">
+  <div class="guide">
+    <p class="eyebrow"><a href="../">design-toolkit</a> / overlay demo</p>
+    <h1>Select something on the screen and change it, but only to a token</h1>
+    <p>The panel on the right reads the selected element's gap, padding, margin and text as tokens, flags what is off the ladder, and offers only the ladder to change it to. Changes preview live and accumulate. Export turns them into the prompt that asks Claude Code to make the edits in the codebase and mirror them to Figma.</p>
+    <h2>Try it</h2>
+    <ol>
+      <li>Click the three stat tiles. The grid gap is 10, so the panel flags it and offers the nearest token.</li>
+      <li>Click the insight block. The button sits 8 under its text; the judgment lint asks for a full unit.</li>
+      <li>Click the second paragraph. It is 15/22, which matches nothing on the ramp.</li>
+      <li>Make a few changes, then press Export prompt.</li>
+    </ol>
+    <h2>What is seeded wrong</h2>
+    <ol class="seeded">
+      <li><code>.stats</code> gap 10, off ladder</li>
+      <li><code>.stat</code> padding 14, off ladder</li>
+      <li><code>.insight</code> button at 1/3 u from its text</li>
+      <li><code>.copy</code> paragraphs at 12, a middle rung in the reading flow</li>
+      <li><code>.copy p.off</code> text at 15/22, off ramp</li>
+    </ol>
+    <h2>Use it on your own build</h2>
+    <p>In the project, run <code>~/.claude/tools/overlay-server</code>. It reads the contract, serves the script and prints one include line for the dev build. The panel then holds the contract's ladder and ramp, and Export gains Send to session, which writes the prompt to <code>.toolkit/inbox/</code> for the session to apply. Without the server the script still works from a manifest or by inference, and Export copies the prompt instead.</p>
+    <button id="copy-bm">Copy bookmarklet (inlines the script)</button>
+    <p><code>Alt+Shift+D</code> hides and shows the panel. <code>Escape</code> clears the selection.</p>
+  </div>
+
+  <div class="phone" data-component="InsightsScreen">
+    <div class="bar"><span>9:41</span><span>Wantlist</span></div>
+    <div class="screen">
+      <div data-component="SectionHead" class="section-head"><span class="kicker">Insights</span><h2>Your collection this month</h2></div>
+      <div data-component="Insight" class="insight">
+        <p>Three of your wants dropped below your target price in the last ten days. Two are still listed.</p>
+        <button class="btn">Review the three</button>
+      </div>
+      <div data-component="StatRow" class="stats">
+        <div class="stat"><b>128</b><span>in collection</span></div>
+        <div class="stat"><b>41</b><span>on wantlist</span></div>
+        <div class="stat"><b>7</b><span>price drops</span></div>
+      </div>
+      <div data-component="Copy" class="copy">
+        <p>Prices for first pressings in your list have moved 4% since August, mostly on the three titles you added from the Blue Note reissue series.</p>
+        <p class="off">Sellers in your region list on Tuesday evenings. Setting an alert for that window catches most of the drops before they close.</p>
+      </div>
+      <div data-component="RowList" class="rows">
+        <div class="row"><div class="sw"></div><div class="t">Blue Train<small>Blue Note, 1958, mono</small></div><span class="v">$412</span></div>
+        <div class="row"><div class="sw"></div><div class="t">Somethin' Else<small>Blue Note, 1958, mono</small></div><span class="v">$390</span></div>
+        <div class="row"><div class="sw"></div><div class="t">Moanin'<small>Blue Note, 1959, stereo</small></div><span class="v">$275</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+window.__designTokens = {
+  unit: 24,
+  space: { "space-1": 4, "space-2": 8, "space-3": 12, "space-4": 16, "space-6": 24, "space-8": 32, "space-12": 48 },
+  text: {
+    "text-caption": { size: 12, line: 16, weight: 400 },
+    "text-small": { size: 13, line: 20, weight: 400 },
+    "text-label": { size: 14, line: 20, weight: 500 },
+    "text-body": { size: 16, line: 24, weight: 400 },
+    "text-title": { size: 20, line: 24, weight: 600 },
+    "text-stat": { size: 24, line: 32, weight: 600 }
+  }
+};
+</script>
+<script src="overlay.js"></script>
+<script>
+(function () {
+  var b = document.getElementById("copy-bm");
+  b.addEventListener("click", function () {
+    fetch("overlay.js").then(function (r) { return r.text(); }).then(function (src) {
+      var bm = "javascript:" + encodeURIComponent("(function(){" + src + "})()");
+      return navigator.clipboard.writeText(bm);
+    }).then(function () { b.textContent = "Copied. Paste it as a bookmark URL."; })
+      .catch(function () { b.textContent = "Copy failed here; take overlay.js from the repo instead."; });
+  });
+  if (location.search.indexOf("autoselect") > -1) {
+    var el = document.querySelector(".insight");
+    el.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+  }
+})();
+</script>
+</body>
+</html>

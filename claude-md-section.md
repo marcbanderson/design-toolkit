@@ -37,8 +37,9 @@ change spacing and text on the render, to tokens only, and send the result to
 the session. Never ship it in a production build.
 
 **An overlay export in `.toolkit/inbox/` is a set of decisions, applied the
-same session.** Read the file, apply each change to the rule that sets the
-property rather than to instances, run `guard verify` on the files touched,
+same session.** Read the file. What it marks as already applied is in the
+source: verify it renders and mirror it. Apply what is left to the rule that
+sets the property rather than to instances, run `guard verify` on the files touched,
 run `measure --compare` at the export's width against its targets, mirror the
 token changes to Figma, record each decision with `decision-log`, then move the
 file to `.toolkit/applied/`. Report any target that was not reached.

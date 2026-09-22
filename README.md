@@ -75,8 +75,8 @@ cd ~/design-toolkit && git add -A && git commit -m "..." && git push
 ```
 tools/         executables the skills call, so a check is run rather than rewritten
 overlay/       the on-screen editor: overlay.js, a demo screen, and its README
-site/          index.html, a self-contained page listing everything here and
-               what the toolkit has learned about the designer; open it in a browser
+docs/          the web view (index.html) and the overlay demo (demo/), one
+               self-contained page each, served by GitHub Pages
 skills/        nine skills, the methods. Written neutrally.
 agents/        two read-only agents, so a sweep's output stays out of the thread
 judgment/      the only personal layer
@@ -91,10 +91,10 @@ the same for anyone, the criteria are not.
 
 ## The web view
 
-`site/index.html` is one self-contained page: every skill, agent and executable
+`docs/index.html` is one self-contained page: every skill, agent and executable
 with what it does and its full source, plus the judgment file rendered as prose.
-Open it in a browser, or serve `site/` with GitHub Pages. Rebuild after a
-change with `python3 site/build.py`; add `--vision` to include the vision
+Open it in a browser, or through GitHub Pages. Rebuild after a change with
+`python3 docs/build.py`; add `--vision` to include the vision
 record section, which is left out of the committed copy because that file is
 not in this repo.
 
@@ -172,7 +172,9 @@ In the dev build, and only the dev build:
 
 Send to session writes `.toolkit/inbox/<stamp>-overlay.md`, which is local
 only. The standing rule in `claude-md-section.md` says what a session does with
-it. `overlay/demo.html` is a sample screen with seeded defects to try it on.
+it. `overlay/demo.html` is a sample screen with seeded defects to try it on, and
+`docs/demo/` is the same page for anyone viewing the repo: preview and export
+work there, apply needs the server.
 
 ## The architecture
 
