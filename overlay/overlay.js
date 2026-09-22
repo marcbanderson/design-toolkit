@@ -335,6 +335,17 @@
     .row { display:flex; flex-direction:column; gap:var(--s1); }
     .row .lab { display:flex; justify-content:space-between; gap:var(--s2); font:400 12px/16px var(--mono); color:var(--ink2); }
     .row .cur { color:var(--ink); } .row .cur.off { color:var(--warn); } .row .cur.off::before { content:"\\25B2 "; } .row .cur.frac { color:var(--ink2); }
+    .fields { display:flex; flex-direction:column; gap:var(--s2); }
+    .field { position:relative; display:grid; grid-template-columns:1fr auto; align-items:center; height:32px; background:var(--sunk); border:1px solid var(--line); border-radius:6px; padding:0 var(--s2) 0 var(--s3); }
+    .field:hover, .field.open { border-color:var(--ink3); }
+    .flab { font:400 13px/20px var(--sans); color:var(--ink2); cursor:ew-resize; user-select:none; -webkit-user-select:none; align-self:stretch; display:flex; align-items:center; }
+    .flab:active { color:var(--ink); }
+    .fval { font:500 13px/20px var(--mono); color:var(--ink); background:transparent; border:0; padding:2px 4px; border-radius:4px; cursor:pointer; display:flex; gap:var(--s2); align-items:baseline; font-variant-numeric:tabular-nums; }
+    .fval small { font:400 11px/16px var(--mono); color:var(--ink3); }
+    .fval:hover { background:rgba(255,255,255,.05); } .fval.off { color:var(--warn); } .fval.off::before { content:"\\25B2"; font-size:9px; margin-right:2px; } .fval.frac small { color:var(--ink2); }
+    .menu { position:absolute; right:0; top:34px; z-index:2; min-width:180px; background:var(--ground); border:1px solid var(--line); border-radius:6px; box-shadow:0 8px 24px rgba(0,0,0,.35); padding:var(--s1); display:flex; flex-direction:column; }
+    .mi { display:flex; justify-content:space-between; gap:var(--s3); font:400 12px/20px var(--mono); color:var(--ink2); background:transparent; border:0; border-radius:4px; padding:2px var(--s2); cursor:pointer; text-align:left; font-variant-numeric:tabular-nums; }
+    .mi span:first-child { color:var(--ink); } .mi:hover { background:rgba(255,255,255,.06); } .mi.cur { background:var(--accent); } .mi.cur span { color:#0B1512; }
     .toks { display:flex; flex-wrap:wrap; gap:var(--s1); }
     .tok { font:500 12px/20px var(--mono); padding:0 7px; border-radius:5px; border:1px solid var(--line); background:var(--sunk); color:var(--ink2); cursor:pointer; }
     .tok:hover { border-color:var(--ink3); color:var(--ink); } .tok.cur { background:var(--accent); color:#0B1512; border-color:var(--accent); }
@@ -394,28 +405,34 @@
     }
     return out;
   }
-  function pickerRow(label, prop, px) {
+  // A field: label on the left, value on the right. Drag across the label to
+  // step through the ladder; click the value for the list. Only tokens are offered.
+  function steps() { return [{ px: 0, name: "0" }].concat(T.ladder); }
+  function fieldRow(label, prop, px) {
     const t = tokenFor(px);
     const cls = t.kind === "off" ? "off" : t.kind === "fraction" ? "frac" : "";
-    return `<div class="row"><div class="lab"><span>${h(label)}</span><span class="cur ${cls}">${px}px ${h(t.name)}</span></div>
-      <div class="toks">${T.ladder.map(k => `<button class="tok ${Math.abs(k.px - px) < 0.5 ? "cur" : ""}" data-prop="${prop}" data-px="${k.px}" data-tok="${h(k.name)}" title="${h(k.name)}">${k.px}</button>`).join("")}<button class="tok" data-prop="${prop}" data-px="0" data-tok="0" title="none">0</button></div></div>`;
+    const open = menuFor === prop;
+    const menu = open ? `<div class="menu">${steps().map(k => `<button class="mi ${Math.abs(k.px - px) < 0.5 ? "cur" : ""}" data-prop="${prop}" data-px="${k.px}" data-tok="${h(k.name)}"><span>${k.px}</span><span>${h(k.name)}</span></button>`).join("")}</div>` : "";
+    return `<div class="field ${open ? "open" : ""}" data-field="${prop}"><span class="flab" data-drag="${prop}" title="Drag to step through the ladder">${h(label)}</span><button class="fval ${cls}" data-menu="${prop}" data-px="${px}" title="Choose a token">${px}px<small>${h(t.kind === "token" ? t.name : t.kind === "zero" ? "" : t.name)}</small></button>${menu}</div>`;
+  }
+  function textFieldRow(info) {
+    const names = Object.keys(T.text); const open = menuFor === "text-style";
+    const menu = open ? `<div class="menu">${names.map(n => { const st = T.text[n]; return `<button class="mi ${n === info.text.style ? "cur" : ""}" data-text="${h(n)}"><span>${st.size}/${st.line} ${st.weight}</span><span>${h(n)}</span></button>`; }).join("")}</div>` : "";
+    return `<div class="field ${open ? "open" : ""}" data-field="text-style"><span class="flab" data-drag="text-style" title="Drag to step through the ramp">Style</span><button class="fval ${info.text.style ? "" : "off"}" data-menu="text-style">${info.text.size}/${info.text.line} ${info.text.weight}<small>${h(info.text.style || "off ramp")}</small></button>${menu}</div>`;
   }
 
-  let exporting = false, sent = "", confirming = null;
+  let exporting = false, sent = "", confirming = null, menuFor = null, drag = null;
   function render() {
+    const prevBody = panel.querySelector(".body"); const scrollAt = prevBody ? prevBody.scrollTop : 0;
     const info = selected && selected.isConnected ? inspect(selected) : null;
     let body = "";
-    body += `<div class="sec"><h3>Selected</h3>${info ? `<div class="id"><div class="name">${info.el === document.body ? "body" : h(identity(info.el).component || identity(info.el).tag)}</div><div class="path">${h(pathOf(info.el))}</div>${identity(info.el).text ? `<div class="txt">${h(identity(info.el).text)}</div>` : ""}</div>` : `<div class="empty">Click anything on the page. Escape clears the selection.</div>`}</div>`;
+    body += `<div class="sec"><h3>Selected</h3>${info ? `<div class="id"><div class="name">${info.el === document.body ? "body" : h(identity(info.el).component || identity(info.el).tag)}</div><div class="path">${h(pathOf(info.el))}</div>${identity(info.el).text ? `<div class="txt">${h(identity(info.el).text)}</div>` : ""}</div>` : `<div class="empty">Click anything on the page. Escape clears the selection.</div>`}${info && !records.length ? `<div class="note">Drag a field's label to step through the ladder. Click its value to choose.</div>` : ""}</div>`;
     if (info) {
       if (info.lints.length) body += `<div class="sec"><h3>Judgment</h3>${info.lints.map((l, i) => `<div class="lint ${l.level}"><span>${h(l.msg)}</span>${l.fix && l.fix.token ? `<button class="btn fix" data-lint="${i}">Set ${h(l.fix.prop)} to ${h(l.fix.token.name)}</button>` : ""}</div>`).join("")}</div>`;
-      if (info.gaps) body += `<div class="sec"><h3>Gap</h3>${pickerRow("row gap", "row-gap", info.gaps["row-gap"])}${pickerRow("column gap", "column-gap", info.gaps["column-gap"])}</div>`;
-      body += `<div class="sec"><h3>Padding</h3>${PADS.map(p => pickerRow(p.replace("padding-", ""), p, info.pads[p])).join("")}</div>`;
-      body += `<div class="sec"><h3>Margin</h3><div class="note">The air belongs to the component, as padding. Reach for margin only when the space is not the component's own.</div>${MARGS.map(p => pickerRow(p.replace("margin-", ""), p, info.margs[p])).join("")}</div>`;
-      if (info.text) {
-        const names = Object.keys(T.text);
-        body += `<div class="sec"><h3>Text</h3><div class="row"><div class="lab"><span>current</span><span class="cur ${info.text.style ? "" : "off"}">${info.text.size}/${info.text.line} ${info.text.weight} ${h(info.text.style || "off ramp")}</span></div>
-          <div class="toks">${names.map(n => { const s = T.text[n]; return `<button class="tok ${n === info.text.style ? "cur" : ""}" data-text="${h(n)}" title="${h(n)}">${s.size}/${s.line} ${s.weight}</button>`; }).join("")}</div></div><div class="note">Ramp ${h(T.textSource)}.</div></div>`;
-      }
+      if (info.gaps) body += `<div class="sec"><h3>Gap</h3><div class="fields">${fieldRow("Row", "row-gap", info.gaps["row-gap"])}${fieldRow("Column", "column-gap", info.gaps["column-gap"])}</div></div>`;
+      body += `<div class="sec"><h3>Padding</h3><div class="fields">${PADS.map(p => fieldRow(p.replace("padding-", "").replace(/^./, c => c.toUpperCase()), p, info.pads[p])).join("")}</div></div>`;
+      body += `<div class="sec"><h3>Margin</h3><div class="fields">${MARGS.map(p => fieldRow(p.replace("margin-", "").replace(/^./, c => c.toUpperCase()), p, info.margs[p])).join("")}</div><div class="note">The air belongs to the component, as padding. Reach for margin only when the space is not the component's own.</div></div>`;
+      if (info.text) body += `<div class="sec"><h3>Text</h3><div class="fields">${textFieldRow(info)}</div><div class="note">Ramp ${h(T.textSource)}.</div></div>`;
     }
     // changes, each with its tier
     const net = netRecords();
@@ -434,12 +451,46 @@
     body += `<div class="sec"><h3>Changes</h3>${net.length ? chgs : `<div class="empty">${records.length ? "Everything is back where it started. Nothing to export." : "Nothing yet. A change you reverse drops out. Each change shows where in the source it lands, or that it needs the session."}</div>`}${sent ? `<div class="note">Sent to <b>${h(sent)}</b>. The session applies what is left, mirrors, and records.</div>` : ""}${exporting ? `<textarea readonly>${h(buildPrompt())}</textarea><div style="display:flex;gap:8px">${ENDPOINT ? `<button class="btn on" data-act="send">Send to session</button>` : ""}<button class="btn" data-act="copy">Copy prompt</button><button class="btn" data-act="closex">Close</button></div>` : ""}</div>`;
     panel.innerHTML = `<div class="head"><b>Overlay</b><small>u = ${T.unit}px, ${T.ladder.length} tokens, ${h(T.spaceSource)}${ENDPOINT ? ", connected" : ""}</small><button class="btn ${picking ? "on" : ""}" data-act="pick" title="Alt+Shift+D">Select</button><button class="btn" data-act="hide">Hide</button></div><div class="body">${body}</div>
       <div class="foot"><span class="cnt">${net.length} net change${net.length === 1 ? "" : "s"}${records.length !== net.length ? `, ${records.length} made` : ""}</span><button class="btn" data-act="undo" ${undoStack.length ? "" : "disabled"}>Undo</button><button class="btn" data-act="clear" ${records.length ? "" : "disabled"} title="Forget every change here. Applied edits stay in the source.">Clear</button>${applyable > 1 ? `<button class="btn" data-act="applyall">Apply ${applyable}</button>` : ""}<button class="btn on" data-act="export" ${net.length ? "" : "disabled"}>Export</button></div>`;
+    panel.querySelector(".body").scrollTop = scrollAt;
     place(selBox, selected); if (selected) selBox.querySelector(".tag").textContent = identity(selected).component || pathOf(selected).split(" > ").pop();
   }
 
+  // drag across a label: each 14px of travel is one rung; the record is written on release
+  panel.addEventListener("pointerdown", ev => {
+    const lab = ev.target.closest("[data-drag]"); if (!lab || !selected || ev.button !== 0) return;
+    const prop = lab.dataset.drag; menuFor = null;
+    let list, idx, startPx;
+    if (prop === "text-style") { list = Object.keys(T.text); const i = inspect(selected); if (!i.text) return; idx = Math.max(0, list.indexOf(i.text.style)); startPx = i.text; }
+    else { list = steps(); startPx = parseFloat(getComputedStyle(selected).getPropertyValue(prop)) || 0; idx = list.findIndex(k => Math.abs(k.px - startPx) < 0.5); if (idx < 0) idx = list.findIndex(k => k.px > startPx); if (idx < 0) idx = list.length - 1; }
+    drag = { prop, list, idx0: idx, idx, x0: ev.clientX, startPx, moved: false, el: selected, lab };
+    lab.setPointerCapture(ev.pointerId); ev.preventDefault();
+  });
+  panel.addEventListener("pointermove", ev => {
+    if (!drag) return;
+    const dx = ev.clientX - drag.x0; if (Math.abs(dx) > 3) drag.moved = true;
+    const idx = Math.max(0, Math.min(drag.list.length - 1, drag.idx0 + Math.round(dx / 14)));
+    if (idx === drag.idx) return; drag.idx = idx;
+    const val = panel.querySelector(`.field[data-field="${drag.prop}"] .fval`);
+    if (drag.prop === "text-style") { const st = T.text[drag.list[idx]]; drag.el.style.setProperty("font-size", st.size + "px", "important"); drag.el.style.setProperty("line-height", st.line + "px", "important"); drag.el.style.setProperty("font-weight", st.weight, "important"); if (val) val.innerHTML = `${st.size}/${st.line} ${st.weight}<small>${h(drag.list[idx])}</small>`; }
+    else { const k = drag.list[idx]; drag.el.style.setProperty(drag.prop, k.px + "px", "important"); if (val) { val.className = "fval"; val.innerHTML = `${k.px}px<small>${h(k.px ? k.name : "")}</small>`; } }
+    place(selBox, selected);
+  });
+  const endDrag = ev => {
+    if (!drag) return; const d = drag; drag = null;
+    if (!d.moved) { menuFor = d.prop; render(); return; }
+    if (d.prop === "text-style") { const name = d.list[d.idx]; if (name !== d.startPx.style) { d.el.style.removeProperty("font-size"); d.el.style.removeProperty("line-height"); d.el.style.removeProperty("font-weight"); applyText(d.el, name, d.startPx); } else render(); return; }
+    const k = d.list[d.idx];
+    if (Math.abs(k.px - d.startPx) < 0.5) { d.el.style.removeProperty(d.prop); render(); return; }
+    d.el.style.removeProperty(d.prop); applyChange(d.el, d.prop, k.px, k.name, d.startPx);
+  };
+  panel.addEventListener("pointerup", endDrag); panel.addEventListener("pointercancel", endDrag);
   panel.addEventListener("click", ev => {
-    const b = ev.target.closest("button"); if (!b) return;
+    const b = ev.target.closest("button");
+    if (menuFor && !(b && (b.dataset.menu || b.classList.contains("mi")))) { menuFor = null; render(); }
+    if (!b) return;
     const act = b.dataset.act;
+    if (b.dataset.menu) { menuFor = menuFor === b.dataset.menu ? null : b.dataset.menu; render(); return; }
+    if (b.classList.contains("mi")) { menuFor = null; if (b.dataset.text) { const i = inspect(selected); if (i.text && i.text.style !== b.dataset.text) applyText(selected, b.dataset.text, i.text); else render(); return; } }
     if (act === "pick") { picking = !picking; render(); return; }
     if (act === "hide") { api.toggle(); return; }
     if (act === "undo") { undo(); return; }
@@ -468,7 +519,7 @@
   function targetFrom(ev) { const t = ev.target; if (t === host || host.contains(t) || ev.composedPath().includes(host)) return null; const el = ev.composedPath()[0]; if (!(el instanceof Element)) return null; return el; }
   function onMove(ev) { if (!picking || !visible) return; const el = targetFrom(ev); if (!el) { hoverEl = null; hoverBox.hidden = true; return; } if (el === hoverEl || el === selected) { if (el === selected) hoverBox.hidden = true; return; } hoverEl = el; place(hoverBox, el); }
   function onClick(ev) { if (!picking || !visible) return; const el = targetFrom(ev); if (!el) return; ev.preventDefault(); ev.stopPropagation(); selected = el; exporting = false; render(); }
-  function onKey(ev) { if (ev.altKey && ev.shiftKey && ev.code === "KeyD") { ev.preventDefault(); api.toggle(); } else if (ev.key === "Escape" && visible) { selected = null; render(); } }
+  function onKey(ev) { if (ev.altKey && ev.shiftKey && ev.code === "KeyD") { ev.preventDefault(); api.toggle(); } else if (ev.key === "Escape" && visible) { if (menuFor) menuFor = null; else selected = null; render(); } }
   function onScroll() { place(selBox, selected); if (hoverEl) place(hoverBox, hoverEl); }
   document.addEventListener("mousemove", onMove, true);
   document.addEventListener("click", onClick, true);

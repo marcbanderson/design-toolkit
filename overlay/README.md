@@ -39,7 +39,12 @@ Plain CSS and custom properties are nearly all tier 1. Utility classes such as
 Tailwind and CSS-in-JS are tier 3 today; the class-swap path is the next thing
 to build.
 
-`Alt+Shift+D` hides and shows the panel. `Escape` clears the selection.
+Each property is a field: label on the left, value on the right. Drag across
+the label to step through the ladder; click the value for the list. Only
+tokens are offered, and an off-ladder value is marked until it is changed.
+
+`Alt+Shift+D` hides and shows the panel. `Escape` closes a list, then clears
+the selection.
 
 ## Without the server
 
