@@ -109,6 +109,7 @@ rewritten check is a check that can be wrong differently each time.
 | --- | --- | --- |
 | `measure` | Rendered geometry at a fixed width, as JSON, with `--compare` to diff two runs | Three measurement errors in one day, all from hand-rolling the harness |
 | `guard` | Proves a file survived a bulk edit: braces, comment pairs, stray placeholders, byte delta, selector collapse | A whole-file regex destroyed a stylesheet and was nearly committed |
+| `cssdiff` | Proves a stylesheet edit changes nothing that renders: same DOM, swap the `<link>`, diff every computed property of every element. `--tokens` resolves custom properties per palette and theme | Three refactors passed a careful static safety check and still changed rendering |
 
 They install to `~/.claude/tools/` and the skills call them by that path.
 `measure` drives headless Chrome over the DevTools protocol with no npm
@@ -116,7 +117,24 @@ dependencies. Both exit non-zero on failure, so either can gate a commit.
 
 Their coverage is deliberately complementary. Revert a spacing rule and `guard`
 says the file is fine, because it is; `measure --compare` reports the three gaps
-that went from 24 to 12.
+that went from 24 to 12; `cssdiff` answers the different question of whether a
+refactor that *should* be inert actually is.
+
+Three rules `cssdiff` enforces that a hand-rolled harness will not:
+
+- **It self-tests.** Run it with `--before` and `--after` identical first. It
+  must report zero. An uncached first swap once reported 883 phantom differences
+  on whichever screen was measured first.
+- **It checks the served file against the file on disk** (`--verify PATH`) and
+  aborts on a mismatch. A stale server on a familiar port silently serves a
+  different checkout that looks identical, and every reading off it is a false
+  pass. That cost two separate sessions.
+- **It separates custom properties from rendered ones.** Deleting a variable
+  shows up on every element that inherits it and says nothing about pixels.
+
+`--tokens` exists because **a token system cannot be checked in the mode you
+designed in.** Six semantic aliases once resolved correctly in Light and Dark
+while both brand palettes silently rendered the default palette's colours.
 
 ## The architecture
 

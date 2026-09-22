@@ -1,0 +1,268 @@
+#!/usr/bin/env node
+/**
+ * cssdiff: prove a stylesheet edit changes nothing that renders.
+ *
+ *   cssdiff <url> --before FILE.css --after FILE.css [options]
+ *
+ *   --before HREF    stylesheet href to snapshot first (as the page would load it)
+ *   --after HREF     stylesheet href to compare against
+ *   --screens FILE   JSON: [{name, js}] app states to drive before measuring
+ *   --width N        viewport width, DEFAULT 393. Match the Figma frame.
+ *   --tokens LIST    comma-separated custom properties to resolve per palette/theme
+ *   --palettes LIST  data-palette values to check, default "gold-ink,periwinkle"
+ *   --json           raw JSON
+ *
+ * Loads the page once, snapshots every computed property of every element, swaps
+ * the <link> against the SAME DOM, snapshots again, and reports only what differs.
+ *
+ * Why this exists. A stylesheet refactor cannot be argued safe, only measured. On
+ * the run this was built for, three edits passed a careful static safety check and
+ * still changed rendering:
+ *
+ *   1. a final compound of `*` has no class/tag tokens, and reading that as
+ *      "matches nothing" let `.orb > *` move past a rule of identical
+ *      specificity, so source order flipped and a flex container became block
+ *   2. `padding` and `padding-right` are one property to the cascade and two
+ *      strings to a comparison
+ *   3. merging rules in source order can leave a longhand above a shorthand
+ *      that resets it
+ *
+ * The reasoning found none of them. The diff found all three.
+ *
+ * Three things it refuses to get wrong:
+ *
+ *   - It SELF-TESTS. With --before and --after identical it must report zero.
+ *     Run that first; an uncached first swap once reported 883 phantom
+ *     differences on the first screen measured.
+ *   - It checks the SERVED file against the file on disk and aborts on a
+ *     mismatch. A stale server on a familiar port silently serves a different
+ *     repository that looks identical, and every reading off it is a false pass.
+ *   - It reports CUSTOM PROPERTIES separately. Deleting one shows up on every
+ *     element that inherits it and says nothing about pixels.
+ *
+ * --tokens exists because a token system cannot be checked in the mode you
+ * designed in. Six aliases once resolved correctly in Light and Dark while both
+ * brand palettes silently rendered the default palette's colours.
+ */
+const { spawn } = require("child_process");
+const fs = require("fs"), os = require("os"), path = require("path");
+
+const CHROME = [
+  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "/Applications/Chromium.app/Contents/MacOS/Chromium",
+  "/usr/bin/google-chrome", "/usr/bin/chromium",
+].find(p => { try { fs.accessSync(p); return true; } catch { return false; } });
+
+function args(argv) {
+  const o = { width: 393, url: null, before: null, after: null, screens: null,
+              tokens: null, palettes: "gold-ink,periwinkle", json: false, verify: null };
+  for (let i = 0; i < argv.length; i++) {
+    const a = argv[i];
+    if (a === "--before") o.before = argv[++i];
+    else if (a === "--after") o.after = argv[++i];
+    else if (a === "--screens") o.screens = argv[++i];
+    else if (a === "--width") o.width = +argv[++i];
+    else if (a === "--tokens") o.tokens = argv[++i];
+    else if (a === "--palettes") o.palettes = argv[++i];
+    else if (a === "--verify") o.verify = argv[++i];
+    else if (a === "--json") o.json = true;
+    else if (a === "-h" || a === "--help") o.help = true;
+    else if (!o.url) o.url = a;
+  }
+  return o;
+}
+
+// Runs in the page. Waits for the <link> rather than assuming it has parsed;
+// assuming threw "Cannot set properties of null" whenever the page was slow.
+function probe(href) {
+  return new Promise((res, rej) => {
+    let tries = 0;
+    (function go() {
+      window.__lnk = window.__lnk || document.querySelector('link[rel="stylesheet"]');
+      if (!window.__lnk) {
+        if (++tries > 60) return rej(new Error("no stylesheet link after 6s"));
+        return setTimeout(go, 100);
+      }
+      window.__lnk.href = href;
+      setTimeout(res, 900);
+    })();
+  });
+}
+function snap() {
+  return [...document.querySelectorAll("*")].map(el => {
+    const cs = getComputedStyle(el), o = {};
+    for (let i = 0; i < cs.length; i++) o[cs[i]] = cs.getPropertyValue(cs[i]);
+    return o;
+  });
+}
+
+async function session(o, fn) {
+  const port = 9000 + Math.floor(Math.random() * 900);
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "cssdiff-"));
+  const chrome = spawn(CHROME, ["--headless=new", `--remote-debugging-port=${port}`,
+    `--user-data-dir=${dir}`, `--window-size=${o.width},1400`,
+    "--no-first-run", "--no-default-browser-check", "--disable-gpu"], { stdio: "ignore" });
+  const kill = () => { try { chrome.kill(); } catch {}
+                       try { fs.rmSync(dir, { recursive: true, force: true }); } catch {} };
+  process.on("exit", kill);
+
+  let target;
+  for (let i = 0; i < 80; i++) {
+    try {
+      const r = await fetch(`http://127.0.0.1:${port}/json/list`);
+      target = (await r.json()).find(t => t.type === "page");
+      if (target) break;
+    } catch {}
+    await new Promise(r => setTimeout(r, 100));
+  }
+  if (!target) { kill(); throw new Error("Chrome did not start"); }
+
+  const ws = new WebSocket(target.webSocketDebuggerUrl);
+  await new Promise((res, rej) => { ws.onopen = res; ws.onerror = rej; });
+  let id = 0; const pending = new Map();
+  ws.onmessage = e => {
+    const m = JSON.parse(e.data);
+    if (m.id && pending.has(m.id)) { pending.get(m.id)(m); pending.delete(m.id); }
+  };
+  const send = (method, params = {}) => new Promise(res => {
+    const i = ++id; pending.set(i, res);
+    ws.send(JSON.stringify({ id: i, method, params }));
+  });
+  const ev = async expr => {
+    const r = await send("Runtime.evaluate",
+      { expression: expr, awaitPromise: true, returnByValue: true });
+    if (r.result?.exceptionDetails)
+      throw new Error(JSON.stringify(r.result.exceptionDetails).slice(0, 300));
+    return r.result?.result?.value;
+  };
+
+  await send("Page.enable"); await send("Runtime.enable");
+  await send("Emulation.setDeviceMetricsOverride",
+    { width: o.width, height: 1400, deviceScaleFactor: 1, mobile: true });
+  await send("Page.navigate", { url: o.url });
+  await new Promise(r => setTimeout(r, 1800));
+  const ok = await ev(`document.querySelectorAll('*').length > 20`);
+  if (!ok) { ws.close(); kill(); throw new Error(`page at ${o.url} did not render`); }
+
+  try { return await fn(ev); } finally { ws.close(); kill(); }
+}
+
+// A stale server on a familiar port serves a DIFFERENT checkout that looks
+// identical. Every measurement off it is a false pass. Refuse to run.
+async function guardServed(url, href, localFile) {
+  if (!localFile) return;
+  const r = await fetch(new URL(href, url).href);
+  const served = Buffer.byteLength(await r.text());
+  const disk = fs.statSync(localFile).size;
+  if (served !== disk)
+    throw new Error(`served ${href} is ${served} bytes, ${localFile} is ${disk}. ` +
+      `Wrong server on this port, or a stale file. Refusing to measure.`);
+}
+
+async function diff(o, screens) {
+  return session(o, async ev => {
+    // Warm both stylesheets before measuring: an uncached first swap reports
+    // hundreds of phantom differences on whichever screen is measured first.
+    await ev(`(async()=>{ const probe=${probe.toString()};
+      await probe(${JSON.stringify(o.after)}); await probe(${JSON.stringify(o.before)}); })()`);
+    await new Promise(r => setTimeout(r, 2500));
+
+    const out = [];
+    for (const sc of screens) {
+      if (sc.js) {
+        await ev(`(async()=>{ const el=document.querySelector('[x-data]');
+          const $data = el && (el.__x ? el.__x.$data : (window.Alpine && Alpine.$data(el)));
+          ${sc.js} })()`);
+        await new Promise(r => setTimeout(r, 700));
+      }
+      const d = await ev(`(async()=>{
+        const probe=${probe.toString()}, snap=${snap.toString()};
+        await probe(${JSON.stringify(o.before)}); const a = snap();
+        await probe(${JSON.stringify(o.after)});  const b = snap();
+        if (a.length !== b.length) return {fatal:'element count '+a.length+' -> '+b.length};
+        const els=[...document.querySelectorAll('*')], rendered=[], custom=new Set();
+        for (let i=0;i<a.length;i++) for (const k in a[i]) if (a[i][k]!==b[i][k]) {
+          if (k.startsWith('--')) { custom.add(k); continue; }
+          const e=els[i];
+          rendered.push({ sel:((e.className&&e.className.toString().trim())||e.tagName.toLowerCase()).slice(0,50),
+                          prop:k, was:a[i][k], now:b[i][k] });
+        }
+        return { rendered, custom:[...custom] };
+      })()`);
+      out.push({ screen: sc.name, elements: await ev(`document.querySelectorAll('*').length`),
+                 rendered: d.rendered || [], custom: d.custom || [], fatal: d.fatal });
+    }
+    return out;
+  });
+}
+
+async function tokens(o) {
+  const toks = o.tokens.split(",").map(s => s.trim());
+  const pals = ["(default)", ...o.palettes.split(",").map(s => s.trim()).filter(Boolean)];
+  return session(o, async ev => {
+    if (o.after) { await ev(`(async()=>{ const probe=${probe.toString()};
+                              await probe(${JSON.stringify(o.after)}); })()`); }
+    await new Promise(r => setTimeout(r, 1200));
+    return ev(`(()=>{ const res={};
+      for (const pal of ${JSON.stringify(pals)}) for (const th of ['light','dark']) {
+        if (pal === '(default)') document.documentElement.removeAttribute('data-palette');
+        else document.documentElement.setAttribute('data-palette', pal);
+        document.documentElement.setAttribute('data-theme', th);
+        const cs = getComputedStyle(document.documentElement);
+        res[pal+'/'+th] = Object.fromEntries(${JSON.stringify(toks)}
+          .map(k => [k, cs.getPropertyValue(k).trim()]));
+      }
+      return res; })()`);
+  });
+}
+
+(async () => {
+  const o = args(process.argv.slice(2));
+  if (o.help || !o.url) {
+    console.log(fs.readFileSync(__filename, "utf8").split("*/")[0].replace(/^\/\*\*?|^ \* ?| \*$/gm, ""));
+    process.exit(o.url ? 0 : 1);
+  }
+  if (!CHROME) { console.error("cssdiff: no Chrome found"); process.exit(1); }
+  if (o.verify) await guardServed(o.url, o.after || o.before, o.verify);
+
+  if (o.tokens) {
+    const r = await tokens(o);
+    if (o.json) return console.log(JSON.stringify(r, null, 1));
+    for (const [mode, vals] of Object.entries(r))
+      console.log(`  ${mode.padEnd(20)} ` +
+        Object.entries(vals).map(([k, v]) => `${k}=${v || "(unset)"}`).join("  "));
+    return;
+  }
+
+  if (!o.before || !o.after) {
+    console.error("cssdiff: --before and --after are both required"); process.exit(1);
+  }
+  const screens = o.screens ? JSON.parse(fs.readFileSync(o.screens, "utf8"))
+                            : [{ name: "default", js: "" }];
+  const r = await diff(o, screens);
+  if (o.json) return console.log(JSON.stringify(r, null, 1));
+
+  const total = r.reduce((n, s) => n + s.rendered.length, 0);
+  const els = r.reduce((n, s) => n + s.elements, 0);
+  const custom = [...new Set(r.flatMap(s => s.custom))];
+  for (const s of r) {
+    if (s.fatal) console.log(`  ${s.screen}: FATAL ${s.fatal}`);
+    else if (s.rendered.length) console.log(`  ${s.screen}: ${s.rendered.length} differences`);
+  }
+  console.log(`\n  ${els} element snapshots across ${r.length} screens`);
+  console.log(`  rendered property differences: ${total}`);
+  if (custom.length) console.log(`  custom properties changed: ${custom.join(", ")}`);
+  if (total) {
+    const c = new Map();
+    for (const s of r) for (const d of s.rendered) {
+      const k = `${d.sel}|${d.prop}|${d.was}|${d.now}`;
+      c.set(k, (c.get(k) || 0) + 1);
+    }
+    console.log();
+    for (const [k, n] of [...c].sort((a, b) => b[1] - a[1]).slice(0, 15)) {
+      const [sel, prop, was, now] = k.split("|");
+      console.log(`   ${String(n).padStart(3)}  .${sel}\n        ${prop}: ${was} -> ${now}`);
+    }
+  }
+  process.exit(r.some(s => s.fatal) || total > 0 ? 1 : 0);
+})().catch(e => { console.error("cssdiff:", e.message); process.exit(1); });
