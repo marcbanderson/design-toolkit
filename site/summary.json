@@ -1,0 +1,364 @@
+{
+ "skills": [
+  {
+   "name": "decision-log",
+   "tagline": "Record decisions, open gaps and what they reveal about judgment",
+   "does": "Keeps two layers apart: the state of the work (settled, open and owed decisions, in the project's contract file) and the judgment behind it (how the designer decides, in a portable file at ~/.claude/design-judgment.md). Every settled row carries a real why and what the decision rejected, reversals stay in the table, and other people's decisions are tracked by name but never reworded. On read, it reports what moved, what is open and who it waits on, leading with anything blocked on the designer.",
+   "when": "When a decision gets made or reversed, at the end of a working session, when the designer asks what is open or decided, or when picking up a project after time away.",
+   "produces": "A Settled / Open / Owed decisions section in the project contract, and Stated or Observed entries appended to ~/.claude/design-judgment.md.",
+   "rule": "\"Why\" is mandatory, and it is not a restatement. \"Because it looks better\" is not a reason. \"Because Figma hugs and the pin restated a token\" is.",
+   "calls": [
+    "the project contract file",
+    "~/.claude/design-judgment.md",
+    "~/.claude/ai-design-vision.md"
+   ]
+  },
+  {
+   "name": "design-contract",
+   "tagline": "Create or update the one file every other skill reads",
+   "does": "Writes the project's DESIGN_CONTRACT.md, or extends whatever contract file the repo already has, holding the values that change per project: source of truth, where the work runs, rhythm ladder, type ramp, token layers, component inventory, copy rules and open decisions. It reads the codebase and Figma file first and asks the designer only about genuine decisions. Rules that stop referring to the project's own values graduate out of the contract and into a skill.",
+   "when": "At the start of a new project, or when the designer asks what the rules are, what the rhythm ladder is, or where the source of truth lives.",
+   "produces": "A single contract file at the repo root, updated in the same session whenever the designer states a rule or corrects a value.",
+   "rule": "Two contracts in one repo is worse than none, because they will disagree and neither will be trusted.",
+   "calls": []
+  },
+  {
+   "name": "design-parity",
+   "tagline": "Put the build beside the Figma frame at matched width and look",
+   "does": "Renders the built screen at the Figma frame's exact width, takes a screenshot of both, and compares them by eye in the order a designer notices things: vertical rhythm, proportion inside components, alignment and edges, type, missing or fabricated data, then state coverage. Only after looking does it measure, using the measure tool rather than a hand-written harness. A defect is fixed only when it is fixed in Figma first and then mirrored in code.",
+   "when": "When the designer asks whether the build matches Figma, says a screen is still off or out of alignment, or before opening a PR that touches design.",
+   "produces": "A defect list, one line per defect naming where, what is wrong and what it should be, plus what was checked and what was not exercised. Never a score.",
+   "rule": "Never report a percentage as an answer to a visual question.",
+   "calls": [
+    "design-contract",
+    "measure",
+    "figma-parity",
+    "get_screenshot"
+   ]
+  },
+  {
+   "name": "rhythm-model",
+   "tagline": "Derive spacing from the body line, then set density",
+   "does": "Takes the line-height of body text as the unit and expresses every spacing role as a simple fraction of it, after Muller-Brockmann's grid derivation. It scores candidate leadings by how many fractions come out whole, maps six relationships onto a ladder of fractions, shifts density by moving one step along that ladder rather than multiplying, aligns the rest of the type ramp so small-type lines add up to body lines, and quantises to the project's tokens last.",
+   "when": "When starting a design system, when asked where spacing values should come from, when a spacing scale and a type ramp disagree, or when a whole system should get looser or denser.",
+   "produces": "A rhythm table written into the project contract with the fractions shown beside the values, and a list of existing values that are not clean fractions (the drift).",
+   "rule": "Bind by pushing out, never by pulling in. When something must read as belonging to what it follows, increase the distance to everything else.",
+   "calls": [
+    "the project contract file"
+   ]
+  },
+  {
+   "name": "rhythm-pass",
+   "tagline": "Tighten spacing and hierarchy without redesigning, every value a token",
+   "does": "Runs the designer's own tuning-pass brief, made permanent: tighten what is loose, loosen what is cramped, line up what is off, and bind every spacing, colour and type value to a Figma variable and a matching code token. The working rule is group first, then stack: decide which adjacent pairs read as one thing, set them at the group value, and let the group enter the block stack. Fixes go on the component so every instance inherits them, in Figma first and then mirrored to code in the same session.",
+   "when": "When the designer asks for a tuning pass, a spacing pass, a rhythm pass, or says things look squished, cramped, tight or loose.",
+   "produces": "A list of what changed and where, in both Figma and code, with no composition changed and no literal introduced.",
+   "rule": "\"This is not a redesign\" is the binding constraint.",
+   "calls": [
+    "design-contract"
+   ]
+  },
+  {
+   "name": "session-state",
+   "tagline": "Read or write STATUS.md so a restart loses nothing",
+   "does": "Maintains a STATUS.md at the repo root that records where the work is right now: branch and PR position, what is in flight, what is next, traps that already cost a round trip, and known broken things not ours to fix. It is a separate file because it changes every session, and a fast-changing fact inside a slow-changing document makes the whole document look stale. On read it verifies position with commands rather than trusting the file and reports in three lines or fewer, blocked-on-the-designer items first.",
+   "when": "At the start of a session to pick up where things left off, when the designer asks where we are, and at the end of a session or whenever position changes.",
+   "produces": "STATUS.md with five ordered sections (Read next, Position, In flight, Next, Traps) kept under a screen, plus a three-line summary on read.",
+   "rule": "If the next session read only STATUS.md and the contract, would it know what to do and what not to trust? If not, the missing part goes in one of them.",
+   "calls": [
+    "decision-log",
+    "the project contract file",
+    "~/.claude/design-judgment.md"
+   ]
+  },
+  {
+   "name": "ship-check",
+   "tagline": "Prove the artifact the designer sees contains the work",
+   "does": "Asks four questions before any claim of done, live or shipped: which artifact the designer is looking at (named by URL or port), whether that artifact actually contains the change (committed is not pushed, pushed is not merged, merged is not built, built is not live), whether anything is cached between the work and his eyes, and what was not exercised. It checks the actual thing, such as the deploy service reporting the pushed commit or the local server serving the edited directory, rather than inferring it.",
+   "when": "Before saying a change is live or done, when the designer says he is still seeing the old version, or when he asks whether a deployed site matches his branch.",
+   "produces": "A short report stating the environment, the evidence, and the gap: what is verified where, and what is not verified and why.",
+   "rule": "Never say done, live, or shipped without having checked. If you cannot check, say what you could not check and why.",
+   "calls": []
+  },
+  {
+   "name": "taste-extract",
+   "tagline": "Recover a designer's spacing, type and colour grammar from hand-tuned screens",
+   "does": "Takes three to five screens the designer actively adjusted and records what each distance separates rather than histogramming values, so the output is a grammar (how many distinct distances, the ratio between them, which relationship gets which) instead of a copied vocabulary. Three filters drop gaps that render nothing, runs of identical items, and component internals, and containers are classified by what their children are, never by shape. Type is measured by usage and colour by relative luminance, with a contrast check on opposed pairs treated as a first-class finding.",
+   "when": "At the start of a project once a calibration set exists, when asked how to apply someone's taste to a new codebase, or when a design system needs rules rather than a copied palette.",
+   "produces": "A Grammar section written into the project contract, stated as relationships and fractions of the unit so it survives being moved to another scale.",
+   "rule": "A button is never the second half of a lockup. If a shape test and a role test disagree, the role test is right.",
+   "calls": [
+    "rhythm-model",
+    "the project contract file"
+   ]
+  },
+  {
+   "name": "token-audit",
+   "tagline": "Find every unbound value in code and Figma, then reconcile the two",
+   "does": "Runs three phases: raw values in styling positions in code, unbound fills, strokes, text, effects, gaps, padding and radius in Figma, and a reconcile that diffs the two token sets for values missing on either side, same name with different values, and same value under different names. It discovers the project's token dialect first and writes it into the contract, proves every detector's coverage by planting a known value, separates authored from vendored, snaps near misses to the nearest token under four honesty rules, and works line by line rather than regexing a whole stylesheet, guarding the file before and after.",
+   "when": "When the designer asks whether everything is tokenized, asks for a variable or styles audit, says values should be tokens, or before adopting a design system into a new codebase.",
+   "produces": "A report of coverage, code findings with snap suggestions, Figma findings per component, reconcile pairs with both values side by side, and noise set aside. Never a percentage tokenized.",
+   "rule": "A raw value in a styling position is a defect.",
+   "calls": [
+    "guard",
+    "rhythm-model",
+    "design-contract",
+    "token-auditor",
+    "get_variable_defs"
+   ]
+  }
+ ],
+ "agents": [
+  {
+   "name": "figma-parity",
+   "tagline": "Runs design-parity in its own context, returns defects only",
+   "does": "Compares built screens against their Figma frames at matched width and hands back a defect list grouped as Checked, Defects and Clean. It is read-only by design: it finds defects and never fixes or reports them as fixed, and a screen it could not reach never appears under Clean.",
+   "why": "Every screen in a parity sweep costs two screenshots plus the DOM and node reads behind them; across a dozen screens that is most of a context window and none of it is the answer. The agent absorbs that cost so only findings reach the main thread.",
+   "runs": "design-parity",
+   "model": "sonnet",
+   "tools": [
+    "Read/Grep/Glob/Bash",
+    "Skill",
+    "Figma MCP (use_figma, get_screenshot, get_metadata)",
+    "Chrome (navigate, computer, javascript, tabs, resize, batch)"
+   ]
+  },
+  {
+   "name": "token-auditor",
+   "tagline": "Runs token-audit in its own context, returns findings only",
+   "does": "Scans code, Figma, or both for unbound values and reconciles the two token sets, returning a fixed report shape: coverage with denominators, near misses safe to snap, off-system values needing a decision, Figma findings per component, reconcile pairs, and what was set aside. It has no edit tools and will narrow scope and say so rather than return a partial report that reads as complete.",
+   "why": "A token sweep scans thousands of declarations and Figma nodes; in one measured session tool results were 99% of all content with single results over half a megabyte. Running the scan elsewhere keeps the main conversation for the judgment that follows.",
+   "runs": "token-audit",
+   "model": "sonnet",
+   "tools": [
+    "Read/Grep/Glob/Bash",
+    "Skill",
+    "Figma MCP (use_figma, get_variable_defs, get_metadata)"
+   ]
+  }
+ ],
+ "tools": [
+  {
+   "name": "measure",
+   "tagline": "Report rendered geometry at a fixed width, as JSON",
+   "does": "A node script that launches headless Chrome over the DevTools protocol at an explicit viewport width, defaulting to the 393 phone frame, optionally runs setup JavaScript to drive app state, and reports gaps between children, element boxes, overflow and collapsed text. It reads columnGap and rowGap rather than the gap shorthand, which does not round-trip a var(), and it never uses page height as a change metric. A saved JSON run can be diffed against a later one.",
+   "usage": [
+    "measure <url> --width 393",
+    "measure <url> --setup 'JS to drive app state' --wait 900",
+    "measure <url> --gaps SEL    vertical gaps between the children of SEL",
+    "measure <url> --box SEL     top, left, width, height, borders of each match",
+    "measure <url> --overflow    elements wider than the viewport",
+    "measure <url> --json > baseline.json",
+    "measure <url> --compare baseline.json    diff against a previous --json run"
+   ],
+   "because": "Three measurement mistakes in one day, each from writing a throwaway harness instead of calling a reliable one: measured at 1512 wide instead of 393, so the answer meant nothing; read getComputedStyle().gap, which does not round-trip a var() and silently reported 6px where the real value was 8; used page height as the change metric, which is pinned by a fixed bottom bar and reported no change whatever happened.",
+   "checks": [
+    "Rendered gap between each adjacent visible child of a selector, with the declared rowGap beside it",
+    "Box of each matched element: top, left, width, height, border, padding, columnGap, rowGap, leading text",
+    "Elements whose right edge exceeds the viewport width",
+    "Count of visible elements",
+    "Count of visible text elements rendering under 2px tall (collapsed text)",
+    "With --compare: which gaps changed, delta in visible elements and collapsed text; exits 1 if collapsed text grew"
+   ]
+  },
+  {
+   "name": "guard",
+   "tagline": "Prove a file survived an edit",
+   "does": "A python script that inspects stylesheets, HTML and JSON for the structural things that break during bulk edits, and compares against a snapshot taken before the edit so a silent catastrophe cannot pass. It records byte count, line count and a hash per file, then on verify flags byte deltas over a limit, collapsed selector counts, and files that did not change at all. Exit code is non-zero on any failure so it can gate a commit.",
+   "usage": [
+    "guard snapshot FILE...    record the state before editing",
+    "guard check FILE...       structural checks only, no snapshot needed",
+    "guard verify [FILE...]    check, then compare to the snapshot",
+    "--max-delta PCT   fail if byte count moved more than this (default 20)",
+    "--changed         additionally fail any file that did NOT change",
+    "--require STR     fail if this string is missing (repeatable)",
+    "--json            machine-readable output"
+   ],
+   "because": "Built after a whole-file regex destroyed a stylesheet and was nearly committed, because the damage was caught three steps later by an unrelated probe rather than by looking at the file.",
+   "checks": [
+    "CSS/SCSS/Less: brace balance after stripping comments",
+    "CSS/SCSS/Less: /* and */ comment markers pair up",
+    "CSS/SCSS/Less: selector count, failing on verify if it fell more than 10%",
+    "HTML/Vue/Svelte: unclosed tags and mismatched closing tags",
+    "HTML/Vue/Svelte: <!-- and --> comment markers balance",
+    "JSON: parses",
+    "Any file: stray null bytes left behind by a placeholder",
+    "Any file: required strings present (--require)",
+    "On verify: byte count moved less than --max-delta percent",
+    "On verify: file still exists and, with --changed, actually changed since the snapshot"
+   ]
+  },
+  {
+   "name": "tokens-manifest",
+   "tagline": "The overlay's token manifest, read from the contract",
+   "does": "Reads the project's contract (DESIGN_CONTRACT.md, DESIGN_SYSTEM.md, DESIGN.md or the design section of CLAUDE.md) and emits the manifest the overlay picks from: the unit, the spacing ladder as name to px, and the text styles as size, line and weight. It only reads; if a value is not in the contract it is not in the manifest, and the summary on stderr says what was missing so the contract gets fixed rather than the manifest.",
+   "usage": [
+    "tokens-manifest [DIR|CONTRACT.md]",
+    "--css FILE      also read custom properties from a token stylesheet",
+    "--unit N        body line-height, when the contract does not state it",
+    "--js            emit window.__designTokens = {...} instead of JSON"
+   ],
+   "because": "The overlay must offer the contract's tokens, not a copy of them that drifts.",
+   "checks": [
+    "unit, stated in the contract or inferred from the ladder",
+    "spacing tokens from the rhythm ladder table or inline definitions",
+    "text styles from a size/line table or the Ramp and Weights lines",
+    "line-heights inferred and flagged when the contract gives only sizes"
+   ]
+  },
+  {
+   "name": "overlay-server",
+   "tagline": "Serves the overlay to a dev build and receives its exports",
+   "does": "A dependency-free local server run from the project root. It reads the contract through tokens-manifest, serves overlay.js and the manifest, and prints the one include line for the dev build. Send to session in the overlay posts here, and each export is written to .toolkit/inbox/ as a markdown file for the session to apply; the server adds .toolkit/ to the repo's local git exclude so nothing is committed.",
+   "usage": [
+    "overlay-server [--port 8766] [--root DIR]",
+    "--manifest FILE  serve this manifest instead of reading the contract",
+    "--css FILE       passed to tokens-manifest",
+    "GET /overlay.js  GET /tokens.json  GET /include  POST /export"
+   ],
+   "because": "The paste step between changing something on screen and the session applying it.",
+   "checks": [
+    "/overlay.js, the script",
+    "/tokens.json, the contract's tokens",
+    "/include, the line for the dev build",
+    "/export, writes .toolkit/inbox/<stamp>-overlay.md"
+   ]
+  }
+ ],
+ "templates": [
+  {
+   "name": "DESIGN_CONTRACT.md",
+   "does": "The slow-changing rules of a project: source of truth and mirror direction, where the work runs, rhythm ladder, type ramp and permitted weights, token layers and dialect, component inventory, copy rules, and a Settled / Open / Owed decisions log."
+  },
+  {
+   "name": "STATUS.md",
+   "does": "The fast-changing record of where the work is right now: a Read next table, Position, In flight, Next, Traps, and Known broken, rewritten at the end of every session."
+  }
+ ],
+ "enforcement": [
+  "**Find the project's contract first.** Read it before changing anything, and never create a second one beside it.",
+  "**Figma is authored first, code follows, in the same session.** A fix that exists in only one place is new drift, not a repair.",
+  "**Never claim done, live, or shipped without running `ship-check`.** Name the artifact the designer is looking at, confirm it contains the change, and say what was not exercised.",
+  "**Never answer a visual question with a number.** Put the renders side by side at matched width and look.",
+  "**Measure the result before reporting it.** A change that reasons correctly can still render wrong.",
+  "**A raw value in a styling position is a defect.** Bind it, or say why it is exempt.",
+  "**Spacing is hierarchical, never uniform.** Group first, then stack; a flat gap between unrelated blocks is the failure mode even when the value is on scale.",
+  "**Delegate the sweep, keep the judgment.** Send work touching more than three files, two screens or a whole Figma page to a read-only subagent, and keep the decision in the main conversation.",
+  "**Read narrowly.** Grep for the selector and read the lines around it; never dump a Figma subtree or screenshot a full page for one property.",
+  "**Return narrowly.** A script that produces findings prints the findings, not the data it derived them from.",
+  "**Say the number, not the list.** \"862 raw values, mostly gap and height\" beats 862 lines."
+ ],
+ "vision": {
+  "last_updated": "2026-09-17",
+  "themes": [
+   {
+    "title": "1. Constraint is the design system's actual product",
+    "thesis": "A design system is a set of refusals, and its value is what it makes unavailable. Limit the places where range invites drift (type sizes, weights, palette use), and supply the places where scarcity invites a workaround (icons).",
+    "quote": "Leave as-is, but are these too many sizes for such a simple page?"
+   },
+   {
+    "title": "2. Tokens are a contract, and amending the contract is the correct move",
+    "thesis": "Every measurement, colour and type value binds to a token, Figma and code are two serializations of one dictionary, and when the system lacks a value you amend the system rather than hardcode around it.",
+    "quote": "Do you have a full understanding of the design system tokens as well as the design system as it is expressed and tokenized within Figma? The two of those things should be identical so that if a Figma design expresses a space or a color using a token, you have that corresponding token."
+   },
+   {
+    "title": "3. Design intent expressed as proportion, not pixels",
+    "thesis": "Relationships are specified as ratios anchored to content when a fixed number would be ambiguous, and as exact pixels only when the relationship is already settled.",
+    "quote": "NO, it got worse. Imagine that the text area is 50% of the viewport's width. The margins in all cases need to each be about 15%-20% of the width of the text area"
+   },
+   {
+    "title": "4. Motion is pacing, and pacing is a reading problem",
+    "thesis": "Scroll-driven motion is authored in units of comprehension, what the reader has finished reading, not in durations or easing curves; the implementation derives the timing.",
+    "quote": "I want a block of text to fully scroll into view, then up and mostly out before the next block scrolls in. As that next block reaches about 25% of the way up the viewport the image will switch, so that the new image is there until the text scrolls up and mostly out of view."
+   },
+   {
+    "title": "5. Mobile is the same design under different constraints, not a second design",
+    "thesis": "One design idea survives the size change with its character intact; scaling up is a redistribution across a ramp that already had the room, and a constraint changes the layout, never the contents.",
+    "quote": "It should still use all of the tokens, and we might just have to decide how the type scales up for desktop... buttons don't become gigantic. They are standard size and aligned to the left, for example."
+   },
+   {
+    "title": "6. AI has to be shown, not claimed",
+    "thesis": "The only credible demonstration of AI is the specificity of what comes back, so show the artifact rather than a gauge measuring it, state what it does not yet know, and let motion obey the argument the interface is making.",
+    "quote": "The real idea here is that a portrait is a collection of traits and characteristics and influences and outputs, and so it's a collection of stuff, not a literal portrait."
+   },
+   {
+    "title": "7. Build it in isolation, get it right, then integrate",
+    "thesis": "Scope down before scoping up, and keep does-it-look-right separate from is-it-wired-in so the feedback loop is about one thing at a time.",
+    "quote": "This is a very long response, and you only need the very top of it, so don't build the whole thing. Additionally, can you build this in a new page to get it right before we attempt to change the asset on this landing page?"
+   },
+   {
+    "title": "8. How he actually works with AI: seeing beats describing",
+    "thesis": "The AI gets a briefing, not a specification: load the context, wait for direction, build, and be corrected against what he sees. A metric is never accepted as the answer to a visual question.",
+    "quote": "I don't want you to make the prototype by yourself. I will guide you to make it, I just need you to have proper context."
+   },
+   {
+    "title": "9. Design decisions are social",
+    "thesis": "Craft decisions are made on principle and positioning decisions on what the business needs from the visitor; colleague reactions are relayed as input without ceremony and the two are not confused.",
+    "quote": "is there a better color than gold? My colleague doesn't like the gold"
+   },
+   {
+    "title": "10. Accessibility as a working constraint, not a review gate",
+    "thesis": "Lightness separation over hue, dark mode as a lived problem, and accessibility and reduced motion enforced as automated gates with off as a first-class token value.",
+    "quote": "we should definitely have a check for accessibility and to make sure that all motion is tokenized to be able to be turned off."
+   },
+   {
+    "title": "11. AI in a mature product is a question of proximity, not capability",
+    "thesis": "What decides whether AI gets used is how close it sits to the thing the person is looking at, not how capable the model is; start from the shipped product and let it converge, never from a blank canvas.",
+    "quote": "Not that you would start blank but you would start with PitchBook as it is today."
+   },
+   {
+    "title": "12. Demand is counted, not assumed",
+    "thesis": "The designs, not the library, are the demand signal: rank components by real instances, collapse axes nobody overrides, refuse to port the unused, and make guards fail builds rather than inform humans.",
+    "quote": "The library is older than the designs and I do not trust all of it. ... The designs are the demand signal, not the library."
+   },
+   {
+    "title": "13. Components are data contracts, not pictures",
+    "thesis": "A component is done when it contains its full state space so wiring it to live data is a parameter change; when a drawing keeps drifting, make it a referenced object and put the rules of use with it.",
+    "quote": "In general, you need to be building these so that we can connect them to the data sources. That means when we have little up arrow icons, there are also the corresponding down arrow icons when something is negative, but that should all be contained within the components."
+   },
+   {
+    "title": "14. The artboard is the contract, and spacing must be measured",
+    "thesis": "Spacing that falls out of nested autolayout has no token name and must be measured off the frame at its authored width, and the durable fix is to give every screen one identical shell and push all spacing nuance into components.",
+    "quote": "All of the built frames need to use identical spacing for the content shell of the frames. Any nuance in spacing has to be a part of the individual components."
+   },
+   {
+    "title": "15. An entry screen should invite exploration, not run a process",
+    "thesis": "An AI product's first screen should demonstrate breadth spatially rather than list prompts under a text box: irregular with structure underneath, running past the edges, every element carrying its subject.",
+    "quote": "those could be kind of swarming on the homepage in such a way I think we can have a little bit like structure so that we have more energy within that context so it feels much more exploratory for the user than it is come in and do a rigid process."
+   },
+   {
+    "title": "16. Surface treatments are a grammar, and the border's job is counting",
+    "thesis": "Each surface treatment is a claim about the object's nature (white plus border marks a peer you act on as a unit, no box for the page's single subject), motifs and placement carry their meaning with them, and friendliness comes from spacing and radius before colour.",
+    "quote": "I was unsure what should get treated with a white background and border. This is where I want consistency and a meaningful choice."
+   },
+   {
+    "title": "17. Corpus is what a persona knows; judgement is how it would act",
+    "thesis": "Judgement tuned on top of a corpus makes the corpus more useful than more content would, and an agent acting on your behalf shows its judgement through a permissions contract that scales with stakes.",
+    "quote": "Right now workflows are just stringing together actions (deterministic actions) that I should also be able to define through conversation, but eventually I should also be able to have a judgement layer help add a POV to the workflows and each workflow step. Don't just 'do this' but do it how Marc would do it."
+   },
+   {
+    "title": "Vertical rhythm (added 2026-09-10)",
+    "thesis": "Tight vertical spacing is read as a defect before anything else; the fix is structural (the component owns its air, as a token) and the transferable part is the roughly 3x ratio between inside a group and between groups, not the numbers.",
+    "quote": "learn from this spacing as we move forward: this is aesthetically more pleasing than what you have automatically created before."
+   },
+   {
+    "title": "Data should tell you what to do (added 2026-09-10)",
+    "thesis": "The bar for a data module is relative performance and a recommendation, not a number; the AI's verdict sits next to the data on every surface.",
+    "quote": "there is probably a more creative way to show them and also meaningful information to provide that can drive more insights than just what the card is doing. Like how that card's performance speaks to the market or what you should do?"
+   },
+   {
+    "title": "The process itself becomes a system (added 2026-09-18)",
+    "thesis": "A designer's standards accumulate like tokens and drift the same way when retyped by hand; the prompt you retype is a literal and the skill is the token. The dominant failure across seven weeks was verification, not taste, so quality is a property of the loop.",
+    "quote": "highly productive while still keeping my unique touch and ensuring the highest quality."
+   }
+  ],
+  "open_threads": [
+   "The amendment path: measure a design system by how cheap it is to legitimately change, not by how strictly it is enforced.",
+   "Comprehension-timed motion: scroll choreography authored in units of what the reader has finished reading.",
+   "Proving AI instead of announcing it: a critique of AI products marketing themselves through interface signals rather than output quality.",
+   "The look-at-it loop: why visual feedback beats specification when working with AI, from a designer's seat.",
+   "Ratio-anchored layout: the technical argument for ratios anchored to content rather than the viewport.",
+   "Proximity beats capability: the strongest new candidate, pairing with section 6 into a point of view on AI in existing products rather than AI-native ones."
+  ]
+ }
+}

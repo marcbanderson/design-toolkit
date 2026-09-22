@@ -74,6 +74,9 @@ cd ~/design-toolkit && git add -A && git commit -m "..." && git push
 
 ```
 tools/         executables the skills call, so a check is run rather than rewritten
+overlay/       the on-screen editor: overlay.js, a demo screen, and its README
+site/          index.html, a self-contained page listing everything here and
+               what the toolkit has learned about the designer; open it in a browser
 skills/        nine skills, the methods. Written neutrally.
 agents/        two read-only agents, so a sweep's output stays out of the thread
 judgment/      the only personal layer
@@ -85,6 +88,15 @@ claude-md-section.md   the enforcement rules, appended to ~/.claude/CLAUDE.md
 
 Everything except `judgment/` is impersonal. That is the point: the methods are
 the same for anyone, the criteria are not.
+
+## The web view
+
+`site/index.html` is one self-contained page: every skill, agent and executable
+with what it does and its full source, plus the judgment file rendered as prose.
+Open it in a browser, or serve `site/` with GitHub Pages. Rebuild after a
+change with `python3 site/build.py`; add `--vision` to include the vision
+record section, which is left out of the committed copy because that file is
+not in this repo.
 
 ## The skills
 
@@ -109,6 +121,8 @@ rewritten check is a check that can be wrong differently each time.
 | --- | --- | --- |
 | `measure` | Rendered geometry at a fixed width, as JSON, with `--compare` to diff two runs | Three measurement errors in one day, all from hand-rolling the harness |
 | `guard` | Proves a file survived a bulk edit: braces, comment pairs, stray placeholders, byte delta, selector collapse | A whole-file regex destroyed a stylesheet and was nearly committed |
+| `tokens-manifest` | Reads the contract's ladder, ramp and weights and emits the manifest the overlay picks from | The overlay must offer the contract's tokens, not a copy of them |
+| `overlay-server` | Serves the overlay to a dev build from one include line and writes its exports to `.toolkit/inbox/` | The paste step between "I changed it on screen" and "the session applies it" |
 | `cssdiff` | Proves a stylesheet edit changes nothing that renders: same DOM, swap the `<link>`, diff every computed property of every element. `--tokens` resolves custom properties per palette and theme | Three refactors passed a careful static safety check and still changed rendering |
 
 They install to `~/.claude/tools/` and the skills call them by that path.
@@ -135,6 +149,30 @@ Three rules `cssdiff` enforces that a hand-rolled harness will not:
 `--tokens` exists because **a token system cannot be checked in the mode you
 designed in.** Six semantic aliases once resolved correctly in Light and Dark
 while both brand palettes silently rendered the default palette's colours.
+
+## The overlay
+
+A panel that sits on top of the running build. Click an element, see its gap,
+padding, margin and text as tokens, change them only to other tokens, and watch
+the render move. Changes reduce to net decisions (a change you reverse drops
+out) and export as a prompt that asks the session to apply them to the source
+rule, verify by measurement, mirror to Figma and record the decisions.
+
+In the project:
+
+```bash
+~/.claude/tools/overlay-server          # reads the contract, serves the script, receives exports
+```
+
+In the dev build, and only the dev build:
+
+```html
+<script src="http://localhost:8766/overlay.js"></script>
+```
+
+Send to session writes `.toolkit/inbox/<stamp>-overlay.md`, which is local
+only. The standing rule in `claude-md-section.md` says what a session does with
+it. `overlay/demo.html` is a sample screen with seeded defects to try it on.
 
 ## The architecture
 

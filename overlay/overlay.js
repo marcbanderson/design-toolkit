@@ -1,0 +1,367 @@
+/* Toolkit overlay, prototype.
+ *
+ * Sits on top of a rendered design. Click an element, see its spacing and text
+ * as tokens, change them only to other tokens, and accumulate the changes into
+ * a prompt for the AI to apply to the codebase. It never writes source.
+ *
+ * Tokens come from window.__designTokens when the page provides it:
+ *   { unit: 24,
+ *     space: { "space-1": 4, "space-2": 8, ... },          // name -> px
+ *     text:  { "text-body": { size:16, line:24, weight:400 }, ... } }
+ * Otherwise spacing tokens are inferred from :root custom properties and the
+ * type ramp from the distinct text styles already on the page, and the panel
+ * says so.
+ *
+ * Toggle with Alt+Shift+D, or window.__toolkitOverlay.toggle().
+ */
+(function () {
+  if (window.__toolkitOverlay) { window.__toolkitOverlay.toggle(); return; }
+  // When served by overlay-server, its origin is the endpoint: manifest in, exports out.
+  const SCRIPT_SRC = (document.currentScript && document.currentScript.src) || "";
+  const ENDPOINT = (window.__designTokens && window.__designTokens.endpoint) || (/^https?:\/\//.test(SCRIPT_SRC) && /\/overlay\.js(\?|$)/.test(SCRIPT_SRC) ? new URL(SCRIPT_SRC).origin : "");
+
+  // ---------- tokens ----------
+  const FRACTIONS = [[1,6],[1,4],[1,3],[1,2],[2,3],[1,1],[4,3],[3,2],[2,1],[3,1]];
+  function discoverTokens() {
+    const given = window.__designTokens || {};
+    const bodyLH = parseFloat(getComputedStyle(document.body).lineHeight);
+    const unit = given.unit || (isFinite(bodyLH) ? Math.round(bodyLH) : 24);
+    let space = given.space, spaceSource = "manifest";
+    if (!space) {
+      space = {}; spaceSource = "inferred from :root";
+      for (const sheet of document.styleSheets) {
+        let rules; try { rules = sheet.cssRules; } catch (e) { continue; }
+        for (const r of rules) {
+          if (!r.selectorText || !/(^|,)\s*(:root|html)\s*(,|$)/.test(r.selectorText)) continue;
+          for (const name of r.style) {
+            if (!name.startsWith("--")) continue;
+            const v = r.style.getPropertyValue(name).trim();
+            const m = /^(-?\d*\.?\d+)(px|rem)$/.exec(v);
+            if (!m) continue;
+            if (!/(space|spacing|gap|^--s-?\d|^--sp)/i.test(name)) continue;
+            const px = m[2] === "rem" ? parseFloat(m[1]) * 16 : parseFloat(m[1]);
+            space[name.replace(/^--/, "")] = px;
+          }
+        }
+      }
+    }
+    let text = given.text, textSource = "manifest";
+    if (!text) {
+      text = {}; textSource = "inferred from the page";
+      const seen = new Map();
+      for (const el of document.body.querySelectorAll("*")) {
+        if (el.closest("[data-toolkit-overlay]")) continue;
+        if (!hasOwnText(el)) continue;
+        const cs = getComputedStyle(el);
+        const key = `${parseFloat(cs.fontSize)}/${parseFloat(cs.lineHeight)}/${cs.fontWeight}`;
+        const s = seen.get(key) || { size: parseFloat(cs.fontSize), line: parseFloat(cs.lineHeight), weight: +cs.fontWeight, family: cs.fontFamily.split(",")[0].replace(/"/g, ""), n: 0 };
+        s.n++; seen.set(key, s);
+      }
+      [...seen.values()].sort((a, b) => b.n - a.n).slice(0, 8).forEach((s, i) => { text[`style-${i + 1} (${s.n} uses)`] = s; });
+    }
+    const ladder = Object.entries(space).map(([name, px]) => ({ name, px })).sort((a, b) => a.px - b.px);
+    return { unit, space, ladder, text, spaceSource, textSource };
+  }
+  function hasOwnText(el) {
+    for (const n of el.childNodes) if (n.nodeType === 3 && n.textContent.trim()) return true;
+    return false;
+  }
+  function tokenFor(px) {
+    const hit = T.ladder.find(t => Math.abs(t.px - px) < 0.5);
+    if (hit) return { kind: "token", name: hit.name };
+    if (px === 0) return { kind: "zero", name: "0" };
+    const f = FRACTIONS.find(([a, b]) => Math.abs(px - T.unit * a / b) < 0.5);
+    if (f) return { kind: "fraction", name: `${f[0]}/${f[1]} u, no token` };
+    return { kind: "off", name: "off ladder" };
+  }
+  function nearestToken(px) {
+    let best = T.ladder[0];
+    for (const t of T.ladder) if (Math.abs(t.px - px) < Math.abs(best.px - px) || (Math.abs(t.px - px) === Math.abs(best.px - px) && t.px > best.px)) best = t;
+    return best;
+  }
+  function textStyleFor(cs) {
+    const size = parseFloat(cs.fontSize), line = parseFloat(cs.lineHeight), weight = +cs.fontWeight;
+    for (const [name, s] of Object.entries(T.text)) if (Math.abs(s.size - size) < 0.5 && Math.abs(s.line - line) < 0.5 && s.weight === weight) return name;
+    return null;
+  }
+
+  // ---------- identity ----------
+  function componentName(el) {
+    let node = el;
+    while (node) {
+      if (node.dataset && (node.dataset.component || node.dataset.testid)) return node.dataset.component || node.dataset.testid;
+      const fk = Object.keys(node).find(k => k.startsWith("__reactFiber$"));
+      if (fk) {
+        let f = node[fk];
+        while (f) { const t = f.type; if (typeof t === "function" && t.name && /^[A-Z]/.test(t.name)) return t.name; if (t && t.displayName) return t.displayName; f = f.return; }
+      }
+      if (node.__vueParentComponent && node.__vueParentComponent.type && node.__vueParentComponent.type.name) return node.__vueParentComponent.type.name;
+      node = node.parentElement;
+    }
+    return null;
+  }
+  function shortSel(el) {
+    const cls = [...el.classList].filter(c => !/^(is-|has-|hover|focus|active|js-)/.test(c)).slice(0, 2).map(c => "." + CSS.escape(c)).join("");
+    return el.tagName.toLowerCase() + cls;
+  }
+  function pathOf(el) {
+    const parts = []; let n = el, depth = 0;
+    while (n && n !== document.body && depth < 4) {
+      let s = shortSel(n);
+      if (n.parentElement) { const same = [...n.parentElement.children].filter(c => c.tagName === n.tagName); if (same.length > 1 && n.classList.length === 0) s += `:nth-of-type(${same.indexOf(n) + 1})`; }
+      parts.unshift(s); n = n.parentElement; depth++;
+    }
+    return parts.join(" > ");
+  }
+  function identity(el) {
+    return { component: componentName(el), path: pathOf(el), text: ((t) => t.length > 60 ? t.slice(0, 57).replace(/\s+\S*$/, "") + "..." : t)((el.innerText || el.textContent || "").trim().replace(/\s+/g, " ")), tag: el.tagName.toLowerCase() };
+  }
+
+  // ---------- inspection ----------
+  const PADS = ["padding-top", "padding-right", "padding-bottom", "padding-left"];
+  const MARGS = ["margin-top", "margin-bottom"];
+  function inspect(el) {
+    const cs = getComputedStyle(el);
+    const isFlex = /flex|grid/.test(cs.display);
+    const out = { el, cs, isFlex, gaps: null, pads: {}, margs: {}, text: null, lints: [] };
+    if (isFlex) out.gaps = { "row-gap": parseFloat(cs.rowGap) || 0, "column-gap": parseFloat(cs.columnGap) || 0 };
+    PADS.forEach(p => out.pads[p] = parseFloat(cs.getPropertyValue(p)) || 0);
+    MARGS.forEach(p => out.margs[p] = parseFloat(cs.getPropertyValue(p)) || 0);
+    if (hasOwnText(el)) out.text = { size: parseFloat(cs.fontSize), line: parseFloat(cs.lineHeight), weight: +cs.fontWeight, style: textStyleFor(cs) };
+    // lints, from the judgment file
+    const vals = Object.assign({}, out.gaps || {}, out.pads);
+    for (const [p, v] of Object.entries(vals)) {
+      if (v === 0) continue;
+      const t = tokenFor(v);
+      if (t.kind === "off") out.lints.push({ prop: p, level: "defect", msg: `${p} is ${v}px, not a fraction of the body line (u = ${T.unit}). Nearest token ${nearestToken(v).name} at ${nearestToken(v).px}px.`, fix: { prop: p, token: nearestToken(v) } });
+      else if (t.kind === "fraction") out.lints.push({ prop: p, level: "note", msg: `${p} is ${v}px, a clean fraction of u but no token carries it.` });
+    }
+    if (out.gaps) {
+      const kids = [...el.children];
+      const column = cs.display.includes("grid") || cs.flexDirection.startsWith("column");
+      const g = column ? out.gaps["row-gap"] : out.gaps["column-gap"];
+      const hasButton = kids.some(k => k.matches("button, a[role=button], [class*=btn], [class*=button]"));
+      if (column && hasButton && g > 0 && g < T.unit) out.lints.push({ prop: "row-gap", level: "defect", msg: `A button is an action, not a continuation of the text above it. Gap to a button is ${g}px, under 1 u (${T.unit}px).`, fix: { prop: "row-gap", token: T.ladder.find(t => t.px === T.unit) } });
+      const reading = kids.filter(k => k.matches("p, h1, h2, h3, h4, h5, h6")).length >= 2;
+      if (column && reading && [8, 12, 16].some(v => Math.abs(g - v) < 0.5)) out.lints.push({ prop: "row-gap", level: "note", msg: `${g}px is a middle rung between reading-flow items. In the reading flow he uses 1/6 u (bound) and 1 u (separate) only; middle rungs live inside components.` });
+    }
+    return out;
+  }
+
+  // ---------- state ----------
+  let T = discoverTokens();
+  const records = [];
+  const undoStack = [];
+  let selected = null, hoverEl = null, picking = true;
+  const STORE = "toolkit-overlay:" + location.pathname;
+  try { const saved = JSON.parse(localStorage.getItem(STORE) || "[]"); saved.forEach(r => records.push(r)); } catch (e) {}
+  function persist() { try { localStorage.setItem(STORE, JSON.stringify(records.map(r => Object.assign({}, r, { el: undefined })))); } catch (e) {} }
+
+  function applyChange(el, prop, toPx, toToken, fromPx) {
+    const id = identity(el);
+    const prev = el.style.getPropertyValue(prop);
+    el.style.setProperty(prop, toPx + "px", "important");
+    const rec = { id: Date.now() + Math.random().toString(16).slice(2, 6), at: new Date().toISOString(), width: innerWidth, identity: id, prop, fromPx, fromToken: tokenFor(fromPx).name, toPx, toToken, el };
+    records.push(rec); undoStack.push({ el, prop, prev }); persist();
+    render();
+  }
+  function applyText(el, name, from) {
+    const s = T.text[name];
+    const prev = { fs: el.style.fontSize, lh: el.style.lineHeight, fw: el.style.fontWeight };
+    el.style.setProperty("font-size", s.size + "px", "important");
+    el.style.setProperty("line-height", s.line + "px", "important");
+    el.style.setProperty("font-weight", s.weight, "important");
+    const rec = { id: Date.now() + Math.random().toString(16).slice(2, 6), at: new Date().toISOString(), width: innerWidth, identity: identity(el), prop: "text-style", fromPx: `${from.size}/${from.line} ${from.weight}`, fromToken: from.style || "off ramp", toPx: `${s.size}/${s.line} ${s.weight}`, toToken: name, el };
+    records.push(rec); undoStack.push({ el, text: prev }); persist(); render();
+  }
+  function undo() {
+    const u = undoStack.pop(); if (!u) return;
+    if (u.text) { u.el.style.fontSize = u.text.fs; u.el.style.lineHeight = u.text.lh; u.el.style.fontWeight = u.text.fw; }
+    else u.el.style.setProperty(u.prop, u.prev);
+    records.pop(); persist(); render();
+  }
+
+  // ---------- prompt ----------
+  // Net change per element and property: first "from", latest "to". A change
+  // that returns to where it started is not a decision and is dropped.
+  function netRecords() {
+    const net = new Map();
+    for (const r of records) {
+      const key = `${r.identity.path}|${r.prop}`;
+      const cur = net.get(key);
+      if (cur) { cur.toPx = r.toPx; cur.toToken = r.toToken; cur.at = r.at; cur.width = r.width; cur.el = r.el || cur.el; }
+      else net.set(key, Object.assign({}, r));
+    }
+    return [...net.values()].filter(r => String(r.toPx) !== String(r.fromPx));
+  }
+  function groupRecords() {
+    const g = new Map();
+    for (const r of netRecords()) {
+      const key = `${r.prop}|${r.fromToken}|${r.toToken}`;
+      if (!g.has(key)) g.set(key, { prop: r.prop, fromToken: r.fromToken, fromPx: r.fromPx, toToken: r.toToken, toPx: r.toPx, items: [] });
+      g.get(key).items.push(r);
+    }
+    return [...g.values()];
+  }
+  function buildPrompt() {
+    const groups = groupRecords();
+    const lines = [];
+    lines.push("Apply the following spacing and text changes to the codebase. Every value is a design token; rebind the rule that sets each property rather than editing instances one at a time. Where the same change repeats across a component, fix the component once.");
+    lines.push("");
+    lines.push(`Tokens: unit u = ${T.unit}px (${T.spaceSource}); ladder ${T.ladder.map(t => `${t.name}=${t.px}`).join(", ")}.`);
+    lines.push(`Preview width: ${innerWidth}px. Page: ${location.href}`);
+    lines.push("");
+    lines.push("## Changes");
+    groups.forEach((g, i) => {
+      lines.push(`${i + 1}. ${g.prop}: ${g.fromToken} (${g.fromPx}) to ${g.toToken} (${g.toPx})${g.items.length > 1 ? `, ${g.items.length} elements, so this is a pattern: fix the shared rule` : ""}`);
+      g.items.forEach(r => {
+        const id = r.identity;
+        lines.push(`   - ${id.component ? `<${id.component}> ` : ""}${id.path}${id.text ? ` "${id.text}"` : ""}`);
+      });
+    });
+    lines.push("");
+    lines.push("## Decisions these codify");
+    groups.forEach(g => {
+      const comps = [...new Set(g.items.map(r => r.identity.component).filter(Boolean))];
+      const where = comps.length ? comps.map(c => `<${c}>`).join(", ") : g.items.map(r => r.identity.path.split(" > ").pop()).join(", ");
+      lines.push(`- ${g.prop} on ${where} is ${g.toToken}${g.items.length > 1 ? ", as a rule, not per instance" : ""}. It was ${g.fromToken}${g.fromToken !== String(g.fromPx) ? ` (${g.fromPx})` : ""}.`);
+    });
+    lines.push("Record each of these as a settled decision in the project contract, with the why, so the next pass does not rediscover them.");
+    lines.push("");
+    lines.push("## Verify before claiming done");
+    lines.push("The preview in the browser is the target. After the change, measure at the same width and confirm each element renders the target value:");
+    lines.push("```json");
+    lines.push(JSON.stringify(netRecords().map(r => ({ selector: r.identity.path, prop: r.prop, target: r.toPx })), null, 2));
+    lines.push("```");
+    lines.push(`Run guard verify on every file you touched, and measure --width ${innerWidth} --compare against a snapshot taken before the edit. Report any element that did not reach its target.`);
+    lines.push("");
+    lines.push("## Mirror");
+    lines.push("Make the same token changes in the Figma frames for these screens in this session. If you cannot find the frame, say so; do not leave it unmirrored silently.");
+    return lines.join("\n");
+  }
+
+  // ---------- UI ----------
+  const host = document.createElement("div");
+  host.setAttribute("data-toolkit-overlay", "");
+  host.style.cssText = "all:initial;position:fixed;inset:0;pointer-events:none;z-index:2147483646";
+  const root = host.attachShadow({ mode: "open" });
+  const css = `
+    :host { --u:24px; --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s6:24px; --ink:#E9EEEC; --ink2:#A7B3AF; --ink3:#748280; --ground:#151B1A; --sunk:#0E1312; --line:#2B3634; --accent:#5CC7AA; --warn:#F1D27B; --mono:"IBM Plex Mono",Menlo,Consolas,monospace; --sans:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif; }
+    * { box-sizing:border-box; }
+    .hl { position:fixed; pointer-events:none; }
+    .hl.hover { outline:1px dashed rgba(140,160,155,.6); outline-offset:-1px; }
+    .hl.sel { outline:2px solid var(--accent); outline-offset:-2px; }
+    .hl .tag { position:absolute; left:-1px; top:-22px; background:var(--accent); color:#0B1512; font:500 12px/20px var(--mono); padding:0 6px; white-space:nowrap; }
+    .panel { position:fixed; top:0; right:0; bottom:0; width:344px; background:var(--ground); color:var(--ink); font:400 14px/20px var(--sans); pointer-events:auto; display:flex; flex-direction:column; border-left:1px solid var(--line); box-shadow:-8px 0 24px rgba(0,0,0,.25); }
+    .head { padding:var(--s3) var(--s4); border-bottom:1px solid var(--line); display:flex; align-items:center; gap:var(--s2); }
+    .head b { font-weight:600; flex:1; white-space:nowrap; }
+    .head small { color:var(--ink3); font:400 12px/16px var(--mono); }
+    .btn { font:500 12px/20px var(--sans); color:var(--ink); background:transparent; border:1px solid var(--line); border-radius:6px; padding:2px 8px; cursor:pointer; }
+    .btn:hover { border-color:var(--ink3); } .btn.on { background:var(--accent); color:#0B1512; border-color:var(--accent); }
+    .btn:focus-visible, .tok:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+    .body { overflow:auto; flex:1; display:flex; flex-direction:column; }
+    .sec { padding:var(--s4); border-bottom:1px solid var(--line); display:flex; flex-direction:column; gap:var(--s3); }
+    .sec h3 { margin:0; font:500 11px/16px var(--sans); letter-spacing:.08em; text-transform:uppercase; color:var(--ink3); }
+    .id .name { font:500 14px/20px var(--sans); } .id .path { font:400 12px/16px var(--mono); color:var(--ink2); overflow-wrap:anywhere; } .id .txt { color:var(--ink3); font-size:12px; line-height:16px; }
+    .empty { color:var(--ink3); }
+    .row { display:flex; flex-direction:column; gap:var(--s1); }
+    .row .lab { display:flex; justify-content:space-between; gap:var(--s2); font:400 12px/16px var(--mono); color:var(--ink2); }
+    .row .cur { color:var(--ink); } .row .cur.off { color:var(--warn); } .row .cur.off::before { content:"\\25B2 "; } .row .cur.frac { color:var(--ink2); }
+    .toks { display:flex; flex-wrap:wrap; gap:var(--s1); }
+    .tok { font:500 12px/20px var(--mono); padding:0 7px; border-radius:5px; border:1px solid var(--line); background:var(--sunk); color:var(--ink2); cursor:pointer; }
+    .tok:hover { border-color:var(--ink3); color:var(--ink); } .tok.cur { background:var(--accent); color:#0B1512; border-color:var(--accent); }
+    .lint { display:flex; flex-direction:column; gap:var(--s1); padding:var(--s2) var(--s3); border-radius:6px; background:var(--sunk); border-left:3px solid var(--ink3); font-size:12px; line-height:16px; color:var(--ink2); }
+    .lint.defect { border-left-color:var(--warn); color:var(--ink); } .lint .fix { align-self:flex-start; }
+    .note { font-size:12px; line-height:16px; color:var(--ink3); }
+    .chg { display:flex; justify-content:space-between; gap:var(--s2); font:400 12px/16px var(--mono); color:var(--ink2); }
+    .chg b { color:var(--ink); font-weight:500; } .chg .n { color:var(--ink3); }
+    .foot { padding:var(--s3) var(--s4); border-top:1px solid var(--line); display:flex; gap:var(--s2); align-items:center; }
+    .foot .cnt { flex:1; color:var(--ink2); font:400 12px/16px var(--mono); }
+    textarea { width:100%; height:260px; background:var(--sunk); color:var(--ink); border:1px solid var(--line); border-radius:6px; padding:var(--s2); font:400 12px/16px var(--mono); resize:vertical; }
+    .kbd { font:400 11px/16px var(--mono); color:var(--ink3); }
+  `;
+  root.innerHTML = `<style>${css}</style><div class="hl hover" hidden></div><div class="hl sel" hidden><span class="tag"></span></div><div class="panel"></div>`;
+  const hoverBox = root.querySelector(".hl.hover"), selBox = root.querySelector(".hl.sel"), panel = root.querySelector(".panel");
+  document.documentElement.appendChild(host);
+
+  function place(box, el) {
+    if (!el || !el.isConnected) { box.hidden = true; return; }
+    const r = el.getBoundingClientRect();
+    box.hidden = false; box.style.left = r.left + "px"; box.style.top = r.top + "px"; box.style.width = r.width + "px"; box.style.height = r.height + "px";
+  }
+  function h(s) { return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+
+  function pickerRow(label, prop, px) {
+    const t = tokenFor(px);
+    const cls = t.kind === "off" ? "off" : t.kind === "fraction" ? "frac" : "";
+    return `<div class="row"><div class="lab"><span>${h(label)}</span><span class="cur ${cls}">${px}px ${t.kind === "token" ? h(t.name) : h(t.name)}</span></div>
+      <div class="toks">${T.ladder.map(k => `<button class="tok ${Math.abs(k.px - px) < 0.5 ? "cur" : ""}" data-prop="${prop}" data-px="${k.px}" data-tok="${h(k.name)}" title="${h(k.name)}">${k.px}</button>`).join("")}<button class="tok" data-prop="${prop}" data-px="0" data-tok="0" title="none">0</button></div></div>`;
+  }
+
+  let exporting = false, sent = "";
+  function render() {
+    const info = selected && selected.isConnected ? inspect(selected) : null;
+    let body = "";
+    body += `<div class="sec"><h3>Selected</h3>${info ? `<div class="id"><div class="name">${info.el === document.body ? "body" : h(identity(info.el).component || identity(info.el).tag)}</div><div class="path">${h(pathOf(info.el))}</div>${identity(info.el).text ? `<div class="txt">${h(identity(info.el).text)}</div>` : ""}</div>` : `<div class="empty">Click anything on the page. Escape clears the selection.</div>`}</div>`;
+    if (info) {
+      if (info.lints.length) body += `<div class="sec"><h3>Judgment</h3>${info.lints.map((l, i) => `<div class="lint ${l.level}"><span>${h(l.msg)}</span>${l.fix && l.fix.token ? `<button class="btn fix" data-lint="${i}">Set ${h(l.fix.prop)} to ${h(l.fix.token.name)}</button>` : ""}</div>`).join("")}</div>`;
+      if (info.gaps) body += `<div class="sec"><h3>Gap</h3>${pickerRow("row gap", "row-gap", info.gaps["row-gap"])}${pickerRow("column gap", "column-gap", info.gaps["column-gap"])}</div>`;
+      body += `<div class="sec"><h3>Padding</h3>${PADS.map(p => pickerRow(p.replace("padding-", ""), p, info.pads[p])).join("")}</div>`;
+      body += `<div class="sec"><h3>Margin</h3><div class="note">The air belongs to the component, as padding. Reach for margin only when the space is not the component's own.</div>${MARGS.map(p => pickerRow(p.replace("margin-", ""), p, info.margs[p])).join("")}</div>`;
+      if (info.text) {
+        const names = Object.keys(T.text);
+        body += `<div class="sec"><h3>Text</h3><div class="row"><div class="lab"><span>current</span><span class="cur ${info.text.style ? "" : "off"}">${info.text.size}/${info.text.line} ${info.text.weight} ${h(info.text.style || "off ramp")}</span></div>
+          <div class="toks">${names.map(n => { const s = T.text[n]; return `<button class="tok ${n === info.text.style ? "cur" : ""}" data-text="${h(n)}" title="${h(n)}">${s.size}/${s.line} ${s.weight}</button>`; }).join("")}</div></div><div class="note">Ramp ${h(T.textSource)}.</div></div>`;
+      }
+    }
+    const groups = groupRecords();
+    body += `<div class="sec"><h3>Changes</h3>${groups.length ? groups.map(g => `<div class="chg"><span><b>${h(g.prop)}</b> ${h(g.fromToken)} to ${h(g.toToken)}</span><span class="n">${g.items.length}</span></div>`).join("") : `<div class="empty">${records.length ? "Everything is back where it started. Nothing to export." : "Nothing yet. Changes group by pattern as you make them, and a change you reverse drops out."}</div>`}${sent ? `<div class="note">Sent to <b>${h(sent)}</b>. The session applies it, verifies, and moves it to .toolkit/applied/.</div>` : ""}${exporting ? `<textarea readonly>${h(buildPrompt())}</textarea><div style="display:flex;gap:8px">${ENDPOINT ? `<button class="btn on" data-act="send">Send to session</button>` : ""}<button class="btn" data-act="copy">Copy prompt</button><button class="btn" data-act="closex">Close</button></div>` : ""}</div>`;
+    panel.innerHTML = `<div class="head"><b>Overlay</b><small>u = ${T.unit}px, ${T.ladder.length} tokens, ${h(T.spaceSource)}${ENDPOINT ? ", connected" : ""}</small><button class="btn ${picking ? "on" : ""}" data-act="pick" title="Alt+Shift+D">Select</button><button class="btn" data-act="hide">Hide</button></div><div class="body">${body}</div>
+      <div class="foot"><span class="cnt">${netRecords().length} net change${netRecords().length === 1 ? "" : "s"}${records.length !== netRecords().length ? `, ${records.length} made` : ""}</span><button class="btn" data-act="undo" ${undoStack.length ? "" : "disabled"}>Undo</button><button class="btn" data-act="clear" ${records.length ? "" : "disabled"}>Clear</button><button class="btn on" data-act="export" ${netRecords().length ? "" : "disabled"}>Export prompt</button></div>`;
+    place(selBox, selected); if (selected) selBox.querySelector(".tag").textContent = identity(selected).component || pathOf(selected).split(" > ").pop();
+  }
+
+  panel.addEventListener("click", ev => {
+    const b = ev.target.closest("button"); if (!b) return;
+    const act = b.dataset.act;
+    if (act === "pick") { picking = !picking; render(); return; }
+    if (act === "hide") { api.toggle(); return; }
+    if (act === "undo") { undo(); return; }
+    if (act === "clear") { while (undoStack.length) undo(); records.length = 0; persist(); render(); return; }
+    if (act === "export") { exporting = true; sent = ""; render(); return; }
+    if (act === "closex") { exporting = false; render(); return; }
+    if (act === "copy") { navigator.clipboard.writeText(buildPrompt()).then(() => { b.textContent = "Copied"; setTimeout(() => (b.textContent = "Copy prompt"), 1200); }); return; }
+    if (act === "send") {
+      b.disabled = true; b.textContent = "Sending";
+      const payload = { prompt: buildPrompt(), records: netRecords().map(r => Object.assign({}, r, { el: undefined })), page: location.href, width: innerWidth };
+      fetch(ENDPOINT + "/export", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
+        .then(r => r.json()).then(j => { sent = j.file || "sent"; exporting = false; render(); })
+        .catch(() => { b.disabled = false; b.textContent = "Send failed, copy instead"; });
+      return;
+    }
+    if (!selected) return;
+    if (b.dataset.lint != null) { const l = inspect(selected).lints[+b.dataset.lint]; if (l && l.fix && l.fix.token) { const cur = parseFloat(getComputedStyle(selected).getPropertyValue(l.fix.prop)) || 0; applyChange(selected, l.fix.prop, l.fix.token.px, l.fix.token.name, cur); } return; }
+    if (b.dataset.prop) { const cur = parseFloat(getComputedStyle(selected).getPropertyValue(b.dataset.prop)) || 0; if (Math.abs(cur - +b.dataset.px) < 0.5) return; applyChange(selected, b.dataset.prop, +b.dataset.px, b.dataset.tok, cur); return; }
+    if (b.dataset.text) { const i = inspect(selected); if (i.text && i.text.style !== b.dataset.text) applyText(selected, b.dataset.text, i.text); }
+  });
+
+  function targetFrom(ev) { const t = ev.target; if (t === host || host.contains(t) || ev.composedPath().includes(host)) return null; const el = ev.composedPath()[0]; if (!(el instanceof Element)) return null; return el; }
+  function onMove(ev) { if (!picking || !visible) return; const el = targetFrom(ev); if (!el) { hoverEl = null; hoverBox.hidden = true; return; } if (el === hoverEl || el === selected) { if (el === selected) hoverBox.hidden = true; return; } hoverEl = el; place(hoverBox, el); }
+  function onClick(ev) { if (!picking || !visible) return; const el = targetFrom(ev); if (!el) return; ev.preventDefault(); ev.stopPropagation(); selected = el; exporting = false; render(); }
+  function onKey(ev) { if (ev.altKey && ev.shiftKey && ev.code === "KeyD") { ev.preventDefault(); api.toggle(); } else if (ev.key === "Escape" && visible) { selected = null; render(); } }
+  function onScroll() { place(selBox, selected); if (hoverEl) place(hoverBox, hoverEl); }
+  document.addEventListener("mousemove", onMove, true);
+  document.addEventListener("click", onClick, true);
+  document.addEventListener("keydown", onKey, true);
+  addEventListener("scroll", onScroll, true); addEventListener("resize", onScroll);
+
+  let visible = true;
+  const api = { toggle() { visible = !visible; host.style.display = visible ? "" : "none"; if (visible) render(); }, records, tokens: T, prompt: buildPrompt };
+  window.__toolkitOverlay = api;
+  render();
+  if (!window.__designTokens && ENDPOINT) {
+    fetch(ENDPOINT + "/tokens.json").then(r => r.json()).then(m => {
+      if (m && m.space && Object.keys(m.space).length) { window.__designTokens = m; T = discoverTokens(); T.spaceSource = "contract"; T.textSource = "contract"; render(); }
+    }).catch(() => {});
+  }
+})();

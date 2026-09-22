@@ -1,0 +1,3545 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Design Toolkit</title>
+<meta name="description" content="What is in the design toolkit and what it has learned about how Marc judges design.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<style>
+:root {
+  --u: 24px;
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-6: 24px; --s-8: 32px; --s-12: 48px; --s-16: 64px;
+  --r-2: 8px; --r-3: 12px;
+  --ground: #F5F7F5; --surface: #FFFFFF; --sunk: #ECF0EE;
+  --ink: #18201E; --ink-2: #4E5A57; --ink-3: #7E8A87;
+  --line: #D6DDDA; --line-strong: #B9C3BF;
+  --accent: #0F6B5A; --accent-ink: #0B5446; --accent-tint: #DCEEE8;
+  --code: #1E2826; --code-ink: #DCE5E1;
+  --display: "Bricolage Grotesque", "Helvetica Neue", Arial, sans-serif;
+  --body: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #121817; --surface: #192120; --sunk: #0E1413;
+    --ink: #E6ECEA; --ink-2: #A9B5B1; --ink-3: #7C8985;
+    --line: #2A3431; --line-strong: #3B4743;
+    --accent: #5CC7AA; --accent-ink: #8FDCC6; --accent-tint: #173129;
+    --code: #0E1413; --code-ink: #C9D4D0;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #121817; --surface: #192120; --sunk: #0E1413;
+  --ink: #E6ECEA; --ink-2: #A9B5B1; --ink-3: #7C8985;
+  --line: #2A3431; --line-strong: #3B4743;
+  --accent: #5CC7AA; --accent-ink: #8FDCC6; --accent-tint: #173129;
+  --code: #0E1413; --code-ink: #C9D4D0;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--ground); color: var(--ink); font: 400 16px/var(--u) var(--body); -webkit-font-smoothing: antialiased; }
+a { color: var(--accent-ink); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+h1, h2, h3, h4 { font-family: var(--display); font-weight: 500; margin: 0; text-wrap: balance; letter-spacing: -0.005em; }
+h1 { font-size: 40px; line-height: var(--s-12); font-weight: 600; }
+h2 { font-size: 28px; line-height: 36px; }
+h3 { font-size: 20px; line-height: var(--u); }
+h4 { font-size: 16px; line-height: var(--u); font-weight: 600; }
+p { margin: 0; }
+q { quotes: "\201C" "\201D"; font-style: italic; }
+b { font-weight: 600; }
+code { font-family: var(--mono); font-size: 14px; }
+
+.shell { max-width: 1120px; margin: 0 auto; padding: var(--s-12) var(--s-6) var(--s-16); display: grid; grid-template-columns: 1fr; gap: var(--s-12); }
+@media (min-width: 960px) { .shell { grid-template-columns: 200px minmax(0, 720px); column-gap: var(--s-16); } }
+
+/* masthead */
+.mast { grid-column: 1 / -1; display: flex; flex-direction: column; gap: var(--s-6); max-width: 720px; }
+.mast .eyebrow { font-family: var(--mono); font-size: 13px; line-height: 20px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.mast .lede { font-size: 18px; line-height: 28px; color: var(--ink-2); max-width: 62ch; }
+.facts { display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-6); margin: 0; padding: 0; list-style: none; font-family: var(--mono); font-size: 13px; line-height: 20px; color: var(--ink-3); }
+.facts b { color: var(--ink); font-weight: 500; }
+
+/* nav */
+nav.toc { align-self: start; }
+@media (min-width: 960px) { nav.toc { position: sticky; top: var(--s-6); } }
+nav.toc ol { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--s-1) var(--s-4); }
+@media (min-width: 960px) { nav.toc ol { flex-direction: column; gap: 0; border-left: 1px solid var(--line); } }
+nav.toc a { display: block; padding: 2px 0; color: var(--ink-2); text-decoration: none; font-size: 14px; line-height: 20px; }
+@media (min-width: 960px) { nav.toc a { padding: 2px var(--s-3); margin-left: -1px; border-left: 1px solid transparent; } }
+nav.toc a:hover { color: var(--ink); border-left-color: var(--line-strong); }
+nav.toc .count { color: var(--ink-3); font-family: var(--mono); font-size: 12px; margin-left: var(--s-2); }
+
+main { display: flex; flex-direction: column; gap: var(--s-16); min-width: 0; }
+section { display: flex; flex-direction: column; gap: var(--s-6); scroll-margin-top: var(--s-6); }
+section > header { display: flex; flex-direction: column; gap: var(--s-1); padding-bottom: var(--s-3); border-bottom: 1px solid var(--line-strong); }
+section > header p { color: var(--ink-2); max-width: 62ch; }
+.intro { max-width: 62ch; color: var(--ink-2); }
+
+/* judgment */
+.judgment { display: flex; flex-direction: column; gap: var(--s-6); background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-3); padding: var(--s-8); max-width: none; }
+.judgment .lede { font-size: 18px; line-height: 28px; }
+.judgment h3 { padding-top: var(--s-6); border-top: 1px solid var(--line); margin-bottom: calc(var(--s-3) - var(--s-6)); }
+.judgment p { max-width: 66ch; }
+.judgment b { color: var(--accent-ink); }
+.ladder { margin: 0; display: flex; flex-direction: column; gap: var(--s-3); padding: var(--s-4) var(--s-4) var(--s-3); background: var(--sunk); border-radius: var(--r-2); }
+.ladder .rung { display: grid; grid-template-columns: 32px 56px 1fr; align-items: center; gap: var(--s-3); font-family: var(--mono); font-size: 13px; line-height: 20px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.ladder .rung i { display: block; height: var(--h); width: 100%; max-width: 320px; background: var(--line-strong); border-radius: 2px; }
+.ladder .rung.on i { background: var(--accent); }
+.ladder .rung.on .px, .ladder .rung.on .fr { color: var(--ink); font-weight: 500; }
+.ladder figcaption { font-size: 13px; line-height: 20px; color: var(--ink-3); }
+
+/* vision */
+.themes { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.themes li { display: flex; flex-direction: column; gap: var(--s-1); padding: var(--s-4) 0; border-top: 1px solid var(--line); }
+.themes li:last-child { border-bottom: 1px solid var(--line); }
+.themes p { color: var(--ink-2); max-width: 66ch; }
+blockquote { margin: var(--s-2) 0 0; padding-left: var(--s-3); border-left: 2px solid var(--accent); font-style: italic; color: var(--ink); max-width: 62ch; }
+.threads { margin: 0; padding-left: 1.2em; color: var(--ink-2); display: flex; flex-direction: column; gap: var(--s-1); max-width: 66ch; }
+
+/* entries */
+.list { display: flex; flex-direction: column; }
+.entry { display: flex; flex-direction: column; gap: var(--s-6); padding: var(--s-6) 0; border-top: 1px solid var(--line); scroll-margin-top: var(--s-6); }
+.entry:first-child { border-top: 0; padding-top: 0; }
+.entry.compact { gap: var(--s-3); }
+.entry-head { display: flex; flex-direction: column; gap: var(--s-1); }
+.entry-head h3 { font-family: var(--mono); font-weight: 500; font-size: 18px; display: flex; align-items: baseline; gap: var(--s-2); }
+.entry-head .slash { color: var(--ink-3); }
+.badge { font-family: var(--body); font-size: 12px; line-height: 16px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent-ink); background: var(--accent-tint); padding: 2px 8px; border-radius: 999px; font-weight: 500; }
+.tagline { font-family: var(--display); font-size: 20px; line-height: 28px; color: var(--ink); }
+.does { max-width: 66ch; }
+.kv { margin: 0; display: flex; flex-direction: column; gap: var(--s-3); }
+.kv > div { display: grid; grid-template-columns: 112px 1fr; gap: var(--s-3); }
+.kv dt { font-size: 13px; line-height: var(--u); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); font-weight: 500; }
+.kv dd { margin: 0; color: var(--ink-2); max-width: 60ch; }
+.kv dd q { color: var(--ink); }
+.chips { list-style: none; margin: 0; padding: 0; display: inline-flex; flex-wrap: wrap; gap: var(--s-2); vertical-align: middle; }
+.chips li { font-family: var(--mono); font-size: 13px; line-height: 20px; padding: 2px 8px; border: 1px solid var(--line-strong); border-radius: 6px; color: var(--ink-2); }
+.calls { display: flex; align-items: center; gap: var(--s-3); flex-wrap: wrap; }
+.calls .lbl { font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); font-weight: 500; }
+ul.plain { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: var(--s-1); }
+pre.usage { margin: 0; background: var(--code); color: var(--code-ink); border-radius: var(--r-2); padding: var(--s-4); overflow-x: auto; font-size: 13px; line-height: 20px; }
+pre.usage code { font-size: inherit; }
+
+details.src { border: 1px solid var(--line); border-radius: var(--r-2); background: var(--surface); }
+details.src summary { cursor: pointer; padding: var(--s-2) var(--s-4); font-family: var(--mono); font-size: 13px; line-height: var(--u); color: var(--accent-ink); display: flex; justify-content: space-between; gap: var(--s-4); list-style: none; }
+details.src summary::-webkit-details-marker { display: none; }
+details.src summary::before { content: "+"; margin-right: var(--s-2); color: var(--ink-3); }
+details.src[open] summary::before { content: "\2212"; }
+details.src summary .len { color: var(--ink-3); }
+details.src pre { margin: 0; border-top: 1px solid var(--line); padding: var(--s-4); max-height: 560px; overflow: auto; font-size: 13px; line-height: 20px; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--ink); background: var(--sunk); border-radius: 0 0 var(--r-2) var(--r-2); }
+details.src pre code { font-size: inherit; }
+
+/* enforcement, architecture */
+ol.rules { margin: 0; padding-left: 1.4em; display: flex; flex-direction: column; gap: var(--s-3); max-width: 66ch; }
+ol.rules li::marker { font-family: var(--mono); color: var(--ink-3); font-size: 13px; }
+.tbl { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 15px; line-height: var(--u); }
+th, td { text-align: left; padding: var(--s-2) var(--s-3); border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); font-weight: 500; }
+td:first-child { font-family: var(--mono); font-size: 14px; white-space: nowrap; }
+td code { font-size: 14px; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+
+<div class="shell">
+  <header class="mast">
+    <p class="eyebrow">design-toolkit</p>
+    <h1>Design Toolkit</h1>
+    <p class="lede">A designer's standards, written once and pulled into every project. Nine skills hold the methods, two agents keep the sweeps out of the thread, two executables make the checks repeatable, and one judgment file holds what the system has learned about how Marc decides.</p>
+    <ul class="facts">
+      <li><b>9</b> skills</li>
+      <li><b>2</b> agents</li>
+      <li><b>4</b> executables</li>
+      <li><b>14</b> commits</li>
+      <li>last commit <b>2026-09-21</b> 6760bce  token-audit learns the shadowed alias; judgment learns to measure the pair</li>
+      <li>built 2026-09-22</li>
+    </ul>
+  </header>
+
+  <nav class="toc" aria-label="Sections">
+    <ol>
+      <li><a href="#judgment">Judgment</a></li>
+      
+      <li><a href="#skills">Skills<span class="count">9</span></a></li>
+      <li><a href="#agents">Agents<span class="count">2</span></a></li>
+      <li><a href="#tools">Executables<span class="count">4</span></a></li>
+      <li><a href="#rules">Standing rules<span class="count">11</span></a></li>
+      <li><a href="#templates">Templates</a></li>
+      <li><a href="#architecture">Architecture</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <section id="judgment">
+      <header>
+        <h2>What the system understands about how Marc judges design</h2>
+        <p>Drawn from <code>judgment/marc.md</code>, the toolkit's one personal layer. Last updated 2026-09-18.</p>
+      </header>
+      <div class="judgment">
+<p class="lede">The toolkit keeps one personal file, and this is what it says. Every line in it is marked <b>Stated</b>, his words, or <b>Observed</b>, a pattern inferred from repeated choices, and an Observed entry is never promoted to a Stated one. The file is meant to be predictive: when a situation comes up, this is what he will want, and why.</p>
+
+<h3>How he reads a screen</h3>
+<p><b>Vertical spacing is the first thing he sees.</b> Before hierarchy, before colour, before copy. If something is wrong and nobody knows what, the gaps are checked first. Tight reads as broken, loose reads as unfinished, and in seven weeks he has never once asked for less space. "Squished" is his most common word for a defect.</p>
+<p>He notices weight before size. A wrong font weight gets flagged; a size one step off often does not. And a number that looks confident but is wrong is worse than a blank: a fabricated 0.0, a dash where a word belongs, a zero standing in for an absent value.</p>
+<p>In a list, every row is one height and one grammar. The options of one control are one object. A field that a choice needs opens inside the chosen option, not below the control.</p>
+
+<h3>Where spacing comes from</h3>
+<p><b>Spacing is derived from the type, never chosen beside it.</b> This is the deepest rule he holds about systems, and he arrived at it twice: once by eye, once by argument. The unit is the line-height of body text, and every vertical distance is a count of it. The ladder he picked by eye over weeks of corrections turned out to be clean fractions of his 24px line, with no remainder. He had the relation before he had the words for it.</p>
+<figure class="ladder" aria-label="The rhythm ladder as fractions of a 24px body line">
+  <div class="rung"><span class="px">4</span><span class="fr">1/6 u</span><i style="--h:4px"></i></div>
+  <div class="rung"><span class="px">8</span><span class="fr">1/3 u</span><i style="--h:8px"></i></div>
+  <div class="rung"><span class="px">12</span><span class="fr">1/2 u</span><i style="--h:12px"></i></div>
+  <div class="rung"><span class="px">16</span><span class="fr">2/3 u</span><i style="--h:16px"></i></div>
+  <div class="rung on"><span class="px">24</span><span class="fr">1 u</span><i style="--h:24px"></i></div>
+  <div class="rung"><span class="px">32</span><span class="fr">4/3 u</span><i style="--h:32px"></i></div>
+  <div class="rung"><span class="px">48</span><span class="fr">2 u</span><i style="--h:48px"></i></div>
+  <figcaption>u is the body line, 24px. This page is set on the same ladder.</figcaption>
+</figure>
+<p>Three consequences follow, and he expects them held. The type ramp is the primary decision and the spacing scale is derived from it; when the two disagree, the type wins and the spacing moves. The unit must be composite, so the fractions land on whole numbers, which turns the leading decision into "pick the ratio that lands the unit on a divisible number". And density is an index shift, not a multiplier: each role moves one step along the shared ladder, so one token scale serves dense, default and loose.</p>
+<p>The same day he extended it to corners without being prompted: <q>why are our radiuses 6, 10 and 12? Shouldn't we do 8, 12, 16?</q> Expect any remaining eye-picked scale to get the same question.</p>
+
+<h3>How he groups things</h3>
+<p><b>To bind two things, move the next thing away. Never pull the pair tighter.</b> This is the sharpest correction he has given, because the rule was already written down and still got broken. When a relationship needs to read as closer, increase the distance to everything else.</p>
+<p>In the reading flow he uses no middle rungs. On the frames he reworked by hand, the content stack runs at exactly two distances: bound, at 1/6 u, and separate, at 1 u, with 2 u between blocks. The middle rungs still exist, but only inside components. A flat 12 makes everything equally related, so nothing groups.</p>
+<p>A button is an action, not a continuation of the text above it. It gets a full unit, never the tight inside-a-group rung. The air belongs to the component, as padding on the component, so it travels to every screen instead of being retyped per layout. And scale moves with content density while the ratio does not: a sparse screen runs 1 u inside and 2 u between, a dense one 1/3 u and 1 u, both roughly a 2 to 3x differential.</p>
+
+<h3>How he decides</h3>
+<p>Craft on principle, positioning on business need, and he does not confuse the two. A spacing question gets a rule. Whether a button says "Join the beta" or "Get in touch" gets reasoned from what the business wants from the visitor.</p>
+<p><b>An aesthetic judgment is not finished until it is portable.</b> Three times in a month he moved from "I like this" to "state it as a rule that works on someone else's scale". When he approves something, the next question is "can that be a rule", so the rule is offered before he asks.</p>
+<p>He looks for the structural cause, not the numeric fix. Given a list of off-scale heights he did not ask which token to snap them to; he asked whether the height should exist at all: <q>if it's a height, it might be a 'hug' in figma that is defined by top and bottom margins, or content within.</q> He was right, and the fix was to delete the value. Retirement over deprecation: when an option is wrong he removes it so it cannot be reached. A metric is never an answer to a visual question. He will take a concern seriously and then decide; push back once with evidence, then do what he says.</p>
+
+<h3>How he wants to work</h3>
+<p><q>I don't want you to make the prototype by yourself. I will guide you to make it, I just need you to have proper context.</q> Context first, direction after; no opening menu of options. Seeing beats describing: the dominant feedback mode is a screenshot with an annotation, and the loop that matters is intent to something he can look at. He tells a rule once and expects it held. Colleague reactions are design input, relayed without ceremony.</p>
+
+<h3>What he counts as done</h3>
+<p>Both places, same session: a fix in code that is not in Figma is new drift. Verified against the artifact he is looking at, not committed, not pushed, not merged. And gaps named rather than discovered: he would far rather be told the DELETE path is unexercised than find it himself in a screenshot.</p>
+
+<h3>Colour</h3>
+<p>Marc has a degree of colour vision deficiency. Two series in a chart must differ in lightness, not only in hue. This is a requirement, not a preference.</p>
+
+<h3>Where the system stops</h3>
+<p>Some entries have no detector and never will, and recognising them is the point. Composition: what goes on a screen, in what order, and what gets cut. When to break a rule, which he does deliberately and usually rightly. Whether a thing is beautiful. Positioning copy. For these the instruction is plain: <b>ask, do not assume.</b> A system that claims to have learned them has started guessing confidently.</p>
+
+<h3>How an entry earns its place</h3>
+<p><q>A rule that produces a number fires. A rule that produces a sentiment does not.</q> So each entry that can be made executable carries a Rule in his words, a Detect that can actually be run, and a Default so no judgment is needed to apply it. The loop: he corrects one case, the rule is extracted rather than the fix, a detector is written, the detector finds the whole class, he confirms on the cheapest second case, and the result is verified by measurement. One correction covered twelve screens that way.</p>
+</div>
+      <details class="src"><summary>Read judgment/marc.md<span class="len">315 lines</span></summary><pre><code># How Marc judges design
+
+Last updated: 2026-09-18
+
+A working file, not a diary. Each entry is meant to be **predictive**: when you
+hit the situation on the left, this is what he will want, and why. Use it to
+pre-empt rather than propose and get corrected.
+
+Distinct from `~/.claude/ai-design-vision.md`, which exists so he can mine it for
+writing. This one exists so work comes back right the first time. When something
+belongs in both, put the philosophy there and the executable rule here.
+
+Every entry is **Stated** (his words) or **Observed** (a pattern inferred from
+repeated choices). Never promote an Observed to a Stated.
+
+## The shape of an entry
+
+A principle in a file does not fire at the moment of decision. This file already
+said &quot;tight reads as broken, and he has never once asked for less space&quot;, and a
+gap still got set to 8 the same day. **A rule that produces a number fires. A
+rule that produces a sentiment does not.**
+
+So an entry that can be made executable carries three parts:
+
+- **Rule** in his words.
+- **Detect** what violating it looks like, as something you can actually run.
+- **Default** the answer when it fires, so no judgment is needed to apply it.
+
+An entry that cannot produce a detector stays prose and is marked **Ask, do not
+assume**. That boundary is the honest part: composition, when to break a rule,
+and whether a thing is beautiful are his, and a system that claims to have
+learned them has started guessing confidently.
+
+The loop this enables, which is how the entries below were earned: he corrects
+one case, you extract the rule rather than the fix, you write the detector, the
+detector finds the whole class, he confirms on the cheapest second case, you
+apply it and verify by measurement. One correction covered twelve screens that
+way on 2026-09-18.
+
+---
+
+## How he reads a screen
+
+**Vertical spacing is the first thing he sees.** Before hierarchy, before
+colour, before copy. If something is wrong and you do not know what, check the
+gaps first. *Observed across 17 messages, every project.*
+
+&gt; **Detect** any rendered gap that is not a simple fraction of the body line.
+&gt; **Default** snap to the nearest fraction, rounding up on a tie.
+
+**Tight reads as broken, loose reads as unfinished.** &quot;Squished&quot; is his most
+common word for a defect. He has never once asked for less space. *Observed.*
+
+**He notices weight before size.** A wrong font weight gets flagged; a size one
+step off often does not. *Observed.*
+
+**A number that looks confident but is wrong is worse than a blank.** A
+fabricated 0.0 score, a dash where a word belongs, a zero standing in for an
+absent value. *Stated, repeatedly, and the whole missing-data pattern came from
+it.*
+
+**In a list, every row is one height and one grammar.** *&quot;all of these rows
+should be the same height even if their description is 1 or two lines&quot;*; a
+sentence that would wrap clamps to one line and returns in full when the row
+opens. And a row that expands in place gets no chevron (*&quot;it&#x27;s just
+expanding&quot;*), but it does get a verb: with only a trash beside it *&quot;it looks
+like clicking will delete&quot;*, so a pencil sits beside the trash, both in
+reserved slots so nothing shifts on hover. *Stated, 2026-09-17, on the
+guardrails list; the same grammar he had already set on the conversation row.*
+
+**The options of one control are one object.** Four choices 24 apart read as
+&quot;spaced too far apart&quot;; at the object step they read as a control. A field a
+choice needs opens inside the chosen option, not below the control. *Stated,
+2026-09-17.*
+
+---
+
+## How he decides
+
+**Craft on principle, positioning on business need, and he does not confuse the
+two.** A spacing question gets a rule. A &quot;should this button say Join the beta
+or Get in touch&quot; gets reasoned from what the business wants from the visitor.
+Do not answer the second kind with a craft argument. *Observed.*
+
+**An aesthetic judgment is not finished until it is portable.** Three times in a
+month he moved from &quot;I like this&quot; to &quot;state it as a rule that works on someone
+else&#x27;s scale&quot;: the token contract, the rhythm ladder, then his own process. When
+he approves something, expect the next question to be &quot;can that be a rule&quot;.
+Offer the rule before he asks. *Observed, high confidence.*
+
+**He looks for the structural cause, not the numeric fix.** Given a list of
+off-scale heights he did not ask which token to snap them to. He asked whether
+the height should exist at all: *&quot;if it&#x27;s a height, it might be a &#x27;hug&#x27; in figma
+that is defined by top and bottom margins, or content within.&quot;* He was right,
+and the fix was to delete the value rather than tokenize it. **When you find an
+off-system value, check whether the property belongs there before proposing a
+token for it.** *Stated, 2026-09-18.*
+
+**Spacing is derived from the type, never chosen beside it.** This is the
+deepest rule he holds about systems, and he arrived at it twice: once by eye,
+once by argument.
+
+The unit is the line-height of body text, and every vertical distance is a count
+of it. Not the font size, the line-height, because what separates two things is
+measured in lines of the text it separates. From Muller-Brockmann, whose grid
+defines field depth as a number of text lines and the gap between fields as one
+or more blank lines. The unit is the line, not the millimetre.
+
+The proof that he already believed it: the ladder he chose by eye over weeks of
+corrections, 8 / 12 / 16 / 24 / 32, turns out to be exactly 1/3, 1/2, 2/3, 1 and
+4/3 of his 24px body line. Five simple fractions, no remainder. His own &quot;roughly
+3x spread&quot; is 1/3 u against 1 u. He had the relation before he had the words for
+it, which is why the framework reads to him as a description rather than a
+proposal.
+
+Three consequences he will expect you to hold:
+
+- **The type ramp is the primary decision and the spacing scale is derived from
+  it.** This inverts how most systems including his own were built. When the two
+  disagree, the type wins and the spacing moves.
+- **The unit must be composite.** The relations are fractions, so a unit that
+  will not divide produces decimals. 24 and 36 satisfy every fraction; 22 and 26
+  satisfy three. This turns the leading decision from &quot;pick a nice ratio&quot; into
+  &quot;pick the ratio that lands the unit on a divisible number&quot;, which is not how
+  anyone normally chooses leading.
+- **Density is an index shift, not a multiplier.** Scaling the values produces
+  decimals and a second token scale. Moving each role one step along the shared
+  fraction ladder keeps every value whole and lets one token scale serve dense,
+  default and loose. He asked for density as a semantic layer, and this is what
+  makes it one: a single declaration from which everything follows.
+
+**Why it matters for execution:** a value that is a clean fraction of the line is
+not drift even when it is off the spacing scale, and a value that is on the
+spacing scale but not a clean fraction was never justified. Auditing spacing
+against a spacing scale cannot see either case. The first time this was run
+against his codebase it found 29 gaps at 4 and 19 at 6 doing one job, which no
+spacing audit could have flagged because both are legal values.
+
+*Stated and built, 2026-09-18. Executable version in the `rhythm-model` skill.*
+
+The same day he extended it to corners without being prompted: *&quot;why are our
+radiuses 6, 10 and 12? Shouldn&#x27;t we do 8, 12, 16?&quot;* Radii are fractions of the
+line too, on the same ladder as the gaps, so a corner and a gap are one system.
+Expect any remaining eye-picked scale (elevation steps, icon sizes) to get the
+same question. *Stated, 2026-09-18.*
+
+**To bind two things, move the next thing away. Never pull the pair tighter.**
+This is the sharpest correction he has given, because he had already stated the
+rule and it was still got wrong.
+
+&gt; **Detect** any change that reduces an existing gap in order to create a
+&gt; grouping. Compare before and after: if the inner gap shrank, it is wrong even
+&gt; when the resulting ratio is right.
+&gt; **Default** leave the inner gap and increase the outer one until the ratio is
+&gt; 2x or better.
+
+On Wantlist / Insights he said the button read as evenly spaced between the
+insight above it and the block below. The fix I made was to pull the button to
+1/3 u from its text. The fix he made was to leave the button a full unit from
+its text and push the next block to 2 u. Same ratio, opposite direction, and
+his never takes space away.
+
+&gt; &quot;Tight reads as broken, loose reads as unfinished. He has never once asked for
+&gt; less space.&quot;
+
+That line was already in this file when I tightened a gap to create a grouping.
+When a relationship needs to read as closer, **increase the distance to
+everything else**. *Stated by demonstration, 2026-09-18.*
+
+**A button is an action, not a continuation of the text above it.** It gets a
+full unit, never the tight inside-a-group rung.
+
+&gt; **Detect** a vertical auto-layout whose children include a Button and whose
+&gt; gap is under 1 u. Run it across every frame, not the one in front of you.
+&gt; **Default** 1 u between the content and the button, and at least 2 u from the
+&gt; button to whatever follows.
+&gt; **Known exception, unresolved:** a submit button under form fields may want
+&gt; less, because it completes the field rather than acting on a paragraph. Ask
+&gt; before applying the default to a form. At 1/3 u it reads as the last
+line of the paragraph; at 1 u it reads as a thing to do. An icon beside its
+label is tight. A control that acts on content is not. *Observed from his
+manual pass, and the ladder has been corrected.*
+
+**The air belongs to the component, as padding on the component.**
+
+&gt; **Detect** a parent gap that exists only to space one specific child, or the
+&gt; same margin retyped at several call sites of one component.
+&gt; **Default** move it onto the component as padding and delete it from the
+&gt; parents.
+ He sets a
+Section Head&#x27;s 12 beneath it as the head&#x27;s own bottom padding, not as the
+parent&#x27;s gap. The space then travels with the component to every screen instead
+of being retyped per layout, and a parent that forgets to set a gap still gets
+the right result. *Observed, and it is the executable form of his stated &quot;a
+section title owns the space beneath it&quot;.*
+
+**In the reading flow he uses no middle rungs.** This is the sharpest spacing
+rule he has demonstrated, and it took two passes to see.
+
+On both frames he reworked by hand, Wantlist / Insights and Collection /
+Insights, the page&#x27;s own content stack runs at exactly two distances: **bound**,
+at 1/6 u, and **separate**, at 1 u, with 2 u between blocks. There is no 8, no
+12 and no 16 anywhere in the reading flow. A label sits 4 above the paragraph it
+introduces because they are one object; everything else is a full unit apart.
+
+The middle rungs still exist, but **only inside components**: a Section Head&#x27;s
+own 12 of bottom padding, a stat row&#x27;s 12 between tiles, a pill row&#x27;s 8. They
+never appear between things the reader is reading.
+
+&gt; **Detect** a page-level vertical stack whose gap is 8, 12 or 16. Distinguish
+&gt; it from a component&#x27;s internal spacing, where those values are correct.
+&gt; **Default** 1 u between items in the reading flow, 2 u between blocks, and
+&gt; 1/6 u only where a label belongs to the text beneath it.
+
+**Why it works, and worth saying because it is not obvious:** a flat 12 makes
+everything equally related, so nothing groups. Using only two distances makes
+every relationship unambiguous at a glance. The middle values are what create
+the &quot;everything is evenly spaced&quot; reading he objects to.
+
+*Observed across two hand passes, 2026-09-18.*
+
+**Scale moves with content density, the ratio does not.** On a sparse screen he
+runs 1 u inside a block and 2 u between. On a dense one, 1/3 u and 1 u. Both are
+roughly a 2 to 3x differential. Do not carry a dense screen&#x27;s numbers onto a
+sparse one; carry the ratio and re-pick the scale. *Observed.*
+
+**Retirement over deprecation.** When an option is wrong, he removes it so it
+cannot be reached: the eight Medium text styles were deleted, not discouraged.
+Offer deletion, not a lint warning. *Observed.*
+
+**A metric is never an answer to a visual question.** Handed a parity score he
+asked *&quot;Does everything look exactly like Figma?&quot;* and then fixed the measuring
+apparatus rather than the number. *Stated.*
+
+**He will take a concern seriously and then decide.** Push back once, with
+evidence, then do what he says. Twice is arguing. *Observed.*
+
+---
+
+## How he wants to work
+
+**Context first, direction after.** *&quot;I don&#x27;t want you to make the prototype by
+yourself. I will guide you to make it, I just need you to have proper context.&quot;*
+Do not open with a menu of options. Become informed, then wait. *Stated.*
+
+**Seeing beats describing.** The dominant feedback mode is a screenshot with an
+annotation. The loop that matters is intent to something-he-can-look-at. Shorten
+that and most of the specification problem disappears. *Observed.*
+
+**He will tell you the rule once and expect it held.** The repeated frustrations
+are never new requirements. They are the same rule, unheld. *Observed.*
+
+**Colleague reactions are design input, relayed without ceremony.** &quot;My
+colleague doesn&#x27;t like the gold&quot; is a real constraint, not a suggestion to
+evaluate. *Observed.*
+
+---
+
+## What he counts as done
+
+**Both places, same session.** A fix in code that is not in Figma is new drift.
+*Stated, and it is the standing rule.*
+
+**Verified against the artifact he is looking at.** Not committed, not pushed,
+not merged. The thing on his screen. *Observed across seven weeks and it is the
+single most repeated frustration.*
+
+**Gaps named, not discovered.** He would far rather be told &quot;the DELETE path is
+unexercised&quot; than find it himself in a screenshot. Naming it costs nothing;
+having him find it costs the claim its credibility. *Observed.*
+
+---
+
+## Accessibility and colour
+
+**Lightness and value separation, not hue separation.** Marc has a degree of
+colour vision deficiency. In charts especially, two series must differ in
+lightness, not only in hue. This is a requirement. *Stated.*
+
+**Measure the pair, do not eyeball it.** Convert to relative luminance and
+report the difference. Under about 10 points is separated by hue alone,
+whatever it looks like on your screen. On this project every positive/negative
+pair came in under 10, the worst at 2.5, and two of those pairs were defined in
+Figma itself, so tokenising the code faithfully would have propagated the
+problem rather than fixed it. **Where a hue-only pair lives upstream, the fix
+is upstream.** *Observed 2026-09-21.*
+
+**A colour change to satisfy a contrast rule is still a design change.** It
+gets asked, not flagged afterwards. Raising a failing pair is right; changing
+the swatch without asking is not. *Correction, 2026-09-21.*
+
+---
+
+## Ask, do not assume
+
+These have no detector and never will. Recognising them is the point.
+
+- **Composition.** What goes on a screen, in what order, and what gets cut.
+- **When to break a rule.** He does it deliberately and the result is usually
+  right. A system that flags it as a defect will be ignored.
+- **Whether a thing is beautiful.** Not a measurement, and pretending otherwise
+  is the parity-score mistake in a different costume.
+- **Positioning copy.** Answered from what the business needs from the reader,
+  not from craft.
+
+---
+
+## Maintenance
+
+Append when a correction reveals a criterion, not when a task completes. The
+test for an entry: **would knowing this have changed what I did?** If not, it
+belongs in the project&#x27;s decision log or nowhere.
+
+Merge into an existing entry rather than adding a near-duplicate. This file
+should get sharper, not longer.
+</code></pre></details>
+    </section>
+
+    
+    <section id="skills">
+      <header>
+        <h2>Skills</h2>
+        <p>Instructions, invoked as <code>/name</code> in any project. Listed in the order a project meets them: the contract first, then the files that carry state, then the passes that do the work. Every skill reads the project's contract before it changes anything.</p>
+      </header>
+      <div class="list">
+<article class="entry" id="skill-design-contract">
+  <header class="entry-head">
+    <h3><span class="slash">/</span>design-contract</h3>
+    <p class="tagline">Create or update the one file every other skill reads</p>
+  </header>
+  <p class="does">Writes the project&#x27;s DESIGN_CONTRACT.md, or extends whatever contract file the repo already has, holding the values that change per project: source of truth, where the work runs, rhythm ladder, type ramp, token layers, component inventory, copy rules and open decisions. It reads the codebase and Figma file first and asks the designer only about genuine decisions. Rules that stop referring to the project&#x27;s own values graduate out of the contract and into a skill.</p>
+  <dl class="kv"><div><dt>When</dt><dd>At the start of a new project, or when the designer asks what the rules are, what the rhythm ladder is, or where the source of truth lives.</dd></div><div><dt>Produces</dt><dd>A single contract file at the repo root, updated in the same session whenever the designer states a rule or corrects a value.</dd></div><div><dt>Holds</dt><dd><q>Two contracts in one repo is worse than none, because they will disagree and neither will be trusted.</q></dd></div></dl>
+  
+  <details class="src"><summary>Read skills/design-contract/SKILL.md<span class="len">88 lines</span></summary><pre><code>---
+name: design-contract
+description: Create or update the DESIGN_CONTRACT.md for a design project. Use at the start of a new project, or when the designer asks what the rules are, what the rhythm ladder is, or where the source of truth lives. Every other design skill reads this file.
+---
+
+# Design contract
+
+Every design skill in this toolkit reads one file at the repo root. It holds the
+values that change per project. The skills hold the rules, which do not.
+
+**Use the file the project already has.** `DESIGN_SYSTEM.md`, `DESIGN.md`, a
+design section in `CLAUDE.md`, whatever it is called. Only create
+`DESIGN_CONTRACT.md` when there is genuinely nothing. Two contracts in one repo
+is worse than none, because they will disagree and neither will be trusted.
+
+That split is the whole point. A rule that names its own numbers is a house
+style. A rule expressed as a relationship survives being moved to a different
+scale, which is the test that matters: *&quot;is it easily articulated in a prompt,
+one that can be applied to a design system with different spacing tokens?&quot;*
+
+## Creating one
+
+Read the project first, then write the file. Do not ask the designer to dictate values
+you can read off the codebase and the Figma file yourself. Ask only about the
+things that are genuinely a decision: which Figma file and page is canonical,
+which direction the mirror runs, and what the deploy surface is.
+
+Template:
+
+```markdown
+# Design contract
+
+## Source of truth
+- Figma file: &lt;url&gt; (key `&lt;key&gt;`)
+- Default page: &lt;name&gt; (`&lt;node id&gt;`)
+- Direction: Figma is authored first. Code follows. Never change code without
+  the change existing in Figma, and never leave a Figma change unmirrored.
+
+## Where the work runs
+- Repo: &lt;path&gt;
+- Local: &lt;command, port, and whether it needs a database&gt;
+- Deployed: &lt;url&gt;, deploys from &lt;branch&gt; via &lt;service&gt;
+- If it cannot run locally, say so here and name the fallback.
+
+## Rhythm ladder
+Values are this project&#x27;s. The ratio is what carries across projects: roughly
+3x between &quot;inside a thought&quot; and &quot;between thoughts&quot;.
+- &lt;n&gt; turn to turn, and header to content
+- &lt;n&gt; between blocks and sections
+- &lt;n&gt; list rows
+- &lt;n&gt; under a control
+- &lt;n&gt; inside a group
+Rule: group first, then stack. A tight pair is grouped, and the group is what
+enters the block stack. Never flatten a pair into the block gap.
+
+## Type
+- Ramp: &lt;sizes&gt;
+- Weights: &lt;the permitted set&gt;. Anything lighter is retired, not discouraged.
+
+## Tokens
+- Figma variables: &lt;collections&gt;
+- Code tokens: &lt;file and naming layers&gt;
+- Rule: every spacing, radius, color and type value is bound. A literal is a
+  defect, not a shortcut.
+
+## Component inventory
+| Component | Figma node | Code class |
+|---|---|---|
+
+## Copy rules
+- No em dashes. Restructure the sentence.
+- A value the system does not have says what is missing and what would fill it.
+  Never a blank, never a zero, never a dash standing in for a number.
+- Put the verdict next to the data, not only in chat.
+
+## Open decisions
+Things deliberately unresolved, with the date and who owns them.
+```
+
+## Maintaining it
+
+When the designer states a rule, add it here in the same session, in his words where
+the phrasing is his. When he corrects a value, change it here rather than only
+in the file you were editing, or the next session will not know.
+
+When a rule stops referring to this project&#x27;s own values, it has graduated:
+move it out of the contract and into the skill that enforces it, so every
+project gets it.
+</code></pre></details>
+</article>
+<article class="entry" id="skill-session-state">
+  <header class="entry-head">
+    <h3><span class="slash">/</span>session-state</h3>
+    <p class="tagline">Read or write STATUS.md so a restart loses nothing</p>
+  </header>
+  <p class="does">Maintains a STATUS.md at the repo root that records where the work is right now: branch and PR position, what is in flight, what is next, traps that already cost a round trip, and known broken things not ours to fix. It is a separate file because it changes every session, and a fast-changing fact inside a slow-changing document makes the whole document look stale. On read it verifies position with commands rather than trusting the file and reports in three lines or fewer, blocked-on-the-designer items first.</p>
+  <dl class="kv"><div><dt>When</dt><dd>At the start of a session to pick up where things left off, when the designer asks where we are, and at the end of a session or whenever position changes.</dd></div><div><dt>Produces</dt><dd>STATUS.md with five ordered sections (Read next, Position, In flight, Next, Traps) kept under a screen, plus a three-line summary on read.</dd></div><div><dt>Holds</dt><dd><q>If the next session read only STATUS.md and the contract, would it know what to do and what not to trust? If not, the missing part goes in one of them.</q></dd></div></dl>
+  <p class="calls"><span class="lbl">Calls</span><ul class="chips"><li>decision-log</li><li>the project contract file</li><li>~/.claude/design-judgment.md</li></ul></p>
+  <details class="src"><summary>Read skills/session-state/SKILL.md<span class="len">85 lines</span></summary><pre><code>---
+name: session-state
+description: Read or write the project&#x27;s STATUS.md, the file that records where work stands right now. Use at the start of a session to pick up where things left off, when the designer asks where we are or to catch him up, and at the end of a working session or whenever position changes.
+---
+
+# Session state
+
+The goal: **restart the session and lose nothing in terms of
+context and understanding.**
+
+That fails today because every file in a project records what is *true* and none
+records where we *are*. The branch, the open PR, the half-done thing, the next
+move, the trap that already cost a round trip. All of it lives only in the
+conversation, and the conversation ends.
+
+`STATUS.md` at the repo root is that file.
+
+## The organising principle: rate of change, not topic
+
+This is why it is a separate file rather than a section in the contract.
+
+| Changes | File | Holds |
+|---|---|---|
+| Never | `~/.claude/CLAUDE.md` | the rules that bind every session |
+| Rarely | `~/.claude/design-judgment.md` | how the designer decides |
+| Occasionally | the project contract | what is true in this project |
+| Every session | `STATUS.md` | where we are right now |
+
+**A fast-changing fact inside a slow-changing document makes the whole document
+look stale, and then none of it is trusted.** That is exactly what happened to
+the &quot;Open decisions&quot; list in one real contract: it was written once, went out
+of date, and stopped being read. Keep the clocks apart.
+
+Corollary: if something in `STATUS.md` stops changing, it has graduated. Move it
+into the contract as a rule and delete the line. If something in the contract
+starts changing every session, it was never a rule. Move it here.
+
+## Reading it
+
+First action in a session on a project that has one, before any other file.
+Then tell the designer, in three lines or fewer:
+
+- Where we are, and anything that changed since it was written (check the branch
+  and the PR state yourself; do not trust the file for facts a command can
+  confirm)
+- What is next
+- Anything blocked on him, which leads, because it is the only part he can clear
+
+If the file disagrees with reality, reality wins. Fix the file and say you did.
+
+## Writing it
+
+At the end of a working session, and whenever position changes mid-session. Do
+not ask permission; it is a status note and the cost of a wrong line is a line.
+
+Five sections, in this order. Keep the whole file under a screen, because a
+status file nobody rewrites is worse than none.
+
+- **Read next.** A short table pointing at the other documents. This is the
+  entry point to everything else.
+- **Position.** Branch, PR state, what is pushed and what is not, what is
+  deployed. Verify with commands rather than memory.
+- **In flight.** Anything half-done, with enough detail to resume. &quot;Nothing
+  half-edited, tree is clean&quot; is a valid and useful entry.
+- **Next.** The actual next actions, ordered. Not aspirations.
+- **Traps.** Things that have already cost a round trip. This section only grows
+  when something bites, which makes it the most valuable part of the file.
+
+Plus, optionally, **Known broken, not ours to fix yet**, so a pre-existing defect
+is never rediscovered as news.
+
+## What does not go here
+
+- Decisions and their reasoning. Those belong in the contract&#x27;s decision log,
+  via the `decision-log` skill. This file says where we are, not what we chose.
+- How the designer judges design. That is `~/.claude/design-judgment.md`.
+- Anything a command can answer more reliably. Do not write a commit SHA that
+  `git log` will tell you. Write the ones that carry meaning, like a stack of
+  local commits that need rebasing, and verify them on read.
+
+## The test
+
+Before ending a session, ask: **if the next session read only `STATUS.md` and the
+contract, would it know what to do and what not to trust?** If not, the missing
+part goes in one of them.
+</code></pre></details>
+</article>
+<article class="entry" id="skill-decision-log">
+  <header class="entry-head">
+    <h3><span class="slash">/</span>decision-log</h3>
+    <p class="tagline">Record decisions, open gaps and what they reveal about judgment</p>
+  </header>
+  <p class="does">Keeps two layers apart: the state of the work (settled, open and owed decisions, in the project&#x27;s contract file) and the judgment behind it (how the designer decides, in a portable file at ~/.claude/design-judgment.md). Every settled row carries a real why and what the decision rejected, reversals stay in the table, and other people&#x27;s decisions are tracked by name but never reworded. On read, it reports what moved, what is open and who it waits on, leading with anything blocked on the designer.</p>
+  <dl class="kv"><div><dt>When</dt><dd>When a decision gets made or reversed, at the end of a working session, when the designer asks what is open or decided, or when picking up a project after time away.</dd></div><div><dt>Produces</dt><dd>A Settled / Open / Owed decisions section in the project contract, and Stated or Observed entries appended to ~/.claude/design-judgment.md.</dd></div><div><dt>Holds</dt><dd><q>&quot;Why&quot; is mandatory, and it is not a restatement. &quot;Because it looks better&quot; is not a reason. &quot;Because Figma hugs and the pin restated a token&quot; is.</q></dd></div></dl>
+  <p class="calls"><span class="lbl">Calls</span><ul class="chips"><li>the project contract file</li><li>~/.claude/design-judgment.md</li><li>~/.claude/ai-design-vision.md</li></ul></p>
+  <details class="src"><summary>Read skills/decision-log/SKILL.md<span class="len">180 lines</span></summary><pre><code>---
+name: decision-log
+description: Record and read design decisions, open gaps and to-dos for a project, and capture what those decisions reveal about how the designer judges design. Use when a decision gets made or reversed, when the designer asks what is still open or what we decided, at the end of a working session, or when picking up a project after time away.
+---
+
+# Decision log
+
+Two layers, because the designer asked for two things: the state of the work, and the
+judgment behind it.
+
+| Layer | Lives in | Scope | Answers |
+|---|---|---|---|
+| **State** | the project&#x27;s contract file | one repo | What did we decide, what is still open, what is owed |
+| **Judgment** | `~/.claude/design-judgment.md` | every project | How the designer decides, so the next proposal is right first time |
+
+Keep them apart. State goes stale and gets closed out. Judgment accumulates and
+gets sharper. Mixing them buries the durable thing inside the perishable one.
+
+---
+
+## Layer 1: state, in the project
+
+Extend the contract file&#x27;s existing decisions section. **Do not create a second
+file.** If it only has &quot;Open decisions&quot;, widen it to three parts.
+
+```markdown
+## Decisions
+
+### Settled
+| Date | Decision | Why | What it rejected |
+|---|---|---|---|
+| 2026-09-18 | Chips carry no fixed height | Figma hugs; the height is line-height plus padding | Adding a chip height token |
+
+### Open
+| Raised | Question | Blocked on | Owner |
+|---|---|---|---|
+| 2026-09-10 | Spotlight at 1, 3, 6, 12+ cards | the designer picking one of four proposals | the designer |
+
+### Owed
+| Since | What | Why it is not done |
+|---|---|---|
+| 2026-09-17 | Exercise the cardRemove DELETE path | Needs a real backend |
+```
+
+Three rules that keep it honest:
+
+- **&quot;Why&quot; is mandatory, and it is not a restatement.** &quot;Because it looks better&quot;
+  is not a reason. &quot;Because Figma hugs and the pin restated a token&quot; is.
+- **Record what a decision rejected.** The alternative not taken is what makes
+  the log worth reading in six weeks. It is also what stops the same debate
+  reopening.
+- **A decision that reversed stays in the table**, with the reversal as its own
+  row. Deleting it hides the most instructive thing in the file.
+
+Settled rows are not permanent. When a settled decision has held long enough to
+be a rule, move it out of the table and into the contract&#x27;s rules as a rule,
+then delete the row. The log records the change; the contract records the state.
+
+---
+
+### Whose decision is it
+
+A project has more than one decider. The two layers treat that differently, and
+getting it wrong corrupts the more valuable one.
+
+**The state layer records every decision that binds the project, whoever made
+it, with the name attached.** A colleague&#x27;s call on a build pipeline belongs in
+the log; leaving it out makes the log wrong. Add a &quot;Decided by&quot; column when a
+project has more than one decider, and never quietly reattribute.
+
+**The judgment layer takes only the designer&#x27;s criteria.** It is a model of how *he*
+decides, used to pre-empt what he will want. Absorbing someone else&#x27;s reasoning
+into it poisons exactly the thing it exists for: you would start proposing work
+shaped by a criterion he does not hold, and the file would confirm it.
+
+Four cases, because the middle two are easy to get wrong:
+
+| What happened | State log | Judgment |
+|---|---|---|
+| the designer decides | yes, his name | **yes** |
+| A colleague decides, the designer is not involved | yes, their name | no |
+| the designer relays a colleague&#x27;s constraint and accepts it | yes, attributed to them, noted that the designer endorsed it | **no**, this is a constraint he accepted, not a criterion he holds |
+| the designer overrides a colleague | yes, both positions | **yes**, an override is his criterion in its clearest form |
+
+### Other people&#x27;s entries are read-only
+
+Track them, never touch them. Recording a colleague&#x27;s decision is required;
+editing one is not yours to do, and the damage is quiet because a rewritten
+entry still looks authoritative.
+
+- **Never change the wording of someone else&#x27;s decision**, including tightening
+  it, summarising it, or fixing what looks like an error. Their phrasing is the
+  record. If you think it is wrong, say so to the designer and leave the file alone.
+- **Never change a &quot;Decided by&quot;.** Not to add yourself, not to generalise it to
+  the team.
+- **Never delete or overwrite one because it was superseded.** Add a new row
+  that says what changed and when, and leave theirs standing. The pair is the
+  useful artefact; the survivor alone is not.
+- **Do not copy a decision that already lives somewhere else.** If a colleague&#x27;s
+  call is written up in a shared doc, reference that doc. A copy is a second
+  source, and two sources drift. This is the same rule as never creating a rival
+  contract file.
+
+The practical shape in a shared repo: your own decisions are written into the
+log, and other people&#x27;s are referenced into it with a pointer to wherever they
+actually live. The log then tells you everything that binds the project without
+claiming authorship of any of it.
+
+When a colleague&#x27;s decision blocks something of the designer&#x27;s, that belongs in **Open**
+with them as the owner, not in Settled. the designer reads Open first because it is the
+part he can push on.
+
+The third row is the trap. &quot;Base every branch on current main&quot;, relayed from a teammate,
+reads like a rule the designer holds. It is a rule the designer agreed to. If it enters the
+judgment layer you will later defend it as though it were his, when he might
+drop it the day the constraint does.
+
+The fourth row is the most valuable entry type in the whole file. When he
+overrides someone, the reason he gives is a criterion stated under pressure,
+which is the least ambiguous form it ever takes.
+
+**When you cannot tell whose it was, ask, or leave it out of the judgment
+layer.** A missing entry costs nothing. A wrong one is believed.
+
+---
+
+## Layer 2: judgment, portable
+
+`~/.claude/design-judgment.md` records how the designer decides, so the next proposal
+lands right rather than getting corrected.
+
+**The test for an entry: would knowing this have changed what I did?** If the
+answer is no, it belongs in the project&#x27;s log or nowhere. A completed task is
+not a judgment. A criterion revealed by a correction is.
+
+Capture from three moments:
+
+1. **He corrected you.** The correction names a criterion you did not have.
+   This is the richest source by far.
+2. **He chose between options you offered.** What he picked, and more usefully
+   what he passed over, is a criterion in action.
+3. **He accepted something without comment that he has previously flagged.**
+   That is a rule now held, and worth noting as resolved rather than repeating.
+
+Mark every entry **Stated** (his words, quoted) or **Observed** (inferred from
+repeated choices). Never promote an Observed to a Stated. If he has said it once
+and you have seen it twice, quote the once and note the twice.
+
+Merge into an existing entry rather than adding a near-duplicate.
+
+### Where the philosophy goes instead
+
+`~/.claude/ai-design-vision.md` is for writing: thought pieces, talks,
+positioning. A thesis about design systems goes there. An executable rule about
+what the designer will want next goes in `design-judgment.md`. When something is both,
+put the argument there and the rule here, and do not paste it into both.
+
+---
+
+## Reading the log
+
+When picking up a project after time away, or when the designer asks what is open, read
+the state layer and report:
+
+- What moved since the last entry
+- What is open and who it is waiting on
+- What is owed and why it is still owed
+
+Lead with anything **blocked on the designer**, because that is the only part he can
+clear.
+
+## When to write
+
+At the end of a working session, and whenever a decision is made or reversed
+mid-session. Do not ask permission for either layer; both are append-only notes
+and the cost of a wrong entry is a line to delete.
+
+Mention it in one clause when you have added something substantial to the
+judgment layer, because that file shapes how future work is proposed and he
+should know what it now believes about him.
+</code></pre></details>
+</article>
+<article class="entry" id="skill-taste-extract">
+  <header class="entry-head">
+    <h3><span class="slash">/</span>taste-extract</h3>
+    <p class="tagline">Recover a designer&#x27;s spacing, type and colour grammar from hand-tuned screens</p>
+  </header>
+  <p class="does">Takes three to five screens the designer actively adjusted and records what each distance separates rather than histogramming values, so the output is a grammar (how many distinct distances, the ratio between them, which relationship gets which) instead of a copied vocabulary. Three filters drop gaps that render nothing, runs of identical items, and component internals, and containers are classified by what their children are, never by shape. Type is measured by usage and colour by relative luminance, with a contrast check on opposed pairs treated as a first-class finding.</p>
+  <dl class="kv"><div><dt>When</dt><dd>At the start of a project once a calibration set exists, when asked how to apply someone&#x27;s taste to a new codebase, or when a design system needs rules rather than a copied palette.</dd></div><div><dt>Produces</dt><dd>A Grammar section written into the project contract, stated as relationships and fractions of the unit so it survives being moved to another scale.</dd></div><div><dt>Holds</dt><dd><q>A button is never the second half of a lockup. If a shape test and a role test disagree, the role test is right.</q></dd></div></dl>
+  <p class="calls"><span class="lbl">Calls</span><ul class="chips"><li>rhythm-model</li><li>the project contract file</li></ul></p>
+  <details class="src"><summary>Read skills/taste-extract/SKILL.md<span class="len">200 lines</span></summary><pre><code>---
+name: taste-extract
+description: Infer a designer&#x27;s grammar for spacing, type and colour from screens they have hand-tuned, and write it into the project contract. Use at the start of a project after a calibration set exists, when asked how to apply someone&#x27;s taste to a new codebase, or when a design system needs rules rather than a copied palette.
+---
+
+# Taste extract
+
+A design system copied between projects gives you someone&#x27;s **vocabulary**, which
+is the wrong half. The values belong to the project they came from. What
+transfers is the **grammar**: how many distinct values are allowed, the ratios
+between them, and which relationship gets which.
+
+This skill recovers the grammar from work the designer has already done, so a new
+project is informed by their taste without inheriting another project&#x27;s numbers.
+
+---
+
+## The calibration set
+
+Ask for **three to five screens they have hand-tuned** and consider right. Not
+screens they approved, screens they actively adjusted. A correction carries more
+signal than an acceptance, because an acceptance might just be tolerance.
+
+Choose for variety, not volume: a dense screen, a sparse one, a form, and
+something with data in it. Three frames were enough to recover a full spacing
+grammar on a real project.
+
+This inverts the usual cost. Instead of one correction per screen for weeks,
+they spend concentrated effort once on screens they pick, and everything else is
+derivation.
+
+---
+
+## The unit of analysis is the relationship, not the value
+
+Do not histogram every gap in the file. That returns a list of numbers, which is
+vocabulary. Record **what each distance separates**, then ask what distance each
+kind of relationship reliably gets.
+
+On a real extraction that meant classifying every adjacency as: text to text,
+head to content, content to action, or block to block. The answer came out as
+&quot;content to action is always one unit, nine times out of nine, no variation&quot;,
+which is a rule. &quot;24 appears 47 times&quot; is not.
+
+---
+
+## Three filters, and they encode judgment
+
+The first run of this on a real file returned three distinct distances. One was
+noise. Get these wrong and you will produce a confident, wrong grammar.
+
+1. **Drop gaps that render nothing.** A container with one child has a gap that
+   separates nothing. It will still show up in a naive scan.
+2. **Drop runs of identical items.** A row of three stat tiles or a list of
+   bullets has a list rhythm, not a reading rhythm. Detect by whether every
+   child shares a name or a main component.
+3. **Separate component internals from the reading flow.** This is the important
+   one. On the project this skill was built from, the designer used only two
+   distances between things a reader reads, while components internally used
+   three more. Mixing them makes the grammar look twice as loose as it is.
+   Detect by whether the node is an instance or sits inside one.
+
+Say which filters you applied when you report. A grammar is only as trustworthy
+as the definition of what counted.
+
+---
+
+### Classify by role, never by shape
+
+The first version of this classified a container as a &quot;lockup&quot; when it held two
+or three children of which at most one was not text. That is a shape test, and
+it cannot tell a title with its subtitle from a paragraph with its button. It
+tightened a dozen actions to 8 across a real file, including several the
+designer had explicitly set minutes earlier.
+
+Classify by what the children **are**:
+
+| The container holds | It is | Distance |
+|---|---|---|
+| a text field | a form | the form rung |
+| only buttons | an action group | the bound value |
+| a button plus anything else | a reading flow | the separate value |
+| text and text alone | a lockup or a bound pair | the bound value |
+
+A button is never the second half of a lockup. If a shape test and a role test
+disagree, the role test is right.
+
+And re-verify after applying, on the whole file, not the screens you changed.
+A blanket rule is only safe if you can show every container now sits on the
+rung its role calls for. The pass that produced this section reported five
+remaining violations on the re-check, all of which the apply step had created.
+
+---
+
+## Spacing
+
+Derive the unit first, per the `rhythm-model` skill: it is the body text&#x27;s
+line-height. Then express every measured distance as a fraction of it, and
+report:
+
+- **How many distinct distances** appear in the reading flow. This is the single
+  most characteristic number. Two is a strong, opinionated grammar. Five is a
+  weak one, and usually reads as &quot;everything is evenly spaced&quot;.
+- **The ratio between them.** A 6x spread between bound and separate reads very
+  differently from a 1.5x spread, at any scale.
+- **The block boundary**, usually a multiple of the separate value.
+- **Which relationship gets which distance**, as a table.
+
+The output is portable. A grammar of &quot;two distances, 6x apart, blocks at 2x&quot;
+applied to a project whose unit is 32 gives roughly 5, 32 and 64. Same taste,
+different numbers.
+
+---
+
+## Type
+
+Measure usage, not the style sheet. A defined ramp tells you what is available;
+usage tells you what is believed.
+
+- **Weights actually used.** A retired weight that still appears is a rule not
+  holding. A ramp with three weights in use is a decision; six is a default.
+- **Sizes actually used**, and the **step ratio** between adjacent ones. Steps
+  under about 1.2x are hard to read as hierarchy: a 14 against a 16 is a 14%
+  difference and registers as noise rather than rank.
+- **Distinct sizes per screen**, as a median. This is the type equivalent of
+  &quot;how many distinct distances&quot;, and it is worth comparing the two. A system
+  with two spacing distances and five type sizes per screen is using opposite
+  philosophies in the two axes, and the type is usually the half that is wrong.
+- **Line-height against the spacing unit.** Per Müller-Brockmann, a whole number
+  of small-type lines should equal a whole number of body lines. Flag any
+  heavily used size whose line-height has no small common multiple with the
+  unit, because that is the one quietly breaking the grid.
+
+---
+
+## Colour
+
+Convert every value to relative luminance and hue before comparing anything.
+Hex strings and names tell you nothing about whether a hierarchy works.
+
+For each family (text, surface, icon, border, status, chart) report:
+
+- **The lightness ladder**, sorted. A hierarchy that steps cleanly in lightness
+  is robust; one that does not is relying on hue.
+- **How many hues** the family spans.
+- **Whether the family separates by lightness or by hue.** This is the grammar
+  question, and different families legitimately answer differently.
+
+**Then run the contrast check, and treat it as a first-class finding.** For any
+pair that carries opposite meaning, positive against negative most of all,
+report the lightness difference. A pair separated by under about 10 points of
+luminance is distinguished almost entirely by hue.
+
+That matters generally and it matters more for a designer with colour vision
+deficiency, where hue separation alone is not separation. On the project this
+was built from, the chart palette was seven colours in a single hue band
+separated purely by lightness, which is exactly right, while the positive and
+negative text colours sat 2.5 luminance points apart and differed only in red
+against green. The same file contained both the rule and its violation, and only
+measuring found it.
+
+---
+
+## What does not extract
+
+Say so plainly rather than inferring it.
+
+- **Composition.** What goes on a screen, in what order, what gets cut. A single
+  observation is a hypothesis, not a rule, and encoding it produces confident
+  nonsense.
+- **When to break a rule.** Deliberate exceptions look identical to defects in
+  any measurement.
+- **Whether a thing is beautiful.**
+
+If a pattern appears once, record it as a hypothesis to test against the next
+hand pass, and label it as one.
+
+---
+
+## Output
+
+Write the grammar into the project contract, not into a separate file, and state
+it as relationships rather than values so it survives being moved:
+
+```markdown
+## Grammar, extracted &lt;date&gt; from &lt;the calibration frames&gt;
+
+Spacing   two distances in the reading flow, 1/6 u and 1 u, roughly 6x apart.
+          Blocks at 2 u. Middle values only inside components.
+          Content to action is always the separate value, never the bound one.
+Type      three weights. Steps of at least 1.2x. Aim for three distinct sizes
+          per screen. Line-heights share a small multiple with the unit.
+Colour    text and icon hierarchies separate by lightness in one hue family.
+          Charts separate by lightness, never hue alone. Opposed pairs need
+          10+ points of luminance difference.
+```
+
+Re-run it after the next few hand passes. A grammar that changes is a grammar
+that was read from too small a sample; a grammar that holds across three passes
+is one you can apply without asking.
+</code></pre></details>
+</article>
+<article class="entry" id="skill-rhythm-model">
+  <header class="entry-head">
+    <h3><span class="slash">/</span>rhythm-model</h3>
+    <p class="tagline">Derive spacing from the body line, then set density</p>
+  </header>
+  <p class="does">Takes the line-height of body text as the unit and expresses every spacing role as a simple fraction of it, after Muller-Brockmann&#x27;s grid derivation. It scores candidate leadings by how many fractions come out whole, maps six relationships onto a ladder of fractions, shifts density by moving one step along that ladder rather than multiplying, aligns the rest of the type ramp so small-type lines add up to body lines, and quantises to the project&#x27;s tokens last.</p>
+  <dl class="kv"><div><dt>When</dt><dd>When starting a design system, when asked where spacing values should come from, when a spacing scale and a type ramp disagree, or when a whole system should get looser or denser.</dd></div><div><dt>Produces</dt><dd>A rhythm table written into the project contract with the fractions shown beside the values, and a list of existing values that are not clean fractions (the drift).</dd></div><div><dt>Holds</dt><dd><q>Bind by pushing out, never by pulling in. When something must read as belonging to what it follows, increase the distance to everything else.</q></dd></div></dl>
+  <p class="calls"><span class="lbl">Calls</span><ul class="chips"><li>the project contract file</li></ul></p>
+  <details class="src"><summary>Read skills/rhythm-model/SKILL.md<span class="len">222 lines</span></summary><pre><code>---
+name: rhythm-model
+description: Derive a spacing system from the type rather than choosing it, and set its density. Use when starting a design system, when asked where spacing values should come from, when a spacing scale and a type ramp disagree, or when a system should be made looser or denser as a whole.
+---
+
+# Rhythm model
+
+A spacing scale chosen independently of the type ramp is two systems that happen
+to sit near each other. This derives one from the other, so there is a reason for
+every value and the reason survives being moved to a different scale.
+
+After Josef Müller-Brockmann, *Grid Systems in Graphic Design*. His grid is not a
+set of measurements, it is a derivation: field depth is a count of text lines,
+and the vertical distance between fields is one or more blank lines (p.11, p.57).
+The unit is the line, not the millimetre.
+
+---
+
+## 1. The unit is the body line
+
+**u = the line-height of body text.** Not the font size. Everything vertical is
+counted in `u`.
+
+This is the whole model. If you take nothing else, take this: spacing is measured
+in lines of the text it separates.
+
+## 2. Choose a leading that makes a composite unit
+
+The relations below are fractions of `u`, so `u` must divide well. This is a real
+constraint, not a nicety, and it is why some systems feel arbitrary: their unit
+cannot be halved or thirded without producing decimals.
+
+Score a candidate by how many of the ladder fractions give whole numbers:
+
+| Unit | Whole-number fractions |
+|---|---|
+| 24, 36 | 8 of 8 |
+| 18, 30 | 7 of 8 |
+| 21 | 6 of 8 |
+| 16, 20, 28, 32 | 4 of 8 |
+| 22, 26 | 3 of 8 |
+
+So pick the leading ratio that lands `u` on a composite number, rather than
+picking a round ratio and accepting whatever unit falls out. Body 16 at 1.5 gives
+24. Body 18 at 1.333 also gives 24. Body 14 at 1.286 gives 18.
+
+Müller-Brockmann&#x27;s own worked examples use 12pt (10pt type, 2pt lead), which
+divides by 2, 3, 4 and 6.
+
+## 3. The relations
+
+One ladder of simple fractions, in order:
+
+```
+1/6   1/4   1/3   1/2   2/3   1   4/3   5/3   2
+```
+
+Six roles sit on it. At default density:
+
+| Relationship | Fraction | On u=24 |
+|---|---|---|
+| Inside an atom: an icon and its label | 1/6 u | 4 |
+| Inside a group that reads as one thing | 1/3 u | 8 |
+| A control&#x27;s own space beneath it | 1/2 u | 12 |
+| A list row, top and bottom | 2/3 u | 16 |
+| Between blocks and sections | 1 u | 24 |
+| **Content to the action that acts on it** | **1 u** | **24** |
+| Header to first content, turn to turn | 4/3 u | 32 |
+
+**The action row is the one most often got wrong.** A button following a
+paragraph is not &quot;inside a group&quot;. At 1/3 u it reads as the paragraph&#x27;s last
+line; at a full unit it reads as a thing to do. An icon beside its label is
+tight because they are one object. A control that acts on content is a separate
+object and takes a full unit. This cost a real correction on a real screen.
+
+**Print and screen differ here, and the difference is principled.** The book puts
+whole blank lines between fields, because print holds a baseline grid and text
+must land on it. On screen, components are boxes with padding and page-wide
+baseline alignment is rarely kept. So: **whole units between blocks, where the
+book&#x27;s rule holds exactly, and fractions of a unit inside a group, where screen
+departs from print.** Note that the default table above does exactly this. One
+unit between blocks, thirds and halves within.
+
+## 3a. Bind by pushing out, never by pulling in
+
+When something must read as belonging to what it follows, **increase the
+distance to everything else.** Do not reduce the gap inside the pair.
+
+Both produce the differential. Only one of them respects the rule that tight
+reads as broken and loose reads as unfinished. A designer who has never asked
+for less space will not accept a grouping bought by taking space away, even when
+the ratio is correct.
+
+Worked example, from the correction that produced this section. A button sat
+evenly between the insight above it and the next block below.
+
+- Wrong fix: pull the button to 1/3 u from its text, leaving the next block at
+  1 u. The ratio is 3x and the screen is tighter than it was.
+- Right fix: leave the button at 1 u from its text and push the next block to
+  2 u. The ratio is 2x and nothing lost room.
+
+**Corollary: scale moves with content density, the ratio does not.** A sparse
+screen runs 1 u inside a block and 2 u between. A dense one runs 1/3 u and 1 u.
+Carry the ratio between screens, re-pick the scale.
+
+---
+
+## 4. Density is an index shift, not a multiplier
+
+Density moves every role along the same ladder by one step. It does not scale the
+values, which would produce decimals, and it does not change the unit, which
+would break the derivation.
+
+| Role | Dense | Default | Loose |
+|---|---|---|---|
+| Inside an atom | 1/6 u | 1/6 u | 1/4 u |
+| Inside a group | 1/4 u | 1/3 u | 1/2 u |
+| Under a control | 1/3 u | 1/2 u | 2/3 u |
+| List row | 1/2 u | 2/3 u | 1 u |
+| Between blocks | 2/3 u | 1 u | 4/3 u |
+| Header to content | 1 u | 4/3 u | 5/3 u |
+
+On `u = 24` that is:
+
+```
+dense     4   6   8  12  16  24
+default   4   8  12  16  24  32
+loose     6  12  16  24  32  40
+```
+
+Three densities, **one token scale**. Because the fractions overlap, a system
+only needs 4, 6, 8, 12, 16, 24, 32, 40 to express all three. Changing density is a
+remapping of roles onto tokens that already exist, not a new set of values.
+
+Which is what makes it a semantic layer. `density: dense` is one declaration, and
+every relationship follows.
+
+**What density means.** The book ties it to content volume: denser when text and
+data are heavy or statistics must be shown, looser when the content is simple
+(p.57, p.62). In interface terms:
+
+- **Dense** is enterprise, admin, data tables, anything where the user&#x27;s job is
+  comparison and the screen is a working surface. Also academic and reference
+  setting, where volume is the point.
+- **Default** is most product UI.
+- **Loose** is marketing, editorial, onboarding, and anything read once rather
+  than operated.
+
+Density is a property of the *surface*, not the whole product. A dense data table
+can live inside a default app. Set it per surface, and say which surface each
+setting covers.
+
+## 5. Align the rest of the ramp to the unit
+
+Müller-Brockmann&#x27;s sharpest rule, and the one most often missed (p.59): **a whole
+number of small-type lines should equal a whole number of body lines.** His
+example sets caption type so two of its lines equal one body line, and display
+type so one headline line equals two body lines. Everything then lands on the
+same grid.
+
+So for each step of the type ramp, choose the line-height such that `N` of its
+lines equals `M` body lines, with `N` and `M` small. On `u = 24`: a caption at
+line-height 12 gives 2:1, at 16 gives 3:2, at 18 gives 4:3. The first two are
+strong, the third is weak but legal. A heading at 36 gives 2:3, at 48 gives 2:1.
+
+Prefer the smallest `N` and `M` you can get away with. A 4:3 relationship is
+technically aligned and visually invisible.
+
+## 5a. Put the air on the component, not the parent
+
+A Section Head owns the space beneath it. Express that as the head&#x27;s own bottom
+padding, not as the parent container&#x27;s gap.
+
+Three reasons, in order of how often they bite:
+
+- The space travels with the component to every screen, instead of being retyped
+  in each layout that uses it.
+- A parent that forgets to set a gap still renders correctly.
+- A component&#x27;s spacing becomes reviewable in one place, so changing it is one
+  edit rather than a sweep.
+
+The parent&#x27;s gap then expresses only what is genuinely a relationship *between*
+two things at that level. When a rendered gap is padding plus gap, say which is
+which when reporting it, or the numbers will not reconcile.
+
+---
+
+## 6. Quantise last
+
+Compute the ideal from the relation, then snap to the nearest token the project
+actually has. The relation is the intent; the token scale is the output device.
+
+If the snap moves a value more than a third of a step, the unit is wrong for that
+scale. Do not scatter exceptions to cover it. Go back to step 2.
+
+---
+
+## Applying it
+
+To a new system: pick body size, choose leading for a composite unit, pick
+density per surface, generate, and write the resulting table into the project
+contract with the fractions shown beside the values. The fractions are the part
+that transfers; the values are local.
+
+To an existing system: compute `u`, express each existing value as a fraction of
+it, and see which ones are not simple fractions. Those are the drift. A value
+that turns out to be a clean fraction is not off-system even if it is off the
+spacing scale, and a value that is on the spacing scale but not a clean fraction
+was never justified.
+
+That second case is the one worth looking for. A caption-height chip is one line,
+not a spacing value at all, and auditing it against a spacing scale will always
+call it wrong.
+
+**The commonest finding is two values doing one job.** On a real system, 29 gaps
+at 4 and 19 at 6 were both the icon-to-label distance inside an atom. Neither was
+wrong against the spacing scale, and the spacing audit had no way to see that
+they were the same role. Expressed as fractions of the line, one is 1/6 and the
+other 1/4, and the question becomes answerable: which role is this, and pick one.
+
+Stop the ladder at 1/6. Below that you are inside a glyph&#x27;s own optical spacing,
+which is the typeface&#x27;s business, not the system&#x27;s.
+</code></pre></details>
+</article>
+<article class="entry" id="skill-token-audit">
+  <header class="entry-head">
+    <h3><span class="slash">/</span>token-audit</h3>
+    <p class="tagline">Find every unbound value in code and Figma, then reconcile the two</p>
+  </header>
+  <p class="does">Runs three phases: raw values in styling positions in code, unbound fills, strokes, text, effects, gaps, padding and radius in Figma, and a reconcile that diffs the two token sets for values missing on either side, same name with different values, and same value under different names. It discovers the project&#x27;s token dialect first and writes it into the contract, proves every detector&#x27;s coverage by planting a known value, separates authored from vendored, snaps near misses to the nearest token under four honesty rules, and works line by line rather than regexing a whole stylesheet, guarding the file before and after.</p>
+  <dl class="kv"><div><dt>When</dt><dd>When the designer asks whether everything is tokenized, asks for a variable or styles audit, says values should be tokens, or before adopting a design system into a new codebase.</dd></div><div><dt>Produces</dt><dd>A report of coverage, code findings with snap suggestions, Figma findings per component, reconcile pairs with both values side by side, and noise set aside. Never a percentage tokenized.</dd></div><div><dt>Holds</dt><dd><q>A raw value in a styling position is a defect.</q></dd></div></dl>
+  <p class="calls"><span class="lbl">Calls</span><ul class="chips"><li>guard</li><li>rhythm-model</li><li>design-contract</li><li>token-auditor</li><li>get_variable_defs</li></ul></p>
+  <details class="src"><summary>Read skills/token-audit/SKILL.md<span class="len">345 lines</span></summary><pre><code>---
+name: token-audit
+description: Find every value that should be bound to a token but is not, in code, in Figma, or both, and check that the two sides agree. Use when the designer asks whether everything is tokenized, asks for a variable or styles audit, says values should be tokens, or before adopting a design system into a new codebase.
+---
+
+# Token audit
+
+Three phases. Run all three by default. Run one when the designer names it.
+
+1. **Code.** Raw values in a styling position.
+2. **Figma.** Unbound fills, strokes, text, effects, spacing and radius.
+3. **Reconcile.** Do the two token sets actually describe the same system?
+
+Phase 3 is the point. The standard this phase serves:
+
+&gt; &quot;Do you have a full understanding of the design system tokens as well as the
+&gt; design system as it is expressed and tokenized within Figma? The two of those
+&gt; things should be identical.&quot;
+
+Run in a subagent. The scan output is large and only the findings matter.
+
+---
+
+## Two failures that make this skill worse than useless
+
+Read these before writing any detector. Both were hit while validating this
+skill, on a real project.
+
+**1. A detector that silently finds nothing.** A first pass over his stylesheet
+reported **0** raw values. The real number was **862**. The regex used `\b`,
+which BSD grep accepts and silently does not honour. A clean result that is
+wrong is worse than no result, because it manufactures the false confidence this
+whole toolkit exists to prevent.
+
+So: **every detector proves its own coverage.** Before reporting, plant a known
+raw value, confirm the detector catches it, and report what you scanned
+(files, declarations, nodes) alongside what you found. A report with no
+denominator is not a report.
+
+**2. An audit that cries wolf.** The first Figma pass returned 81 off-scale
+spacing values. Every single one was inside a vendored Apple iOS tab bar
+component. the authored components had **zero**. Had that shipped as &quot;81
+defects&quot;, the real signal would have been invisible and the audit would have
+been ignored once and never run again.
+
+So: **separate what was authored here from what was imported.** A vendored
+component is not yours to tokenize. Report it as a separate, quieter line.
+
+---
+
+## Never regex the whole stylesheet
+
+Three separate passes over one real stylesheet caused damage, each a
+different bug, each nearly shipped: a brace scanner that destroyed every
+selector inside a media query, a trim that chopped comments at their commas,
+and a stash-and-restore that reinserted dead markers because nested
+placeholders were restored in forward order.
+
+**Work line by line.** Mark the token-definition blocks by line number and skip
+them. Split each remaining line on its comments and only touch the code
+segments. Change a value only when its property is one you are targeting.
+
+Then prove the file survived, every time, before looking at anything else.
+**Use the tool, do not rewrite the check:**
+
+```bash
+~/.claude/tools/guard snapshot path/to/file.css    # before the edit
+~/.claude/tools/guard verify                       # after
+```
+
+It checks brace balance, comment-marker pairing, stray placeholder bytes, byte
+delta against a limit, and a collapse in selector count, which is the signature
+of a destroyed stylesheet. It exits non-zero so it can gate a commit.
+
+A stylesheet that parses is not a stylesheet that is intact.
+
+---
+
+## The rhythm test, which the spacing test cannot see
+
+If the project uses the `rhythm-model`, audit against **fractions of the body
+line**, not only against the spacing scale. They are different questions:
+
+- A value can be off the spacing scale and still be a clean fraction. It is not
+  drift; the scale is short a step.
+- A value can be on the spacing scale and not be a clean fraction. It was never
+  justified, and no spacing audit will ever flag it.
+
+Report both tests. On one real system the fraction test found 29 gaps at 4 and
+19 at 6 doing a single job, which the spacing test could not see because both
+values were legal.
+
+---
+
+## Phase 1: code
+
+### Does this work across codebases? Only if you discover the dialect first.
+
+The rule is universal: **a raw value in a styling position is a defect.** What
+changes per project is three things, and a skill that hardcodes any of them
+breaks on the next repo.
+
+- **What a styling position looks like.** A CSS declaration, a Tailwind class, a
+  key in a JS style object, a SwiftUI modifier argument.
+- **What a bound value looks like.** `var(--x)`, `theme(...)`, `$x`, `@x`,
+  `tokens.spacing.md`, a named Tailwind scale key, `Color(&quot;Ink&quot;)`.
+- **What is legitimately exempt.** Differs by stack and by project.
+
+**So the first run does discovery and writes the dialect into the project
+contract.** Later runs read it and go straight to scanning.
+
+Detect the family by what is in the repo, then confirm by reading real code
+rather than trusting the file names:
+
+| Family | Bound looks like | Scan |
+|---|---|---|
+| CSS custom properties | `var(--t-s-md)` | declarations, excluding the `:root` block that defines the tokens |
+| Tailwind | `p-4`, `text-ink` | arbitrary values `p-[13px]`, `text-[#2D3459]`, plus `style=` escapes |
+| Sass / Less | `$space-md` | declarations, excluding the variable file |
+| CSS-in-JS | `theme.space.md`, `${space.md}` | template literals and style objects |
+| Token JSON (Style Dictionary, DTCG) | a `{group.name}` alias | leaf values that are literals where a reference was intended |
+| SwiftUI / Compose | `Spacing.md`, `Color(&quot;Ink&quot;)` | modifier arguments and literal `Color(...)` |
+| React Native | `tokens.space.md` | `StyleSheet.create` objects and inline `style={{...}}` |
+
+A repo may hold two layers at once, and one of one does: a generated layer
+mirroring Figma one for one, and an alias layer that components consume. Both are legitimate, and the
+rule differs by layer: the generated layer **holds** literals by design, the
+alias layer must only ever alias, and components must consume the alias and
+never the generated layer.
+Write that structure into the contract; do not rediscover it each run.
+
+### Exemptions
+
+Not every literal is a defect. Do not report, unless the project says otherwise:
+
+- `0`, and `100%` / `50%` used structurally
+- hairlines: `1px` and `1.5px` borders and dividers
+- a pill radius sentinel such as `999px`, if the project uses one
+- `z-index`, `opacity`, `flex`, `line-height` given unitless
+- values inside the token definitions themselves
+- one-off values inside a vendored or third-party component
+- geometry that is genuinely intrinsic: an icon&#x27;s own viewBox, a mask size
+  pinned to an asset&#x27;s true dimensions
+
+Everything else is reportable. **Component sizes are reportable.** A `height:
+48px` repeated across the codebase is a size token waiting to be named, and the
+&quot;48 throughout&quot; pass is exactly the work that happens when it is not.
+
+### Near misses are the most valuable finding
+
+A designer&#x27;s instruction, worth generalising:
+
+&gt; &quot;If something is a gap of 10, it should probably be the token for 12, and if
+&gt; it&#x27;s a value of 9, it should be the token for 8.&quot;
+
+For every raw value, snap to the nearest scale step and report both. A value one
+or two off the scale is not a rounding error, it is a signal that someone
+bypassed the system, and it is usually a real visual defect too.
+
+**Four rules keep snapping honest.** A trial run on a real stylesheet broke
+all four and produced nonsense like `-200px -&gt; 0` and `100px -&gt; 32`, which is
+how a report loses a reader&#x27;s trust in one line.
+
+1. **Never snap a negative value.** Negatives are overlap, bleed and optical
+   nudges. They are not spacing on a positive scale.
+2. **Never snap against the wrong table.** Radius has its own scale. Letter
+   spacing has its own, usually in ems or sub-pixel, and does not belong to the
+   spacing ramp at all. Matching `-0.48px` letter-spacing against a spacing
+   token is a category error.
+3. **Cap the snap distance.** If the nearest token is more than a third of a
+   step away, it is not a near miss. Report it as off-system and needing a
+   human decision, with no suggestion attached.
+4. **Positional offsets are mechanics, not rhythm.** `top`, `left`, `right`,
+   `bottom` on an absolutely positioned element usually encode a relationship to
+   another element&#x27;s height, not a spacing choice. Report them in a separate,
+   quieter section and never snap them by default.
+
+Sizes are the opposite: report them loudly. A dimension repeated across the
+codebase is a size token waiting to be named.
+
+---
+
+## Phase 2: Figma
+
+Different failure modes entirely. A value here can be raw in seven ways.
+
+Walk the page with `findAll`, and for each node check:
+
+| What | Bound when | Raw when |
+|---|---|---|
+| Fill | `fillStyleId` set, or every paint has `boundVariables.color` | neither |
+| Stroke | `strokeStyleId` set, or paints bound | neither |
+| Text | `textStyleId` set | unset, or `figma.mixed` from local overrides |
+| Effects | `effectStyleId` set | unset with effects present |
+| Gap | `boundVariables.itemSpacing` | `itemSpacing &gt; 0` unbound |
+| Padding | `boundVariables.padding&lt;Side&gt;` | each side unbound |
+| Radius | `boundVariables.topLeftRadius` | `cornerRadius &gt; 0` unbound |
+
+Watch `figma.mixed` on `textStyleId`: it means a text node carries local
+overrides on part of its range, which is a detached style, not a bound one.
+
+Three findings that only exist on this side:
+
+- **A semantic variable holding a literal instead of an alias.** The variable
+  exists, so a naive check passes, but the semantic layer is broken: `text/
+  default` should alias a palette entry, not hold `#2D3459` directly. Resolve
+  each variable&#x27;s value per mode and check whether it is an alias.
+- **Detached instances.** A component instance that has been detached is a
+  future divergence with no warning attached to it.
+- **Dead styles and variables.** Defined and referenced nowhere. These make the
+  system look bigger than it is, which fights the &quot;very lightweight&quot; goal.
+
+Report per component, not per node. Ten unbound paddings inside one component is
+one fix, not ten findings.
+
+### The alias that is defined twice, and the dead one wins
+
+Phase 1 asks whether a value is bound. It does not ask whether the **binding
+survives**, and on a real project that was the expensive gap.
+
+Seven semantic aliases correctly aliased the generated layer near the top of the
+stylesheet, then were redefined as literals in a later section. Same specificity,
+later definition wins, so every one of those aliases was dead code and those
+seven values had silently stopped following the design tool.
+
+So, for every semantic token:
+
+1. **Count its definitions.** More than one at the same specificity is a defect
+   even when every definition looks reasonable on its own.
+2. **Resolve it in the browser, per mode.** Read the computed value off
+   `document.documentElement`, do not read the stylesheet and reason about it.
+
+**Check every mode, not the one you designed in.** This is the part that makes
+it findable. The shadowing literals happened to match the default palette&#x27;s
+values exactly, so light and dark both looked perfect and the bug was visible
+only under two alternate palettes that were not shipped. A coverage audit
+scores this file as fully tokenized, which it is, and completely misses that
+the tokens no longer move.
+
+`~/.claude/tools/cssdiff &lt;url&gt; --tokens &#x27;--t-link,--t-focus&#x27;` resolves a list of
+custom properties in every palette and theme and prints them as a table. Two
+palettes returning identical values is the signature.
+
+---
+
+## Phase 3: reconcile
+
+The audit that neither side can do alone. Pull the Figma variable collections
+and the code token set, normalise the names, and compare:
+
+- **In Figma, missing from code.** A designed value the build cannot express.
+- **In code, missing from Figma.** A value invented in the build. This is the
+  drift that produces &quot;the app is out of alignment with the Figma&quot;.
+- **Same name, different value.** The worst case, because both sides pass their
+  own audit and the screens still disagree.
+- **Same value, different name.** Two names for one decision, which will drift
+  the moment one of them changes.
+
+Report these as pairs with both values side by side. This is the section the designer
+will read first.
+
+### A number in code that Figma derives is not a missing token
+
+The highest-value finding in this phase is a value the code **states** and Figma
+**computes**. It never shows up as a missing token, because the number is
+correct; it is the wrong kind of value.
+
+Figma auto-layout frames that HUG have no chosen height. The height is content
+plus padding. When the code pins that height instead, three things follow, and
+all three were found on one real component set in one pass:
+
+- The pin restates a token. `height: 18px` on a chip whose line-height token is
+  already 18 is a literal copy of a token, and it will not follow if the token
+  moves.
+- The pin can disagree with Figma and nobody notices, because both sides look
+  deliberate. Two chips were pinned to 18 where the component hugs to 22, so the
+  text sat squeezed in its own box.
+- A variant can override the pin and end up smaller than the component it
+  varies.
+
+So: **when a Figma component hugs, the code should carry padding and
+line-height and no height.** Ask &quot;does Figma choose this number, or fall out of
+it?&quot; before proposing a token for it.
+
+**The one exception, and it is a real one.** A Figma stroke set to INSIDE does
+not expand its frame, so a bordered component that hugs to 18 is 18 *including*
+its border. A CSS border always adds to the box. The only way to express an
+inside stroke in CSS is a pinned height with `box-sizing: border-box`. Unpinning
+such a component makes it grow by twice the border width. Check `strokeAlign`
+before removing any height from a component that has a stroke.
+
+**Measure after changing.** Each of the above was reasoned correctly and two of
+the four still rendered wrong. Render the component and compare its box to the
+Figma frame&#x27;s height. The reasoning is the hypothesis; the measurement is the
+result.
+
+---
+
+## Reporting
+
+Coverage first, then findings, then the noise you set aside:
+
+```
+Scanned: 6,410 declarations in app.css, 2,254 nodes on Components.
+Detector self-test: passed (planted value caught).
+
+Code
+  gap            219 raw   most common 12px  -&gt;  space/md
+  height         214 raw   48px x 31         -&gt;  needs a size token
+  border-radius   65 raw   near miss: 10px   -&gt;  radius/sm is 8
+
+Figma
+  Tag / TScore        radius 12 unbound        -&gt; radius/md
+  Empty State         effect unstyled          -&gt; needs an elevation style
+
+Reconcile
+  radius/xxs = 2px    no Figma variable        -&gt; invented in code
+  surface/secondary   #F1F4FB / code #F1F4FA   -&gt; same name, different value
+
+Set aside
+  81 off-scale values inside vendored Apple components. Not ours to tokenize.
+```
+
+Never report a percentage tokenized. It is the same pathology as a parity score:
+it answers &quot;of the things I checked, how many passed&quot;, and the value that is
+wrong is usually one the detector never looked at.
+
+## Fixing
+
+Fix in Figma first, then mirror to code, per the contract. Bind the component
+before the instance. After any batch, re-run phase 3, because a fix on one side
+is a new mismatch until the other side follows.
+
+---
+
+## Finding the contract
+
+Every project keeps its rules in one file at the repo root. **Do not assume a
+filename.** Look, in order, for: `DESIGN_SYSTEM.md`, `DESIGN_CONTRACT.md`,
+`DESIGN.md`, a design section in `CLAUDE.md` or `AGENTS.md`, or a `docs/`
+equivalent. Pick the one that names the source of truth and the spacing rules.
+Use what is there rather than creating a second file beside it, which would give
+the project two contracts that can disagree.
+
+If nothing exists, load the `design-contract` skill and write one.
+</code></pre></details>
+</article>
+<article class="entry" id="skill-design-parity">
+  <header class="entry-head">
+    <h3><span class="slash">/</span>design-parity</h3>
+    <p class="tagline">Put the build beside the Figma frame at matched width and look</p>
+  </header>
+  <p class="does">Renders the built screen at the Figma frame&#x27;s exact width, takes a screenshot of both, and compares them by eye in the order a designer notices things: vertical rhythm, proportion inside components, alignment and edges, type, missing or fabricated data, then state coverage. Only after looking does it measure, using the measure tool rather than a hand-written harness. A defect is fixed only when it is fixed in Figma first and then mirrored in code.</p>
+  <dl class="kv"><div><dt>When</dt><dd>When the designer asks whether the build matches Figma, says a screen is still off or out of alignment, or before opening a PR that touches design.</dd></div><div><dt>Produces</dt><dd>A defect list, one line per defect naming where, what is wrong and what it should be, plus what was checked and what was not exercised. Never a score.</dd></div><div><dt>Holds</dt><dd><q>Never report a percentage as an answer to a visual question.</q></dd></div></dl>
+  <p class="calls"><span class="lbl">Calls</span><ul class="chips"><li>design-contract</li><li>measure</li><li>figma-parity</li><li>get_screenshot</li></ul></p>
+  <details class="src"><summary>Read skills/design-parity/SKILL.md<span class="len">116 lines</span></summary><pre><code>---
+name: design-parity
+description: Check a built screen against its Figma frame by putting them side by side at the same width and looking. Use when the designer asks whether the build matches Figma, says a screen is &quot;still off&quot; or &quot;out of alignment&quot;, or before opening a PR that touches design. Reports defects, never a score.
+---
+
+# Design parity
+
+Run this in a subagent whenever the sweep covers more than two screens. The
+per-screen tool output is large and the designer does not need it in the main thread.
+Return the defect list only.
+
+## The rule this exists to enforce
+
+**Never report a percentage as an answer to a visual question.** the designer was handed
+a parity sweep reporting per-tier percentages and asked instead: *&quot;Does
+everything look exactly like Figma?&quot;* He was right, and it was measurable: a
+sweep across 14 properties and 1141 units reported the sportscard components
+clean while their thumbnails rendered landscape where Figma authored portrait.
+The sweep had never measured the property that was wrong. Four real defects were
+found only by putting the two renders side by side, and none of them moved the
+score.
+
+A score answers &quot;do the properties I sampled agree&quot;. It does not answer &quot;does
+this look right&quot;. The measured pass is for catching regression in what it
+already measures. It never certifies fidelity.
+
+So: **look first, measure second, and report defects rather than a number.**
+
+## Finding the contract
+
+Every project keeps its rules in one file at the repo root. **Do not assume a
+filename.** Look, in order, for: `DESIGN_SYSTEM.md`, `DESIGN_CONTRACT.md`,
+`DESIGN.md`, a design section in `CLAUDE.md` or `AGENTS.md`, or a `docs/`
+equivalent. Pick the one that names the source of truth and the spacing rules.
+Use what is there rather than creating a second file beside it, which would give
+the project two contracts that can disagree.
+
+If nothing exists, load the `design-contract` skill and write one.
+
+## Method
+
+**1. Match the width before you compare anything.**
+
+A correction worth remembering: *&quot;Can you just make the Playground 393? Why so you get a
+one-to-one comparison?&quot;* A comparison at two different widths is not a
+comparison. Render the build at the Figma frame&#x27;s exact width. If the frame is
+393, the viewport is 393.
+
+**2. Get both images.**
+
+- Figma: `get_screenshot` on the frame node.
+- Build: run it and screenshot at the frame width. If it will not run locally
+  (a backend dependency, no offline mode), serve the template statically and
+  drive the client state directly to reach the screen. A static serve makes
+  every API call fail, which is exactly right for checking empty and loading
+  states, and is a genuine test of rendering, CSS and state logic. Say plainly
+  in your report that the API paths were not exercised.
+
+**3. Look at them side by side, and name what is wrong.**
+
+Work down in this order, because this is the order a designer notices things:
+
+- **Vertical rhythm.** He reads tight spacing as a defect before anything else.
+  Check the gaps against the contract&#x27;s ladder. A pair that should be grouped
+  and sitting at the group value, but is sitting at the block value, is a
+  defect even though both numbers are on the ladder.
+- **Proportion inside components.** Two things that should scale together but
+  are not: an icon that stepped down 0.5 while its label stepped 0.75 reads as
+  broken even when both values are on scale.
+- **Alignment and edges.** Gutters, left edges down a column, optical centering.
+- **Type.** Size, weight, line height, case. He notices weight before size.
+- **Missing or fabricated data.** A blank where a value should be, a zero
+  standing in for an absent number, a dash doing a word&#x27;s job.
+- **State coverage.** Does the screen have a loading, empty and sparse
+  treatment, or only the populated one?
+
+**4. Only now, measure. Use the tool, do not rewrite the harness.**
+
+```bash
+~/.claude/tools/measure &lt;url&gt; --width 393 \
+  --setup &quot;&lt;js to drive the screen into state&gt;&quot; \
+  --gaps &quot;.some-container&quot; --box &quot;.some-component&quot; --overflow
+```
+
+It fixes the width explicitly, reads `columnGap` and `rowGap` rather than the
+`gap` shorthand, which does not round-trip a `var()`, and never reports page
+height as a proxy for change. Add `--json` to save a baseline and `--compare
+FILE` to diff a later run against it.
+
+Every one of those three details exists because writing the harness by hand got
+it wrong.
+
+Use computed styles or node properties to confirm what you saw and to catch
+regression in the same properties next time. Measurement supports the finding.
+It does not generate it.
+
+## Reporting
+
+One line per defect. Each line says where, what is wrong, and what it should be.
+
+```
+Card Detail / Market  Empty tab renders nothing. Needs the Empty State
+                      component; it exists in Figma (85:693) and had no code
+                      equivalent at all.
+Wantlist / Wants      Chart legend sits 24 from its chart. It reads the chart,
+                      so it belongs to it at 8. Group it, then stack.
+```
+
+No score. No percentage. If you found nothing, say you found nothing and name
+what you looked at, so the designer knows the coverage of the claim.
+
+## What counts as done
+
+A defect is fixed when it is fixed **in both places**: corrected in Figma first,
+then mirrored in code, per the contract&#x27;s direction. A fix that exists only in
+code is a new drift, not a repair.
+</code></pre></details>
+</article>
+<article class="entry" id="skill-rhythm-pass">
+  <header class="entry-head">
+    <h3><span class="slash">/</span>rhythm-pass</h3>
+    <p class="tagline">Tighten spacing and hierarchy without redesigning, every value a token</p>
+  </header>
+  <p class="does">Runs the designer&#x27;s own tuning-pass brief, made permanent: tighten what is loose, loosen what is cramped, line up what is off, and bind every spacing, colour and type value to a Figma variable and a matching code token. The working rule is group first, then stack: decide which adjacent pairs read as one thing, set them at the group value, and let the group enter the block stack. Fixes go on the component so every instance inherits them, in Figma first and then mirrored to code in the same session.</p>
+  <dl class="kv"><div><dt>When</dt><dd>When the designer asks for a tuning pass, a spacing pass, a rhythm pass, or says things look squished, cramped, tight or loose.</dd></div><div><dt>Produces</dt><dd>A list of what changed and where, in both Figma and code, with no composition changed and no literal introduced.</dd></div><div><dt>Holds</dt><dd><q>&quot;This is not a redesign&quot; is the binding constraint.</q></dd></div></dl>
+  <p class="calls"><span class="lbl">Calls</span><ul class="chips"><li>design-contract</li></ul></p>
+  <details class="src"><summary>Read skills/rhythm-pass/SKILL.md<span class="len">96 lines</span></summary><pre><code>---
+name: rhythm-pass
+description: Tighten spacing, alignment and hierarchy across a project without redesigning it, and bind every value to a token. Use when the designer asks for a tuning pass, a spacing pass, a rhythm pass, or says things look squished, cramped, tight or loose.
+---
+
+# Rhythm pass
+
+This is one real brief, made permanent. He wrote it and pasted it by hand; it
+does not need retyping again:
+
+&gt; You are an expert product designer with a strong eye for spacing, rhythm,
+&gt; alignment, and visual hierarchy. You are doing a tuning pass on this project.
+&gt; This is not a redesign. The layouts, hierarchy, component choices, and overall
+&gt; composition are already decided. Your job is to tighten what&#x27;s loose, loosen
+&gt; what&#x27;s cramped, line up what&#x27;s off, and make sure every spacing, color, and
+&gt; type value is bound to a Figma variable or style and a matching code token.
+&gt;
+&gt; The order of operations is fixed: read the Figma file, make the corrections in
+&gt; Figma, then reflect those exact corrections in the prototype code. Figma is the
+&gt; source of truth. Code follows it. Never make a change in code that isn&#x27;t
+&gt; already in Figma, and never leave a Figma change unreflected in code.
+
+**&quot;This is not a redesign&quot; is the binding constraint.** Do not improve the
+composition, change a component choice, or restructure a screen. If you think
+something needs that, note it and keep tuning.
+
+Run this in a subagent when it spans more than a few screens, and return the
+change list rather than the per-node output.
+
+## The ladder is a ratio, not a set of numbers
+
+Read the values from the project contract (see below). What transfers between projects is
+the **spread**, roughly 3x between &quot;inside a thought&quot; and &quot;between thoughts&quot;.
+In one real system that is 8 inside a group against 24 between groups. The
+numbers 8/12/16/24/32 are incidental and happen to be the common ones.
+
+The rhythm that reads as rhythm is hierarchical, never uniform: tight inside a
+thought, generous between thoughts. A flat gap everywhere is the failure mode,
+even when the flat value is on the scale.
+
+## Group first, then stack
+
+This is the rule that does the real work, and it is the one most often missed.
+
+Before applying the block value to a stack, ask of each adjacent pair: does the
+second thing *read* the first? A legend reads its chart. A caption reads its
+image. A rail reads the section head above it. A sub-line reads the value above
+it.
+
+If yes, they are one thing. Group them at the group value, and let the **group**
+enter the block stack. Applying the block value between a head and its own
+content pushes them apart and destroys the relationship the spacing is supposed
+to encode.
+
+Worked example, from the Wantlist screen: the section held Top, Line Chart,
+Legend, Stats, Section Head, Carousel at a flat 12. The correct result is not
+&quot;set them all to 24&quot;. It is: group Chart with Legend at 8, group Section Head
+with Carousel at 12, then stack the four resulting blocks at 24.
+
+## The air belongs to the component
+
+the designer&#x27;s fix for tight spacing is structural, not visual. A section title owns the
+space beneath it. A row owns its 16 above and below. Do not solve a gap by
+typing a margin onto one instance; solve it in the component, so every instance
+inherits it and the next screen is right before anyone looks at it.
+
+And the amount is always a token, never a number typed on a screen.
+
+## Order of work
+
+1. Read the contract and the Figma page.
+2. **Figma first.** Fix the spacing on the components, then on the screens that
+   use them. Fix the component before the instance, every time.
+3. **Then code.** Mirror the exact same values. Same session, not later.
+4. Report what changed, in both places, as a list of what and where.
+
+## Checks before you call it done
+
+- Every value you touched resolves to a variable in Figma and a token in code.
+- No literal was introduced. A literal is a defect, not a shortcut.
+- No composition changed. If you think one should, it is a note, not an edit.
+- Both places agree. A Figma fix left unmirrored is the drift this skill exists
+  to remove.
+
+---
+
+## Finding the contract
+
+Every project keeps its rules in one file at the repo root. **Do not assume a
+filename.** Look, in order, for: `DESIGN_SYSTEM.md`, `DESIGN_CONTRACT.md`,
+`DESIGN.md`, a design section in `CLAUDE.md` or `AGENTS.md`, or a `docs/`
+equivalent. Pick the one that names the source of truth and the spacing rules.
+Use what is there rather than creating a second file beside it, which would give
+the project two contracts that can disagree.
+
+If nothing exists, load the `design-contract` skill and write one.
+</code></pre></details>
+</article>
+<article class="entry" id="skill-ship-check">
+  <header class="entry-head">
+    <h3><span class="slash">/</span>ship-check</h3>
+    <p class="tagline">Prove the artifact the designer sees contains the work</p>
+  </header>
+  <p class="does">Asks four questions before any claim of done, live or shipped: which artifact the designer is looking at (named by URL or port), whether that artifact actually contains the change (committed is not pushed, pushed is not merged, merged is not built, built is not live), whether anything is cached between the work and his eyes, and what was not exercised. It checks the actual thing, such as the deploy service reporting the pushed commit or the local server serving the edited directory, rather than inferring it.</p>
+  <dl class="kv"><div><dt>When</dt><dd>Before saying a change is live or done, when the designer says he is still seeing the old version, or when he asks whether a deployed site matches his branch.</dd></div><div><dt>Produces</dt><dd>A short report stating the environment, the evidence, and the gap: what is verified where, and what is not verified and why.</dd></div><div><dt>Holds</dt><dd><q>Never say done, live, or shipped without having checked. If you cannot check, say what you could not check and why.</q></dd></div></dl>
+  
+  <details class="src"><summary>Read skills/ship-check/SKILL.md<span class="len">78 lines</span></summary><pre><code>---
+name: ship-check
+description: Verify that what the designer is looking at is actually the work that was done, before claiming anything shipped. Use before saying a change is live or done, when the designer says he is still seeing the old version, or when he asks whether a deployed site matches his branch.
+---
+
+# Ship check
+
+The most repeated frustration in this working relationship is not a design
+failure. It is a **verification failure**: the work was described as done while
+the designer was looking at something that did not contain it.
+
+&gt; &quot;You say you are making these changes but they are not appearing in playground&quot;
+&gt;
+&gt; &quot;The updates were pushed, and I am still seeing a number of issues&quot;
+&gt;
+&gt; &quot;I&#x27;m still seeing the old website&quot;
+&gt;
+&gt; &quot;8084 still shows the old homepage not the new one&quot;
+&gt;
+&gt; &quot;Were you just editing locally?&quot;
+
+Every one of these cost a round trip that a check would have prevented. Run this
+before any claim that something is done, live, fixed or shipped.
+
+## The four questions
+
+**1. Which artifact is the designer looking at?**
+
+Name it explicitly, by URL or port. There are usually several in play at once:
+a local server, a static preview, a deployed staging site, production, and a
+Figma prototype. They do not contain the same code and they never have.
+
+If a preview was produced by injecting styles into a running page, say so and
+say it was removed. A client-side injection is a way to *look* at a change, not
+a way to make one. Never let it stand in for the edit.
+
+**2. Does that artifact contain the change?**
+
+Trace it the whole way. Committed is not pushed. Pushed is not merged. Merged is
+not built. Built is not live: a deployment can be waiting on approval, and
+approval is not yours to give.
+
+Check the actual thing, do not infer it. For a deploy, confirm the service
+reports the exact commit that was pushed. For a local server, confirm it is
+serving the directory you edited, and not a sibling repo. That one is real: a
+server running from a neighbouring checkout looked exactly like the app under
+test and contained none of the work.
+
+**3. Is anything cached between the work and his eyes?**
+
+Static assets, service workers, CDN, phone browsers. *&quot;on my phone the asset is
+still wrong. is there a way to hard-reset it?&quot;* If a hard reload is needed, say
+so up front rather than letting him discover it.
+
+**4. What did you not exercise?**
+
+Say it plainly, and be specific about which paths. &quot;Rendered and checked against
+the stylesheet, but the DELETE round trip is unexercised because the app needs a
+database and will not run locally&quot; is useful. &quot;Should be fine&quot; is not.
+
+## Reporting
+
+State the environment, the evidence, and the gap:
+
+```
+Live on the production URL: yes. The service reports commit 8441278, which
+is the merge of PR #3. Checked the deploy status, not just the merge.
+
+Not verified: the removal flow. It needs a real backend, so the DELETE is
+unexercised. One click on staging would close it.
+```
+
+## The standing rule
+
+Never say done, live, or shipped without having checked. If you cannot check,
+say what you could not check and why. a designer would far rather have an honest gap
+named than discover it himself in a screenshot, because discovering it himself
+costs him a round trip and costs the claim its credibility.
+</code></pre></details>
+</article></div>
+    </section>
+
+    <section id="agents">
+      <header>
+        <h2>Agents</h2>
+        <p>Read-only. Each runs one skill in its own context so a sweep's screenshots and scan output never land in the main thread. What comes back is the finding list; the decision that follows stays in the conversation.</p>
+      </header>
+      <div class="list">
+<article class="entry" id="agent-figma-parity">
+  <header class="entry-head">
+    <h3>figma-parity<span class="badge">agent</span></h3>
+    <p class="tagline">Runs design-parity in its own context, returns defects only</p>
+  </header>
+  <p class="does">Compares built screens against their Figma frames at matched width and hands back a defect list grouped as Checked, Defects and Clean. It is read-only by design: it finds defects and never fixes or reports them as fixed, and a screen it could not reach never appears under Clean.</p>
+  <dl class="kv"><div><dt>Runs</dt><dd><a href="#skill-design-parity">/design-parity</a></dd></div><div><dt>Why an agent</dt><dd>Every screen in a parity sweep costs two screenshots plus the DOM and node reads behind them; across a dozen screens that is most of a context window and none of it is the answer. The agent absorbs that cost so only findings reach the main thread.</dd></div><div><dt>Model</dt><dd>sonnet</dd></div><div><dt>Has</dt><dd><ul class="chips"><li>Read/Grep/Glob/Bash</li><li>Skill</li><li>Figma MCP (use_figma, get_screenshot, get_metadata)</li><li>Chrome (navigate, computer, javascript, tabs, resize, batch)</li></ul></dd></div></dl>
+  <details class="src"><summary>Read agents/figma-parity.md<span class="len">61 lines</span></summary><pre><code>---
+name: figma-parity
+description: &quot;Compares built screens against their Figma frames at matched width and reports defects, in its own context. Use when the designer asks whether the build matches Figma, says a screen is still off or out of alignment, or before a PR that touches design. Also use for any sweep covering more than two screens.\\n\\nExamples:\\n\\n- User: \&quot;Does everything look exactly like Figma?\&quot;\\n  Assistant: \&quot;Launching the figma-parity agent so the screenshots stay out of our thread.\&quot;\\n\\n- User: \&quot;I feel like the app is out of alignment with the Figma and my branch.\&quot;\\n  Assistant: \&quot;I&#x27;ll run the figma-parity agent across the screens and bring back the defect list.\&quot;\\n\\n- User: \&quot;Check the Card Detail tabs against the frames before we open the PR.\&quot;\\n  Assistant: \&quot;Running the figma-parity agent on those four screens.\&quot;&quot;
+model: sonnet
+tools: Read, Grep, Glob, Bash, Skill, mcp__plugin_figma_figma__use_figma, mcp__plugin_figma_figma__get_screenshot, mcp__plugin_figma_figma__get_metadata, mcp__claude-in-chrome__navigate, mcp__claude-in-chrome__computer, mcp__claude-in-chrome__javascript_tool, mcp__claude-in-chrome__tabs_context_mcp, mcp__claude-in-chrome__tabs_create_mcp, mcp__claude-in-chrome__tabs_close_mcp, mcp__claude-in-chrome__resize_window, mcp__claude-in-chrome__browser_batch
+---
+
+You run the `design-parity` skill. **Invoke it first with the Skill tool and
+follow it exactly.** It holds the method; this file holds your operating
+constraints.
+
+## Why you exist
+
+Every screen in a parity sweep costs two screenshots plus the DOM and node reads
+behind them. Across a dozen screens that is most of a context window, and none
+of it is the answer. You absorb that cost and hand back the defect list.
+
+## Read-only
+
+You have no edit tools, deliberately. You find defects; you do not fix them.
+Never report a defect as fixed.
+
+## The rule you cannot break
+
+**Never return a score, a percentage, or a count-of-passing as the answer.** A
+sweep once reported components clean while their thumbnails rendered landscape
+against portrait in Figma, because the sweep never measured that property. Look
+at the two renders first, name what is wrong, and use measurement only to
+confirm what you saw.
+
+## What you must return
+
+Findings only. No screenshots, no DOM dumps, no per-node output, no narration of
+what you tried.
+
+```
+Checked
+  &lt;screens, and at what width&gt;
+  &lt;how the build was reached, and what that does not exercise&gt;
+
+Defects
+  &lt;screen&gt;   &lt;what is wrong&gt;   &lt;what it should be, and where that is authored&gt;
+
+Clean
+  &lt;screens you checked and found nothing on&gt;
+```
+
+One line per defect. Each names where, what, and the target. Work down in the
+order the designer notices things: vertical rhythm first, then proportion inside
+components, then alignment and edges, then type, then missing or fabricated
+data, then whether the screen has loading, empty and sparse states at all.
+
+If you could not reach a screen, say which and why. A screen you did not check
+must never appear under Clean.
+
+## Honesty about the harness
+
+If the app could not run properly and you used a static serve or stubbed state,
+say so in Checked, and name what that leaves unexercised. A parity pass that
+silently skipped the backend paths is the false confidence this whole toolkit
+exists to prevent.
+</code></pre></details>
+</article>
+<article class="entry" id="agent-token-auditor">
+  <header class="entry-head">
+    <h3>token-auditor<span class="badge">agent</span></h3>
+    <p class="tagline">Runs token-audit in its own context, returns findings only</p>
+  </header>
+  <p class="does">Scans code, Figma, or both for unbound values and reconciles the two token sets, returning a fixed report shape: coverage with denominators, near misses safe to snap, off-system values needing a decision, Figma findings per component, reconcile pairs, and what was set aside. It has no edit tools and will narrow scope and say so rather than return a partial report that reads as complete.</p>
+  <dl class="kv"><div><dt>Runs</dt><dd><a href="#skill-token-audit">/token-audit</a></dd></div><div><dt>Why an agent</dt><dd>A token sweep scans thousands of declarations and Figma nodes; in one measured session tool results were 99% of all content with single results over half a megabyte. Running the scan elsewhere keeps the main conversation for the judgment that follows.</dd></div><div><dt>Model</dt><dd>sonnet</dd></div><div><dt>Has</dt><dd><ul class="chips"><li>Read/Grep/Glob/Bash</li><li>Skill</li><li>Figma MCP (use_figma, get_variable_defs, get_metadata)</li></ul></dd></div></dl>
+  <details class="src"><summary>Read agents/token-auditor.md<span class="len">66 lines</span></summary><pre><code>---
+name: token-auditor
+description: &quot;Runs a token audit across code, Figma, or both, in its own context. Use whenever the designer asks whether everything is tokenized, asks for a variable or styles audit, says values should be tokens, or when a sweep would scan more than a couple of files or a whole Figma page.\\n\\nExamples:\\n\\n- User: \&quot;Are all the spacing values tokens yet?\&quot;\\n  Assistant: \&quot;I&#x27;ll run the token-auditor agent so the scan output stays out of our thread.\&quot;\\n\\n- User: \&quot;Do a variables and styles audit on the Figma side.\&quot;\\n  Assistant: \&quot;Launching the token-auditor agent for phase 2.\&quot;\\n\\n- User: \&quot;Can we check the Figma tokens and the code tokens actually agree?\&quot;\\n  Assistant: \&quot;That&#x27;s phase 3. Running the token-auditor agent.\&quot;&quot;
+model: sonnet
+tools: Read, Grep, Glob, Bash, Skill, mcp__plugin_figma_figma__use_figma, mcp__plugin_figma_figma__get_variable_defs, mcp__plugin_figma_figma__get_metadata
+---
+
+You run the `token-audit` skill. **Invoke it first with the Skill tool and follow
+it exactly.** It holds the method; this file holds your operating constraints.
+
+## Why you exist
+
+A token sweep scans thousands of declarations and Figma nodes. In the main
+conversation that output crowds out the work it was meant to support: in one
+measured session, tool results were 99% of all content, with single results over
+half a megabyte. You run that scan in your own context and hand back findings.
+
+## Read-only
+
+You have no edit tools, deliberately. Do not attempt to fix anything, and do not
+ask for write access. If the designer wants the fixes applied, that is a separate, named
+decision he makes after reading your findings. Reporting a fix you did not make
+as if you made it is the worst thing you can do here.
+
+## What you must return
+
+Return findings only. Never paste raw scan output, file contents, node dumps, or
+your intermediate reasoning. Someone reading your report should be able to act
+without seeing anything you looked at.
+
+The shape, in full:
+
+```
+Coverage
+  &lt;what you scanned, with denominators&gt;
+  Detector self-test: &lt;passed, and what you planted to prove it&gt;
+
+Near misses, safe to snap      &lt;count&gt;
+  &lt;value&gt; x&lt;n&gt;  -&gt;  &lt;token&gt;
+
+Off system, needs a decision   &lt;count&gt;
+  &lt;value&gt; x&lt;n&gt;   &lt;why no suggestion is offered&gt;
+
+Figma
+  &lt;component&gt;   &lt;what is unbound&gt;   -&gt;  &lt;the variable it should use&gt;
+
+Reconcile
+  &lt;name&gt;   &lt;figma value&gt; / &lt;code value&gt;   &lt;what that means&gt;
+
+Set aside
+  &lt;noise you deliberately excluded, and why&gt;
+```
+
+Hard limits on the report: no percentage tokenized, ever. No suggestion attached
+to a value more than a third of a step from its nearest token. Group findings by
+component, not by node, because ten unbound paddings in one component is one fix.
+
+If a phase found nothing, say so and name what you checked, so the claim has a
+known coverage rather than an implied one.
+
+## Budget
+
+If the scan is running long, narrow the scope and say what you narrowed, rather
+than returning a partial report that reads as complete. An honest &quot;phases 1 and
+2 only, phase 3 not run&quot; is worth more than a full-looking report with a silent
+gap in it.
+</code></pre></details>
+</article></div>
+    </section>
+
+    <section id="tools">
+      <header>
+        <h2>Executables</h2>
+        <p>Skills are instructions; these are programs. A rewritten check can be wrong differently each time. Both install to <code>~/.claude/tools/</code>, both exit non-zero on failure, and their coverage is deliberately complementary: revert a spacing rule and guard says the file is fine, because it is, while measure reports the gaps that changed.</p>
+      </header>
+      <div class="list">
+<article class="entry" id="tool-measure">
+  <header class="entry-head">
+    <h3>measure<span class="badge">executable</span></h3>
+    <p class="tagline">Report rendered geometry at a fixed width, as JSON</p>
+  </header>
+  <p class="does">A node script that launches headless Chrome over the DevTools protocol at an explicit viewport width, defaulting to the 393 phone frame, optionally runs setup JavaScript to drive app state, and reports gaps between children, element boxes, overflow and collapsed text. It reads columnGap and rowGap rather than the gap shorthand, which does not round-trip a var(), and it never uses page height as a change metric. A saved JSON run can be diffed against a later one.</p>
+  <pre class="usage"><code>measure &lt;url&gt; --width 393
+measure &lt;url&gt; --setup &#x27;JS to drive app state&#x27; --wait 900
+measure &lt;url&gt; --gaps SEL    vertical gaps between the children of SEL
+measure &lt;url&gt; --box SEL     top, left, width, height, borders of each match
+measure &lt;url&gt; --overflow    elements wider than the viewport
+measure &lt;url&gt; --json &gt; baseline.json
+measure &lt;url&gt; --compare baseline.json    diff against a previous --json run</code></pre>
+  <dl class="kv"><div><dt>Exists because</dt><dd>Three measurement mistakes in one day, each from writing a throwaway harness instead of calling a reliable one: measured at 1512 wide instead of 393, so the answer meant nothing; read getComputedStyle().gap, which does not round-trip a var() and silently reported 6px where the real value was 8; used page height as the change metric, which is pinned by a fixed bottom bar and reported no change whatever happened.</dd></div><div><dt>Reports</dt><dd><ul class='plain'><li>Rendered gap between each adjacent visible child of a selector, with the declared rowGap beside it</li><li>Box of each matched element: top, left, width, height, border, padding, columnGap, rowGap, leading text</li><li>Elements whose right edge exceeds the viewport width</li><li>Count of visible elements</li><li>Count of visible text elements rendering under 2px tall (collapsed text)</li><li>With --compare: which gaps changed, delta in visible elements and collapsed text; exits 1 if collapsed text grew</li></ul></dd></div></dl>
+  <details class="src"><summary>Read tools/measure<span class="len">230 lines</span></summary><pre><code>#!/usr/bin/env node
+/**
+ * measure: report rendered geometry at a fixed width, as JSON.
+ *
+ *   measure &lt;url&gt; [options]
+ *
+ *   --width N        viewport width, DEFAULT 393. Match the Figma frame.
+ *   --setup &#x27;JS&#x27;     runs in the page before measuring, to drive app state
+ *   --wait MS        after setup, before measuring (default 900)
+ *   --gaps SEL       vertical gaps between the children of SEL
+ *   --box SEL        box of each match: top, left, width, height, borders
+ *   --overflow       elements wider than the viewport
+ *   --compare FILE   diff against a previous --json run
+ *   --json           raw JSON instead of a table
+ *
+ * Why this exists. Three measurement mistakes in one day, each from writing a
+ * throwaway harness instead of calling a reliable one:
+ *
+ *   1. measured at 1512 wide instead of 393, so the answer meant nothing
+ *   2. read getComputedStyle().gap, which does not round-trip a var() and
+ *      silently reported 6px where the real value was 8
+ *   3. used page height as the change metric, which is pinned by a fixed
+ *      bottom bar and reported &quot;no change&quot; whatever happened
+ *
+ * This tool cannot make those mistakes. The width is explicit and defaults to a
+ * phone frame, it reads columnGap and rowGap rather than the shorthand, and it
+ * never reports page height as a proxy for anything.
+ */
+const { spawn } = require(&quot;child_process&quot;);
+const fs = require(&quot;fs&quot;);
+const os = require(&quot;os&quot;);
+const path = require(&quot;path&quot;);
+
+const CHROME = [
+  &quot;/Applications/Google Chrome.app/Contents/MacOS/Google Chrome&quot;,
+  &quot;/Applications/Chromium.app/Contents/MacOS/Chromium&quot;,
+  &quot;/usr/bin/google-chrome&quot;, &quot;/usr/bin/chromium&quot;,
+].find(p =&gt; { try { fs.accessSync(p); return true; } catch { return false; } });
+
+function args(argv) {
+  const o = { width: 393, wait: 900, url: null, setup: &quot;&quot;, gaps: null,
+              box: null, overflow: false, json: false, compare: null };
+  for (let i = 0; i &lt; argv.length; i++) {
+    const a = argv[i];
+    if (a === &quot;--width&quot;) o.width = +argv[++i];
+    else if (a === &quot;--wait&quot;) o.wait = +argv[++i];
+    else if (a === &quot;--setup&quot;) o.setup = argv[++i];
+    else if (a === &quot;--gaps&quot;) o.gaps = argv[++i];
+    else if (a === &quot;--box&quot;) o.box = argv[++i];
+    else if (a === &quot;--compare&quot;) o.compare = argv[++i];
+    else if (a === &quot;--overflow&quot;) o.overflow = true;
+    else if (a === &quot;--json&quot;) o.json = true;
+    else if (a === &quot;-h&quot; || a === &quot;--help&quot;) o.help = true;
+    else if (!o.url) o.url = a;
+  }
+  return o;
+}
+
+// Runs inside the page. Everything here is deliberate; see the header.
+function probe(sel, wantGaps, wantBox, wantOverflow, vw) {
+  const seen = el =&gt; {
+    const r = el.getBoundingClientRect();
+    return r.width &gt; 0 &amp;&amp; r.height &gt; 0 &amp;&amp; el.offsetParent !== null;
+  };
+  const name = el =&gt; {
+    const c = (el.className &amp;&amp; el.className.toString().trim()) || &quot;&quot;;
+    return c ? &quot;.&quot; + c.split(/\s+/).join(&quot;.&quot;) : el.tagName.toLowerCase();
+  };
+  const out = {};
+
+  if (wantGaps) {
+    out.gaps = [];
+    for (const parent of document.querySelectorAll(wantGaps)) {
+      if (!seen(parent)) continue;
+      const kids = [...parent.children].filter(seen);
+      const cs = getComputedStyle(parent);
+      // rowGap, never the `gap` shorthand: the shorthand does not round-trip a var()
+      const declared = cs.display.includes(&quot;flex&quot;) || cs.display.includes(&quot;grid&quot;)
+        ? Math.round(parseFloat(cs.rowGap) || 0) : null;
+      for (let i = 1; i &lt; kids.length; i++) {
+        const a = kids[i - 1].getBoundingClientRect();
+        const b = kids[i].getBoundingClientRect();
+        out.gaps.push({
+          parent: name(parent), from: name(kids[i - 1]), to: name(kids[i]),
+          gap: Math.round(b.top - a.bottom), declaredRowGap: declared,
+        });
+      }
+    }
+  }
+
+  if (wantBox) {
+    out.boxes = [...document.querySelectorAll(wantBox)].filter(seen).map(el =&gt; {
+      const r = el.getBoundingClientRect(), cs = getComputedStyle(el);
+      return {
+        sel: name(el),
+        top: Math.round(r.top), left: Math.round(r.left),
+        width: Math.round(r.width), height: Math.round(r.height),
+        border: cs.borderTopWidth, padTop: cs.paddingTop, padBottom: cs.paddingBottom,
+        // both, because the shorthand lies when the value came from a variable
+        colGap: cs.columnGap, rowGap: cs.rowGap,
+        text: (el.textContent || &quot;&quot;).trim().slice(0, 30),
+      };
+    });
+  }
+
+  if (wantOverflow) {
+    out.overflow = [...document.querySelectorAll(&quot;*&quot;)].filter(el =&gt; {
+      if (!seen(el)) return false;
+      return el.getBoundingClientRect().right &gt; vw + 1;
+    }).map(el =&gt; ({ sel: name(el), right: Math.round(el.getBoundingClientRect().right) }));
+  }
+
+  const visible = [...document.querySelectorAll(&quot;*&quot;)].filter(seen);
+  out.visibleElements = visible.length;
+  // Text that renders with no height is almost always a real defect. It must be
+  // counted only among VISIBLE elements: counting hidden ones returns hundreds
+  // of meaningless hits, which is what the first version of this did.
+  out.collapsedText = visible.filter(el =&gt;
+    el.children.length === 0 &amp;&amp; (el.textContent || &quot;&quot;).trim() &amp;&amp;
+    el.getBoundingClientRect().height &lt; 2).length;
+  return out;
+}
+
+async function cdp(o) {
+  const port = 9000 + Math.floor(Math.random() * 900);
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), &quot;measure-&quot;));
+  const chrome = spawn(CHROME, [
+    &quot;--headless=new&quot;, `--remote-debugging-port=${port}`,
+    `--user-data-dir=${dir}`, `--window-size=${o.width},1400`,
+    &quot;--no-first-run&quot;, &quot;--no-default-browser-check&quot;, &quot;--disable-gpu&quot;,
+  ], { stdio: &quot;ignore&quot; });
+
+  const kill = () =&gt; { try { chrome.kill(); } catch {}
+                       try { fs.rmSync(dir, { recursive: true, force: true }); } catch {} };
+  process.on(&quot;exit&quot;, kill);
+
+  let target;
+  for (let i = 0; i &lt; 60; i++) {
+    try {
+      const r = await fetch(`http://127.0.0.1:${port}/json/list`);
+      const list = await r.json();
+      target = list.find(t =&gt; t.type === &quot;page&quot;);
+      if (target) break;
+    } catch {}
+    await new Promise(r =&gt; setTimeout(r, 100));
+  }
+  if (!target) { kill(); throw new Error(&quot;Chrome did not start&quot;); }
+
+  const ws = new WebSocket(target.webSocketDebuggerUrl);
+  await new Promise((res, rej) =&gt; { ws.onopen = res; ws.onerror = rej; });
+  let id = 0; const pending = new Map();
+  ws.onmessage = e =&gt; {
+    const m = JSON.parse(e.data);
+    if (m.id &amp;&amp; pending.has(m.id)) { pending.get(m.id)(m); pending.delete(m.id); }
+  };
+  const send = (method, params = {}) =&gt; new Promise(res =&gt; {
+    const i = ++id; pending.set(i, res);
+    ws.send(JSON.stringify({ id: i, method, params }));
+  });
+  const evaluate = async expr =&gt; {
+    const r = await send(&quot;Runtime.evaluate&quot;,
+      { expression: expr, awaitPromise: true, returnByValue: true });
+    if (r.result?.exceptionDetails) throw new Error(r.result.exceptionDetails.text);
+    return r.result?.result?.value;
+  };
+
+  await send(&quot;Page.enable&quot;);
+  await send(&quot;Runtime.enable&quot;);
+  await send(&quot;Emulation.setDeviceMetricsOverride&quot;,
+    { width: o.width, height: 1400, deviceScaleFactor: 1, mobile: true });
+  await send(&quot;Page.navigate&quot;, { url: o.url });
+  await new Promise(r =&gt; setTimeout(r, 1500));
+  if (o.setup) { await evaluate(`(async()=&gt;{ ${o.setup} })()`); }
+  await new Promise(r =&gt; setTimeout(r, o.wait));
+
+  const result = await evaluate(
+    `(${probe.toString()})(null, ${JSON.stringify(o.gaps)}, ${JSON.stringify(o.box)}, ${o.overflow}, ${o.width})`);
+  ws.close(); kill();
+  return { url: o.url, width: o.width, ...result };
+}
+
+function table(r) {
+  const L = [];
+  L.push(`  ${r.url}  at ${r.width}px`);
+  L.push(`  ${r.visibleElements} visible elements, ${r.collapsedText} with collapsed text`);
+  if (r.gaps?.length) {
+    L.push(&quot;\n  gaps&quot;);
+    for (const g of r.gaps)
+      L.push(`    ${String(g.gap).padStart(4)}  ${g.from} -&gt; ${g.to}`);
+  }
+  if (r.boxes?.length) {
+    L.push(&quot;\n  boxes&quot;);
+    for (const b of r.boxes)
+      L.push(`    ${b.sel}  ${b.width}x${b.height} at ${b.left},${b.top}  border ${b.border}  gap ${b.colGap}`);
+  }
+  if (r.overflow?.length) {
+    L.push(`\n  overflowing ${r.width}px`);
+    for (const o of r.overflow) L.push(`    ${o.sel} to ${o.right}`);
+  }
+  return L.join(&quot;\n&quot;);
+}
+
+(async () =&gt; {
+  const o = args(process.argv.slice(2));
+  if (o.help || !o.url) {
+    console.log(fs.readFileSync(__filename, &quot;utf8&quot;).split(&quot;*/&quot;)[0].replace(/^\/\*\*?|^ \* ?/gm, &quot;&quot;));
+    process.exit(o.url ? 0 : 1);
+  }
+  if (!CHROME) { console.error(&quot;measure: no Chrome found&quot;); process.exit(1); }
+  const r = await cdp(o);
+
+  if (o.compare) {
+    const was = JSON.parse(fs.readFileSync(o.compare, &quot;utf8&quot;));
+    const diffs = [];
+    const key = g =&gt; `${g.parent}|${g.from}|${g.to}`;
+    const before = new Map((was.gaps || []).map(g =&gt; [key(g), g.gap]));
+    for (const g of r.gaps || []) {
+      const b = before.get(key(g));
+      if (b !== undefined &amp;&amp; b !== g.gap) diffs.push(`${g.from} -&gt; ${g.to}: ${b} to ${g.gap}`);
+    }
+    const dEl = r.visibleElements - was.visibleElements;
+    const dCol = r.collapsedText - was.collapsedText;
+    console.log(o.json ? JSON.stringify({ diffs, dEl, dCol }, null, 1)
+      : `  elements ${dEl &gt;= 0 ? &quot;+&quot; : &quot;&quot;}${dEl} | collapsed text ${dCol &gt;= 0 ? &quot;+&quot; : &quot;&quot;}${dCol}\n` +
+        (diffs.length ? &quot;  changed gaps\n&quot; + diffs.map(d =&gt; &quot;    &quot; + d).join(&quot;\n&quot;)
+                      : &quot;  no gap changed&quot;));
+    process.exit(dCol &gt; 0 ? 1 : 0);
+  }
+  console.log(o.json ? JSON.stringify(r, null, 1) : table(r));
+})().catch(e =&gt; { console.error(&quot;measure:&quot;, e.message); process.exit(1); });
+</code></pre></details>
+</article>
+<article class="entry" id="tool-guard">
+  <header class="entry-head">
+    <h3>guard<span class="badge">executable</span></h3>
+    <p class="tagline">Prove a file survived an edit</p>
+  </header>
+  <p class="does">A python script that inspects stylesheets, HTML and JSON for the structural things that break during bulk edits, and compares against a snapshot taken before the edit so a silent catastrophe cannot pass. It records byte count, line count and a hash per file, then on verify flags byte deltas over a limit, collapsed selector counts, and files that did not change at all. Exit code is non-zero on any failure so it can gate a commit.</p>
+  <pre class="usage"><code>guard snapshot FILE...    record the state before editing
+guard check FILE...       structural checks only, no snapshot needed
+guard verify [FILE...]    check, then compare to the snapshot
+--max-delta PCT   fail if byte count moved more than this (default 20)
+--changed         additionally fail any file that did NOT change
+--require STR     fail if this string is missing (repeatable)
+--json            machine-readable output</code></pre>
+  <dl class="kv"><div><dt>Exists because</dt><dd>Built after a whole-file regex destroyed a stylesheet and was nearly committed, because the damage was caught three steps later by an unrelated probe rather than by looking at the file.</dd></div><div><dt>Checks</dt><dd><ul class='plain'><li>CSS/SCSS/Less: brace balance after stripping comments</li><li>CSS/SCSS/Less: /* and */ comment markers pair up</li><li>CSS/SCSS/Less: selector count, failing on verify if it fell more than 10%</li><li>HTML/Vue/Svelte: unclosed tags and mismatched closing tags</li><li>HTML/Vue/Svelte: &lt;!-- and --&gt; comment markers balance</li><li>JSON: parses</li><li>Any file: stray null bytes left behind by a placeholder</li><li>Any file: required strings present (--require)</li><li>On verify: byte count moved less than --max-delta percent</li><li>On verify: file still exists and, with --changed, actually changed since the snapshot</li></ul></dd></div></dl>
+  <details class="src"><summary>Read tools/guard<span class="len">200 lines</span></summary><pre><code>#!/usr/bin/env python3
+&quot;&quot;&quot;guard: prove a file survived an edit.
+
+A file that parses is not a file that is intact. This checks the things that
+actually break during bulk edits, and compares against a snapshot taken before
+the edit so a silent catastrophe cannot pass.
+
+  guard snapshot FILE...      record the state before editing
+  guard check FILE...         structural checks only, no snapshot needed
+  guard verify [FILE...]      check, then compare to the snapshot
+
+  --max-delta PCT   fail if byte count moved more than this (default 20)
+  --changed         additionally fail any file that did NOT change
+  --require STR     fail if this string is missing (repeatable)
+  --json            machine-readable output
+
+Exit code is 0 when everything passes, 1 when anything fails.
+
+Built after a whole-file regex destroyed a stylesheet and was nearly committed,
+because the damage was caught three steps later by an unrelated probe rather
+than by looking at the file.
+&quot;&quot;&quot;
+import sys, os, re, json, hashlib, argparse
+from html.parser import HTMLParser
+
+SNAP = os.path.join(os.path.expanduser(&quot;~&quot;), &quot;.cache&quot;, &quot;design-toolkit&quot;, &quot;guard.json&quot;)
+VOID = {&#x27;area&#x27;,&#x27;base&#x27;,&#x27;br&#x27;,&#x27;col&#x27;,&#x27;embed&#x27;,&#x27;hr&#x27;,&#x27;img&#x27;,&#x27;input&#x27;,&#x27;link&#x27;,&#x27;meta&#x27;,
+        &#x27;param&#x27;,&#x27;source&#x27;,&#x27;track&#x27;,&#x27;wbr&#x27;}
+
+
+class Tags(HTMLParser):
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.stack, self.bad = [], []
+
+    def handle_starttag(self, tag, attrs):
+        if tag not in VOID:
+            self.stack.append(tag)
+
+    def handle_endtag(self, tag):
+        if tag in VOID:
+            return
+        if not self.stack or self.stack[-1] != tag:
+            self.bad.append(tag)
+        else:
+            self.stack.pop()
+
+
+def inspect(path):
+    &quot;&quot;&quot;Structural facts about one file. Never raises on content.&quot;&quot;&quot;
+    raw = open(path, encoding=&quot;utf-8&quot;, errors=&quot;replace&quot;).read()
+    f = {
+        &quot;path&quot;: path,
+        &quot;bytes&quot;: len(raw.encode(&quot;utf-8&quot;)),
+        &quot;lines&quot;: raw.count(&quot;\n&quot;) + 1,
+        &quot;sha&quot;: hashlib.sha1(raw.encode(&quot;utf-8&quot;)).hexdigest()[:12],
+        &quot;nulls&quot;: raw.count(&quot;\x00&quot;),
+        &quot;problems&quot;: [],
+    }
+    ext = os.path.splitext(path)[1].lower()
+
+    if ext in (&quot;.css&quot;, &quot;.scss&quot;, &quot;.less&quot;):
+        stripped = re.sub(r&quot;/\*.*?\*/&quot;, &quot;&quot;, raw, flags=re.S)
+        f[&quot;brace_balance&quot;] = stripped.count(&quot;{&quot;) - stripped.count(&quot;}&quot;)
+        f[&quot;comment_open&quot;], f[&quot;comment_close&quot;] = raw.count(&quot;/*&quot;), raw.count(&quot;*/&quot;)
+        f[&quot;selectors&quot;] = len(re.findall(r&quot;(?m)^\s*[.#@:a-zA-Z\[][^{}\n]*\{&quot;, raw))
+        if f[&quot;brace_balance&quot;]:
+            f[&quot;problems&quot;].append(f&quot;brace balance {f[&#x27;brace_balance&#x27;]:+d}&quot;)
+        if f[&quot;comment_open&quot;] != f[&quot;comment_close&quot;]:
+            f[&quot;problems&quot;].append(
+                f&quot;comment markers {f[&#x27;comment_open&#x27;]} open vs {f[&#x27;comment_close&#x27;]} close&quot;)
+
+    elif ext in (&quot;.html&quot;, &quot;.htm&quot;, &quot;.vue&quot;, &quot;.svelte&quot;):
+        p = Tags()
+        try:
+            p.feed(raw)
+        except Exception as e:
+            f[&quot;problems&quot;].append(f&quot;parser error: {e}&quot;)
+        f[&quot;unclosed&quot;], f[&quot;mismatched&quot;] = len(p.stack), len(p.bad)
+        f[&quot;comment_open&quot;], f[&quot;comment_close&quot;] = raw.count(&quot;&lt;!--&quot;), raw.count(&quot;--&gt;&quot;)
+        if p.stack:
+            f[&quot;problems&quot;].append(f&quot;{len(p.stack)} unclosed: {&#x27;, &#x27;.join(p.stack[:4])}&quot;)
+        if p.bad:
+            f[&quot;problems&quot;].append(f&quot;{len(p.bad)} mismatched: {&#x27;, &#x27;.join(p.bad[:4])}&quot;)
+        if f[&quot;comment_open&quot;] != f[&quot;comment_close&quot;]:
+            f[&quot;problems&quot;].append(&quot;unbalanced html comments&quot;)
+
+    elif ext in (&quot;.json&quot;,):
+        try:
+            json.loads(raw)
+        except Exception as e:
+            f[&quot;problems&quot;].append(f&quot;invalid json: {e}&quot;)
+
+    if f[&quot;nulls&quot;]:
+        f[&quot;problems&quot;].append(f&quot;{f[&#x27;nulls&#x27;]} stray null bytes, a placeholder was left behind&quot;)
+    return f
+
+
+def load():
+    try:
+        return json.load(open(SNAP))
+    except Exception:
+        return {}
+
+
+def save(d):
+    os.makedirs(os.path.dirname(SNAP), exist_ok=True)
+    json.dump(d, open(SNAP, &quot;w&quot;), indent=1)
+
+
+def main():
+    ap = argparse.ArgumentParser(add_help=False)
+    ap.add_argument(&quot;cmd&quot;, choices=[&quot;snapshot&quot;, &quot;check&quot;, &quot;verify&quot;])
+    ap.add_argument(&quot;files&quot;, nargs=&quot;*&quot;)
+    ap.add_argument(&quot;--max-delta&quot;, type=float, default=20.0)
+    ap.add_argument(&quot;--require&quot;, action=&quot;append&quot;, default=[])
+    ap.add_argument(&quot;--changed&quot;, action=&quot;store_true&quot;)
+    ap.add_argument(&quot;--json&quot;, action=&quot;store_true&quot;)
+    ap.add_argument(&quot;-h&quot;, &quot;--help&quot;, action=&quot;store_true&quot;)
+    a = ap.parse_args()
+    if a.help:
+        print(__doc__)
+        return 0
+
+    prev = load()
+    files = a.files or sorted(prev.keys())
+    if not files:
+        print(&quot;guard: no files given and no snapshot to verify&quot;, file=sys.stderr)
+        return 1
+
+    if a.cmd == &quot;snapshot&quot;:
+        snap = {f: inspect(f) for f in files}
+        save(snap)
+        if a.json:
+            print(json.dumps(snap, indent=1))
+        else:
+            for f, d in snap.items():
+                print(f&quot;  snapshot {f}: {d[&#x27;bytes&#x27;]} bytes, {d[&#x27;lines&#x27;]} lines, {d[&#x27;sha&#x27;]}&quot;)
+        return 0
+
+    failed, report = False, []
+    for path in files:
+        if not os.path.exists(path):
+            report.append((path, [&quot;file is gone&quot;], {}))
+            failed = True
+            continue
+        now = inspect(path)
+        problems = list(now[&quot;problems&quot;])
+
+        raw = open(path, encoding=&quot;utf-8&quot;, errors=&quot;replace&quot;).read()
+        for s in a.require:
+            if s not in raw:
+                problems.append(f&quot;missing required string: {s!r}&quot;)
+
+        if a.cmd == &quot;verify&quot; and path in prev:
+            was = prev[path]
+            if was[&quot;sha&quot;] == now[&quot;sha&quot;]:
+                # not a failure: verifying a set where only some files changed is normal.
+                # It is worth saying, because an edit that silently did not apply looks
+                # exactly like an edit that worked.
+                now[&quot;unchanged&quot;] = True
+                if a.changed:
+                    problems.append(&quot;unchanged since snapshot, the edit did not apply&quot;)
+            delta = (now[&quot;bytes&quot;] - was[&quot;bytes&quot;]) / max(was[&quot;bytes&quot;], 1) * 100
+            now[&quot;delta_pct&quot;] = round(delta, 1)
+            if abs(delta) &gt; a.max_delta:
+                problems.append(
+                    f&quot;byte count moved {delta:+.1f}%, over the {a.max_delta}% limit &quot;
+                    f&quot;({was[&#x27;bytes&#x27;]} to {now[&#x27;bytes&#x27;]})&quot;)
+            for k in (&quot;selectors&quot;, &quot;unclosed&quot;, &quot;mismatched&quot;):
+                if k in was and k in now and was[k] != now[k]:
+                    # selectors disappearing is the signature of a destroyed stylesheet
+                    if k == &quot;selectors&quot; and now[k] &lt; was[k] * 0.9:
+                        problems.append(f&quot;selector count fell {was[k]} to {now[k]}&quot;)
+                    elif k != &quot;selectors&quot;:
+                        problems.append(f&quot;{k} changed {was[k]} to {now[k]}&quot;)
+
+        if problems:
+            failed = True
+        report.append((path, problems, now))
+
+    if a.json:
+        print(json.dumps([{&quot;path&quot;: p, &quot;problems&quot;: pr, **d} for p, pr, d in report], indent=1))
+    else:
+        for path, problems, d in report:
+            if problems:
+                print(f&quot;  FAIL {path}&quot;)
+                for p in problems:
+                    print(f&quot;       {p}&quot;)
+            elif d.get(&quot;unchanged&quot;):
+                print(f&quot;  ok   {path} (unchanged since snapshot)&quot;)
+            else:
+                extra = f&quot;, {d[&#x27;delta_pct&#x27;]:+}%&quot; if &quot;delta_pct&quot; in d else &quot;&quot;
+                print(f&quot;  ok   {path} ({d[&#x27;bytes&#x27;]} bytes{extra})&quot;)
+        print(&quot;\nguard: &quot; + (&quot;FAILED&quot; if failed else &quot;all clear&quot;))
+    return 1 if failed else 0
+
+
+if __name__ == &quot;__main__&quot;:
+    sys.exit(main())
+</code></pre></details>
+</article>
+<article class="entry" id="tool-tokens-manifest">
+  <header class="entry-head">
+    <h3>tokens-manifest<span class="badge">executable</span></h3>
+    <p class="tagline">The overlay&#x27;s token manifest, read from the contract</p>
+  </header>
+  <p class="does">Reads the project&#x27;s contract (DESIGN_CONTRACT.md, DESIGN_SYSTEM.md, DESIGN.md or the design section of CLAUDE.md) and emits the manifest the overlay picks from: the unit, the spacing ladder as name to px, and the text styles as size, line and weight. It only reads; if a value is not in the contract it is not in the manifest, and the summary on stderr says what was missing so the contract gets fixed rather than the manifest.</p>
+  <pre class="usage"><code>tokens-manifest [DIR|CONTRACT.md]
+--css FILE      also read custom properties from a token stylesheet
+--unit N        body line-height, when the contract does not state it
+--js            emit window.__designTokens = {...} instead of JSON</code></pre>
+  <dl class="kv"><div><dt>Exists because</dt><dd>The overlay must offer the contract&#x27;s tokens, not a copy of them that drifts.</dd></div><div><dt>Checks</dt><dd><ul class='plain'><li>unit, stated in the contract or inferred from the ladder</li><li>spacing tokens from the rhythm ladder table or inline definitions</li><li>text styles from a size/line table or the Ramp and Weights lines</li><li>line-heights inferred and flagged when the contract gives only sizes</li></ul></dd></div></dl>
+  <details class="src"><summary>Read tools/tokens-manifest<span class="len">228 lines</span></summary><pre><code>#!/usr/bin/env python3
+&quot;&quot;&quot;tokens-manifest: emit the overlay&#x27;s token manifest from the project&#x27;s contract.
+
+  tokens-manifest [DIR|CONTRACT.md] [options]
+
+  --css FILE      also read custom properties from a token stylesheet
+  --unit N        body line-height in px, when the contract does not state it
+  --js            emit `window.__designTokens = {...};` instead of JSON
+  --quiet         no summary on stderr
+
+Reads the rhythm ladder, the type ramp and the weights from the contract the
+project already has (DESIGN_CONTRACT.md, DESIGN_SYSTEM.md, DESIGN.md, or the
+design section of CLAUDE.md) and prints the manifest the overlay picks from:
+
+  { &quot;unit&quot;: 24,
+    &quot;space&quot;: { &quot;space-6&quot;: 24, ... },
+    &quot;text&quot;:  { &quot;text-body&quot;: { &quot;size&quot;: 16, &quot;line&quot;: 24, &quot;weight&quot;: 400 }, ... } }
+
+The contract is the source; this only reads it. If a value is not in the
+contract, it is not in the manifest, and the summary says what was missing so
+the contract gets fixed rather than the manifest.
+Exit code is 0 when a manifest with at least one spacing token was produced.
+&quot;&quot;&quot;
+import sys, os, re, json
+
+CONTRACT_NAMES = [&quot;DESIGN_CONTRACT.md&quot;, &quot;DESIGN_SYSTEM.md&quot;, &quot;DESIGN.md&quot;, &quot;design-contract.md&quot;, &quot;CLAUDE.md&quot;]
+FRACTIONS = [(1, 6), (1, 4), (1, 3), (1, 2), (2, 3), (1, 1), (4, 3), (3, 2), (2, 1), (3, 1)]
+
+def find_contract(arg):
+    if arg and os.path.isfile(arg):
+        return arg
+    base = arg if arg and os.path.isdir(arg) else os.getcwd()
+    for n in CONTRACT_NAMES:
+        p = os.path.join(base, n)
+        if os.path.isfile(p):
+            return p
+    return None
+
+def px(s):
+    m = re.fullmatch(r&quot;\s*`?\$?(-?\d*\.?\d+)\s*(px|rem)?`?\s*&quot;, s or &quot;&quot;)
+    if not m:
+        return None
+    v = float(m.group(1))
+    return v * 16 if m.group(2) == &quot;rem&quot; else v
+
+def token_name(s):
+    s = (s or &quot;&quot;).strip().strip(&quot;`&quot;).strip()
+    m = re.fullmatch(r&quot;(?:--|\$|var\(--)?([A-Za-z][\w.-]*)\)?&quot;, s)
+    if not m:
+        return None
+    name = m.group(1)
+    return name if re.search(r&quot;\d|space|gap|sp|size|text|type|font&quot;, name, re.I) else None
+
+def tables(md):
+    rows, cur = [], []
+    for line in md.splitlines():
+        if line.strip().startswith(&quot;|&quot;):
+            cells = [c.strip() for c in line.strip().strip(&quot;|&quot;).split(&quot;|&quot;)]
+            if all(re.fullmatch(r&quot;:?-{2,}:?&quot;, c) for c in cells if c):
+                continue
+            cur.append(cells)
+        else:
+            if cur:
+                rows.append(cur); cur = []
+    if cur:
+        rows.append(cur)
+    return rows
+
+def section(md, title_re):
+    m = re.search(r&quot;^##+\s*(&quot; + title_re + r&quot;)[^\n]*\n(.*?)(?=^##\s|\Z)&quot;, md, re.S | re.M | re.I)
+    return m.group(2) if m else &quot;&quot;
+
+def read_space(md, notes):
+    space = {}
+    # 1. any table with a token-looking cell and a px-looking cell
+    for t in tables(md):
+        for cells in t:
+            names = [token_name(c) for c in cells]
+            vals = [px(c) for c in cells]
+            ti = next((i for i, n in enumerate(names) if n and vals[i] is None), None)
+            vi = next((i for i, v in enumerate(vals) if v is not None), None)
+            if ti is not None and vi is not None and ti != vi:
+                space[names[ti]] = vals[vi]
+    if space:
+        notes.append(f&quot;{len(space)} spacing tokens from a contract table&quot;)
+    # 2. inline `--space-6: 24px` or `space-6 = 24`
+    inline = {}
+    for m in re.finditer(r&quot;(?:--|\$)?((?:space|spacing|gap|sp|s)-?[\w-]*\d[\w-]*)\s*[:=]\s*(\d*\.?\d+)\s*(px|rem)?&quot;, md, re.I):
+        v = float(m.group(2)) * (16 if m.group(3) == &quot;rem&quot; else 1)
+        inline.setdefault(m.group(1), v)
+    if inline:
+        for k, v in inline.items():
+            space.setdefault(k, v)
+        notes.append(f&quot;{len(inline)} spacing tokens from inline definitions&quot;)
+    return space
+
+def read_css(path, notes):
+    space, text = {}, {}
+    try:
+        css = open(path, encoding=&quot;utf-8&quot;).read()
+    except OSError as e:
+        notes.append(f&quot;could not read {path}: {e}&quot;); return space, text
+    for m in re.finditer(r&quot;--([\w-]+)\s*:\s*(-?\d*\.?\d+)(px|rem)\s*;&quot;, css):
+        name, v, u = m.group(1), float(m.group(2)), m.group(3)
+        if re.search(r&quot;space|spacing|gap|^sp-|^s-\d&quot;, name, re.I):
+            space[name] = v * 16 if u == &quot;rem&quot; else v
+    if space:
+        notes.append(f&quot;{len(space)} spacing tokens from {os.path.basename(path)}&quot;)
+    return space, text
+
+def read_unit(md, space, opt_unit, notes):
+    if opt_unit:
+        return opt_unit
+    m = re.search(r&quot;\b(?:u|unit|body line|line-height)\b[^\d\n]{0,40}?(\d{2})\s*px&quot;, md, re.I) or re.search(r&quot;\bu\s*=\s*(\d{2})&quot;, md)
+    if m:
+        notes.append(f&quot;unit {m.group(1)} stated in the contract&quot;); return int(m.group(1))
+    vals = sorted(set(v for v in space.values() if v &gt; 0))
+    for cand in (24, 20, 28, 32, 16, 36, 40):
+        if all(any(abs(v - cand * a / b) &lt; 0.5 for a, b in FRACTIONS) for v in vals):
+            notes.append(f&quot;unit {cand} inferred: every spacing token is a simple fraction of it; state it in the contract&quot;); return cand
+    notes.append(&quot;unit not found; defaulting to 24, pass --unit or state it in the contract&quot;)
+    return 24
+
+def read_text(md, notes):
+    text = {}
+    # 1. a table with size and line columns
+    for t in tables(md):
+        if not t:
+            continue
+        head = [c.lower() for c in t[0]]
+        si = next((i for i, h in enumerate(head) if &quot;size&quot; in h), None)
+        li = next((i for i, h in enumerate(head) if &quot;line&quot; in h or &quot;leading&quot; in h), None)
+        wi = next((i for i, h in enumerate(head) if &quot;weight&quot; in h), None)
+        ni = next((i for i, h in enumerate(head) if h in (&quot;name&quot;, &quot;style&quot;, &quot;token&quot;, &quot;role&quot;)), 0)
+        if si is None:
+            continue
+        for cells in t[1:]:
+            if len(cells) &lt;= si:
+                continue
+            m = re.match(r&quot;(\d+)\s*/\s*(\d+)&quot;, cells[si])
+            size = int(m.group(1)) if m else px(cells[si])
+            line = int(m.group(2)) if m else (px(cells[li]) if li is not None and li &lt; len(cells) else None)
+            weight = int(re.sub(r&quot;\D&quot;, &quot;&quot;, cells[wi]) or 400) if wi is not None and wi &lt; len(cells) and re.search(r&quot;\d&quot;, cells[wi]) else 400
+            if size:
+                name = (cells[ni].strip(&quot;`&quot;) if ni &lt; len(cells) and cells[ni] and not px(cells[ni]) else f&quot;text-{int(size)}&quot;)
+                text[name] = {&quot;size&quot;: int(size), &quot;line&quot;: int(line) if line else None, &quot;weight&quot;: weight}
+        if text:
+            notes.append(f&quot;{len(text)} text styles from a contract table&quot;); return text
+    # 2. the template&#x27;s &quot;Ramp:&quot; and &quot;Weights:&quot; lines
+    sec = section(md, r&quot;type|typography&quot;) or md
+    ramp = re.search(r&quot;ramp\s*[:=]\s*`?([^`\n]+)`?&quot;, sec, re.I)
+    weights = re.search(r&quot;weights?\s*[:=]\s*`?([^`\n]+)`?&quot;, sec, re.I)
+    ws = [int(w) for w in re.findall(r&quot;\b([1-9]00)\b&quot;, weights.group(1))] if weights else []
+    if ramp:
+        pairs = re.findall(r&quot;(\d{2})\s*/\s*(\d{2})&quot;, ramp.group(1))
+        if pairs:
+            for s, l in pairs:
+                text[f&quot;text-{s}&quot;] = {&quot;size&quot;: int(s), &quot;line&quot;: int(l), &quot;weight&quot;: ws[0] if ws else 400}
+            notes.append(f&quot;{len(pairs)} text sizes with line-heights from the Ramp line&quot;)
+        else:
+            sizes = [int(s) for s in re.findall(r&quot;\b(\d{2})\b&quot;, ramp.group(1))]
+            for s in sizes:
+                text[f&quot;text-{s}&quot;] = {&quot;size&quot;: s, &quot;line&quot;: None, &quot;weight&quot;: ws[0] if ws else 400}
+            if sizes:
+                notes.append(f&quot;{len(sizes)} text sizes from the Ramp line, no line-heights stated&quot;)
+        if ws and len(ws) &gt; 1:
+            # every size at every permitted weight is too many; keep the first weight per size
+            # and add the heavier weights on the two largest sizes, which is where they get used
+            big = sorted(text.keys(), key=lambda k: -text[k][&quot;size&quot;])[:2]
+            for k in big:
+                for w in ws[1:]:
+                    text[f&quot;{k}-{w}&quot;] = dict(text[k], weight=w)
+    return text
+
+def fill_lines(text, unit, notes):
+    missing = [k for k, v in text.items() if not v[&quot;line&quot;]]
+    for k in missing:
+        s = text[k][&quot;size&quot;]
+        # smallest ladder fraction of the unit that gives at least 1.25x the size
+        cands = sorted(set(round(unit * a / b) for a, b in FRACTIONS))
+        text[k][&quot;line&quot;] = next((c for c in cands if c &gt;= s * 1.25), s + 8)
+        text[k][&quot;inferred_line&quot;] = True
+    if missing:
+        notes.append(f&quot;line-heights inferred for {len(missing)} styles; state them in the contract as size/line&quot;)
+
+def main():
+    args = sys.argv[1:]
+    opt = {&quot;css&quot;: None, &quot;unit&quot;: None, &quot;js&quot;: False, &quot;quiet&quot;: False}
+    pos = []
+    i = 0
+    while i &lt; len(args):
+        a = args[i]
+        if a == &quot;--css&quot;: opt[&quot;css&quot;] = args[i + 1]; i += 2
+        elif a == &quot;--unit&quot;: opt[&quot;unit&quot;] = int(args[i + 1]); i += 2
+        elif a == &quot;--js&quot;: opt[&quot;js&quot;] = True; i += 1
+        elif a == &quot;--quiet&quot;: opt[&quot;quiet&quot;] = True; i += 1
+        elif a in (&quot;-h&quot;, &quot;--help&quot;): print(__doc__); return 0
+        else: pos.append(a); i += 1
+    notes = []
+    contract = find_contract(pos[0] if pos else None)
+    md = &quot;&quot;
+    if contract:
+        md = open(contract, encoding=&quot;utf-8&quot;).read()
+        if os.path.basename(contract) == &quot;CLAUDE.md&quot;:
+            md = section(md, r&quot;design[^\n]*&quot;) or md
+        notes.append(f&quot;contract {os.path.relpath(contract)}&quot;)
+    else:
+        notes.append(&quot;no contract found; run /design-contract first&quot;)
+    space = read_space(md, notes) if md else {}
+    if opt[&quot;css&quot;]:
+        cs, _ = read_css(opt[&quot;css&quot;], notes)
+        for k, v in cs.items():
+            space.setdefault(k, v)
+    unit = read_unit(md, space, opt[&quot;unit&quot;], notes)
+    text = read_text(md, notes) if md else {}
+    fill_lines(text, unit, notes)
+    space = {k: (int(v) if float(v).is_integer() else v) for k, v in sorted(space.items(), key=lambda kv: kv[1])}
+    manifest = {&quot;unit&quot;: unit, &quot;space&quot;: space, &quot;text&quot;: text, &quot;source&quot;: os.path.relpath(contract) if contract else None}
+    out = json.dumps(manifest, indent=2)
+    if opt[&quot;js&quot;]:
+        out = &quot;window.__designTokens = &quot; + out + &quot;;&quot;
+    print(out)
+    if not opt[&quot;quiet&quot;]:
+        sys.stderr.write(&quot;tokens-manifest: &quot; + &quot;; &quot;.join(notes) + &quot;\n&quot;)
+    return 0 if space else 1
+
+if __name__ == &quot;__main__&quot;:
+    sys.exit(main())
+</code></pre></details>
+</article>
+<article class="entry" id="tool-overlay-server">
+  <header class="entry-head">
+    <h3>overlay-server<span class="badge">executable</span></h3>
+    <p class="tagline">Serves the overlay to a dev build and receives its exports</p>
+  </header>
+  <p class="does">A dependency-free local server run from the project root. It reads the contract through tokens-manifest, serves overlay.js and the manifest, and prints the one include line for the dev build. Send to session in the overlay posts here, and each export is written to .toolkit/inbox/ as a markdown file for the session to apply; the server adds .toolkit/ to the repo&#x27;s local git exclude so nothing is committed.</p>
+  <pre class="usage"><code>overlay-server [--port 8766] [--root DIR]
+--manifest FILE  serve this manifest instead of reading the contract
+--css FILE       passed to tokens-manifest
+GET /overlay.js  GET /tokens.json  GET /include  POST /export</code></pre>
+  <dl class="kv"><div><dt>Exists because</dt><dd>The paste step between changing something on screen and the session applying it.</dd></div><div><dt>Checks</dt><dd><ul class='plain'><li>/overlay.js, the script</li><li>/tokens.json, the contract&#x27;s tokens</li><li>/include, the line for the dev build</li><li>/export, writes .toolkit/inbox/&lt;stamp&gt;-overlay.md</li></ul></dd></div></dl>
+  <details class="src"><summary>Read tools/overlay-server<span class="len">125 lines</span></summary><pre><code>#!/usr/bin/env node
+/**
+ * overlay-server: serve the overlay to a dev build and receive its exports.
+ *
+ *   overlay-server [options]
+ *
+ *   --port N         default 8766
+ *   --root DIR       the project, default cwd. The contract is read here and
+ *                    exports land in DIR/.toolkit/inbox/
+ *   --manifest FILE  serve this manifest instead of reading the contract
+ *   --css FILE       passed to tokens-manifest, to read a token stylesheet too
+ *
+ * One include line in the dev build is the whole integration:
+ *
+ *   &lt;script src=&quot;http://localhost:8766/overlay.js&quot;&gt;&lt;/script&gt;
+ *
+ * The script loads its manifest from this server, so the pickers hold the
+ * contract&#x27;s ladder and ramp, and Send to session posts the export here. Each
+ * export is written to .toolkit/inbox/ as a markdown file the session applies
+ * and then moves to .toolkit/applied/. No npm dependencies.
+ */
+const http = require(&quot;http&quot;);
+const fs = require(&quot;fs&quot;);
+const path = require(&quot;path&quot;);
+const { execFileSync } = require(&quot;child_process&quot;);
+
+const args = process.argv.slice(2);
+const opt = { port: 8766, root: process.cwd(), manifest: null, css: null };
+for (let i = 0; i &lt; args.length; i++) {
+  const a = args[i];
+  if (a === &quot;--port&quot;) opt.port = +args[++i];
+  else if (a === &quot;--root&quot;) opt.root = path.resolve(args[++i]);
+  else if (a === &quot;--manifest&quot;) opt.manifest = path.resolve(args[++i]);
+  else if (a === &quot;--css&quot;) opt.css = path.resolve(args[++i]);
+  else if (a === &quot;-h&quot; || a === &quot;--help&quot;) { console.log(fs.readFileSync(__filename, &quot;utf8&quot;).split(&quot;*/&quot;)[0].replace(/^\/\*\*?|^ \* ?/gm, &quot;&quot;)); process.exit(0); }
+}
+
+const HERE = __dirname;
+const OVERLAY = [path.join(HERE, &quot;overlay.js&quot;), path.join(HERE, &quot;..&quot;, &quot;overlay&quot;, &quot;overlay.js&quot;)].find(fs.existsSync);
+const EMITTER = path.join(HERE, &quot;tokens-manifest&quot;);
+if (!OVERLAY) { console.error(&quot;overlay.js not found beside this server; run install.sh&quot;); process.exit(1); }
+
+const INBOX = path.join(opt.root, &quot;.toolkit&quot;, &quot;inbox&quot;);
+const APPLIED = path.join(opt.root, &quot;.toolkit&quot;, &quot;applied&quot;);
+fs.mkdirSync(INBOX, { recursive: true });
+fs.mkdirSync(APPLIED, { recursive: true });
+// keep .toolkit/ out of the project&#x27;s git without touching its .gitignore
+const exclude = path.join(opt.root, &quot;.git&quot;, &quot;info&quot;, &quot;exclude&quot;);
+if (fs.existsSync(path.join(opt.root, &quot;.git&quot;))) {
+  try {
+    const cur = fs.existsSync(exclude) ? fs.readFileSync(exclude, &quot;utf8&quot;) : &quot;&quot;;
+    if (!/^\.toolkit\/$/m.test(cur)) fs.appendFileSync(exclude, &quot;\n# design toolkit overlay exports, local only\n.toolkit/\n&quot;);
+  } catch (e) {}
+}
+
+let cache = { at: 0, body: &quot;&quot;, note: &quot;&quot; };
+function manifest() {
+  if (opt.manifest) return { body: fs.readFileSync(opt.manifest, &quot;utf8&quot;), note: &quot;manifest file&quot; };
+  if (Date.now() - cache.at &lt; 2000) return cache;
+  let body = &quot;{}&quot;, note = &quot;&quot;;
+  try {
+    const a = [opt.root, &quot;--quiet&quot;]; if (opt.css) a.push(&quot;--css&quot;, opt.css);
+    body = execFileSync(EMITTER, a, { encoding: &quot;utf8&quot;, stdio: [&quot;ignore&quot;, &quot;pipe&quot;, &quot;pipe&quot;] });
+    note = &quot;from the contract&quot;;
+  } catch (e) {
+    body = e.stdout &amp;&amp; e.stdout.trim().startsWith(&quot;{&quot;) ? e.stdout : &quot;{}&quot;;
+    note = &quot;no spacing tokens found in the contract; the overlay will infer&quot;;
+  }
+  cache = { at: Date.now(), body, note };
+  return cache;
+}
+
+function send(res, code, type, body, extra) {
+  res.writeHead(code, Object.assign({ &quot;Content-Type&quot;: type, &quot;Access-Control-Allow-Origin&quot;: &quot;*&quot;, &quot;Access-Control-Allow-Headers&quot;: &quot;Content-Type&quot;, &quot;Access-Control-Allow-Methods&quot;: &quot;GET, POST, OPTIONS&quot;, &quot;Cache-Control&quot;: &quot;no-store&quot; }, extra || {}));
+  res.end(body);
+}
+function stamp() { return new Date().toISOString().replace(/[:.]/g, &quot;-&quot;).slice(0, 19); }
+
+const server = http.createServer((req, res) =&gt; {
+  const url = new URL(req.url, &quot;http://x&quot;);
+  if (req.method === &quot;OPTIONS&quot;) return send(res, 204, &quot;text/plain&quot;, &quot;&quot;);
+  if (url.pathname === &quot;/overlay.js&quot;) return send(res, 200, &quot;application/javascript&quot;, fs.readFileSync(OVERLAY, &quot;utf8&quot;));
+  if (url.pathname === &quot;/tokens.json&quot;) return send(res, 200, &quot;application/json&quot;, manifest().body);
+  if (url.pathname === &quot;/manifest.js&quot;) return send(res, 200, &quot;application/javascript&quot;, &quot;window.__designTokens = &quot; + manifest().body + &quot;;&quot;);
+  if (url.pathname === &quot;/include&quot;) return send(res, 200, &quot;text/plain&quot;, `&lt;script src=&quot;http://localhost:${opt.port}/overlay.js&quot;&gt;&lt;/script&gt;\n`);
+  if (url.pathname === &quot;/inbox&quot;) return send(res, 200, &quot;application/json&quot;, JSON.stringify(fs.readdirSync(INBOX).sort()));
+  if (url.pathname === &quot;/export&quot; &amp;&amp; req.method === &quot;POST&quot;) {
+    let data = &quot;&quot;;
+    req.on(&quot;data&quot;, c =&gt; { data += c; if (data.length &gt; 2e6) req.destroy(); });
+    req.on(&quot;end&quot;, () =&gt; {
+      let body; try { body = JSON.parse(data); } catch (e) { return send(res, 400, &quot;application/json&quot;, JSON.stringify({ error: &quot;bad json&quot; })); }
+      const file = `${stamp()}-overlay.md`;
+      const md = [
+        `# Overlay export, ${new Date().toISOString()}`,
+        &quot;&quot;,
+        `Page: ${body.page || &quot;unknown&quot;}  Width: ${body.width || &quot;?&quot;}px  Net changes: ${(body.records || []).length}`,
+        &quot;&quot;,
+        body.prompt || &quot;&quot;,
+        &quot;&quot;,
+        &quot;## Records&quot;,
+        &quot;```json&quot;,
+        JSON.stringify(body.records || [], null, 2),
+        &quot;```&quot;,
+        &quot;&quot;
+      ].join(&quot;\n&quot;);
+      fs.writeFileSync(path.join(INBOX, file), md);
+      console.log(`export  .toolkit/inbox/${file}  ${(body.records || []).length} net changes`);
+      return send(res, 200, &quot;application/json&quot;, JSON.stringify({ file: `.toolkit/inbox/${file}` }));
+    });
+    return;
+  }
+  if (url.pathname === &quot;/&quot;) return send(res, 200, &quot;text/plain&quot;, `overlay-server\n  GET /overlay.js  GET /tokens.json  GET /manifest.js  GET /include  GET /inbox  POST /export\n`);
+  send(res, 404, &quot;text/plain&quot;, &quot;not found&quot;);
+});
+
+server.listen(opt.port, &quot;127.0.0.1&quot;, () =&gt; {
+  const m = manifest();
+  let summary = &quot;&quot;;
+  try { const j = JSON.parse(m.body); summary = `u = ${j.unit}, ${Object.keys(j.space || {}).length} spacing tokens, ${Object.keys(j.text || {}).length} text styles (${m.note})`; } catch (e) { summary = m.note; }
+  console.log(`overlay-server on http://localhost:${opt.port}`);
+  console.log(`  project   ${opt.root}`);
+  console.log(`  manifest  ${summary}`);
+  console.log(`  inbox     ${path.relative(opt.root, INBOX) || INBOX}/`);
+  console.log(`  include   &lt;script src=&quot;http://localhost:${opt.port}/overlay.js&quot;&gt;&lt;/script&gt;`);
+});
+</code></pre></details>
+</article></div>
+    </section>
+
+    <section id="rules">
+      <header>
+        <h2>Standing rules</h2>
+        <p>Appended to <code>~/.claude/CLAUDE.md</code> by the installer, so they bind every session on the machine whether or not a skill is invoked.</p>
+      </header>
+      <ol class="rules"><li>**Find the project&#x27;s contract first.** Read it before changing anything, and never create a second one beside it.</li><li>**Figma is authored first, code follows, in the same session.** A fix that exists in only one place is new drift, not a repair.</li><li>**Never claim done, live, or shipped without running `ship-check`.** Name the artifact the designer is looking at, confirm it contains the change, and say what was not exercised.</li><li>**Never answer a visual question with a number.** Put the renders side by side at matched width and look.</li><li>**Measure the result before reporting it.** A change that reasons correctly can still render wrong.</li><li>**A raw value in a styling position is a defect.** Bind it, or say why it is exempt.</li><li>**Spacing is hierarchical, never uniform.** Group first, then stack; a flat gap between unrelated blocks is the failure mode even when the value is on scale.</li><li>**Delegate the sweep, keep the judgment.** Send work touching more than three files, two screens or a whole Figma page to a read-only subagent, and keep the decision in the main conversation.</li><li>**Read narrowly.** Grep for the selector and read the lines around it; never dump a Figma subtree or screenshot a full page for one property.</li><li>**Return narrowly.** A script that produces findings prints the findings, not the data it derived them from.</li><li>**Say the number, not the list.** &quot;862 raw values, mostly gap and height&quot; beats 862 lines.</li></ol>
+      <details class="src"><summary>Read claude-md-section.md<span class="len">75 lines</span></summary><pre><code>
+## Design workflow
+
+A personal toolkit of skills lives in `~/.claude/skills/`: `design-contract`,
+`design-parity`, `rhythm-pass`, `token-audit`, `ship-check`, with executables in
+`~/.claude/tools/`: `measure`, `guard`, `tokens-manifest`, `overlay-server`. It is available in
+every project. These are not optional suggestions, they are how design work runs.
+
+**Find the project&#x27;s contract first.** Every design repo keeps its rules in one
+file (`DESIGN_SYSTEM.md`, `DESIGN_CONTRACT.md`, a design section in `CLAUDE.md`).
+Read it before changing anything, and never create a second one beside it.
+
+**Figma is authored first, code follows, in the same session.** Never change code
+without the change existing in Figma, and never leave a Figma change unmirrored.
+A fix that exists in only one place is new drift, not a repair.
+
+**Never claim done, live, or shipped without running `ship-check`.** Name the
+artifact the designer is looking at, confirm it contains the change, and say plainly what
+was not exercised. This is the most repeated frustration in this working
+relationship and it is a verification failure every time, not a design failure.
+
+**Never answer a visual question with a number.** No parity score, no percentage
+tokenized. A score says &quot;the properties I sampled agree&quot;, which is not &quot;this
+looks right&quot;. Put the renders side by side at matched width and look.
+
+**Measure the result before reporting it.** A change that reasons correctly can
+still render wrong. Where a value has a target, check the rendered value against
+the target rather than trusting the edit.
+
+**A raw value in a styling position is a defect.** Not a shortcut. Bind it, or
+say why it is exempt.
+
+**A build served for review carries the overlay in dev mode.** One include line,
+`&lt;script src=&quot;http://localhost:8766/overlay.js&quot;&gt;&lt;/script&gt;`, with
+`~/.claude/tools/overlay-server` running in the project. It lets the designer
+change spacing and text on the render, to tokens only, and send the result to
+the session. Never ship it in a production build.
+
+**An overlay export in `.toolkit/inbox/` is a set of decisions, applied the
+same session.** Read the file, apply each change to the rule that sets the
+property rather than to instances, run `guard verify` on the files touched,
+run `measure --compare` at the export&#x27;s width against its targets, mirror the
+token changes to Figma, record each decision with `decision-log`, then move the
+file to `.toolkit/applied/`. Report any target that was not reached.
+
+**Spacing is hierarchical, never uniform.** Group first, then stack: decide what
+reads as one thing, set it tight, and let the group enter the block stack. A flat
+gap between unrelated blocks is the failure mode even when the value is on scale.
+
+## Context discipline
+
+Tool output, not conversation, is what fills a context window. Measured on one
+real session: 1,744 tool results totalling 29.5MB against 278KB of actual
+discussion. Tool output was 99% of everything, and single results ran past half
+a megabyte. None of it was the answer the designer wanted.
+
+**Delegate the sweep, keep the judgment.** Send work to a subagent when it will
+touch more than three files, more than two screens, or a whole Figma page.
+`token-auditor` and `figma-parity` exist for exactly this and are read-only.
+What comes back is the finding list, and that is what belongs in the thread.
+
+Do not delegate the decision that follows. the designer wants the judgment in the main
+conversation where he can argue with it.
+
+**Read narrowly.** Never read a large file whole to find one rule: grep for the
+selector, then read the lines around it. Never dump a Figma subtree when the
+question is one property. Never screenshot a full page when the question is one
+component.
+
+**Return narrowly.** When a script produces findings, have it print the findings,
+not the data it derived them from. A scan of 6,000 declarations should emit
+twenty lines.
+
+**Say the number, not the list.** &quot;862 raw values, mostly gap and height&quot; beats
+862 lines. the designer asks for the list when he wants the list.
+</code></pre></details>
+    </section>
+
+    <section id="templates">
+      <header>
+        <h2>Templates</h2>
+        <p>For a project that has nothing yet. The contract skill adopts an existing file before it ever creates one of these.</p>
+      </header>
+      <div class="list">
+<article class="entry compact">
+  <header class="entry-head"><h3>DESIGN_CONTRACT.md<span class="badge">template</span></h3></header>
+  <p class="does">The slow-changing rules of a project: source of truth and mirror direction, where the work runs, rhythm ladder, type ramp and permitted weights, token layers and dialect, component inventory, copy rules, and a Settled / Open / Owed decisions log.</p>
+  <details class="src"><summary>Read templates/DESIGN_CONTRACT.md<span class="len">89 lines</span></summary><pre><code># Design contract
+
+The rules of this project. Slow-changing. What is **true** here.
+
+Where the work stands right now lives in `STATUS.md`, deliberately separate,
+because it changes every session and a fast-changing fact inside a slow-changing
+document makes the whole document look stale.
+
+**If this repo already has a file like this under another name, use that one.**
+Two contracts in one repo is worse than none.
+
+---
+
+## Source of truth
+
+- Figma file: `&lt;url&gt;` (key `&lt;key&gt;`)
+- Default page: `&lt;name&gt;` (`&lt;node id&gt;`)
+- Direction: Figma is authored first. Code follows. Never change code without
+  the change existing in Figma, and never leave a Figma change unmirrored.
+
+## Where the work runs
+
+- Repo: `&lt;path&gt;` / `&lt;remote&gt;`
+- Local: `&lt;command, port, and whether it needs a database&gt;`
+- Deployed: `&lt;url&gt;`, from `&lt;branch&gt;` via `&lt;service&gt;`
+- If it cannot run locally, say so here and name the fallback.
+- Note any lookalike surface that is **not** this project. A neighbouring
+  checkout serving the same-looking app on a nearby port will pass a check
+  falsely, and someone will hit it.
+
+## Rhythm ladder
+
+Values are this project&#x27;s. The ratio is what carries across projects: roughly
+3x between &quot;inside a thought&quot; and &quot;between thoughts&quot;.
+
+| Relationship | Token | Value |
+| --- | --- | --- |
+| Turn to turn, header to content | | |
+| Between blocks and sections | | |
+| List rows | | |
+| Under a control | | |
+| Inside a group | | |
+
+**Group first, then stack.** Decide what reads as one thing, set it tight, and
+let the group enter the block stack. Never run a flat gap across unrelated
+blocks.
+
+## Type
+
+- Ramp: `&lt;sizes&gt;`
+- Weights: `&lt;the permitted set&gt;`. Anything lighter is retired, not discouraged.
+
+## Tokens
+
+- Figma variables: `&lt;collections&gt;`
+- Code tokens: `&lt;file, and the naming layers&gt;`
+- Dialect, so the audit does not rediscover it: `&lt;what a bound value looks like
+  here, and what is legitimately exempt&gt;`
+- Rule: every spacing, radius, colour and type value is bound. A literal is a
+  defect, not a shortcut.
+
+## Component inventory
+
+| Component | Figma node | Code class |
+| --- | --- | --- |
+
+## Copy rules
+
+- No em dashes. Restructure the sentence.
+- A value the system does not have says what is missing and what would fill it.
+  Never a blank, never a zero, never a dash standing in for a number.
+- Put the verdict next to the data, not only in chat.
+
+## Decisions
+
+### Settled
+
+| Date | Decision | Why | What it rejected |
+| --- | --- | --- | --- |
+
+### Open
+
+| Raised | Question | Blocked on | Owner |
+| --- | --- | --- | --- |
+
+### Owed
+
+| Since | What | Why it is not done |
+| --- | --- | --- |
+</code></pre></details>
+</article>
+<article class="entry compact">
+  <header class="entry-head"><h3>STATUS.md<span class="badge">template</span></h3></header>
+  <p class="does">The fast-changing record of where the work is right now: a Read next table, Position, In flight, Next, Traps, and Known broken, rewritten at the end of every session.</p>
+  <details class="src"><summary>Read templates/STATUS.md<span class="len">47 lines</span></summary><pre><code># Status
+
+Where the work is right now. Read this first, before anything else in the repo.
+
+Everything else records what is **true**. This records where we **are**, and it
+goes stale fastest, so it lives on its own. Rewritten at the end of every working
+session, and whenever position changes mid-session.
+
+Last written: &lt;date&gt;
+
+---
+
+## Read next
+
+| For | Read |
+| --- | --- |
+| The rules of this project | `&lt;contract file&gt;` |
+| What was decided and why, what is open, what is owed | `&lt;contract file&gt;`, Decisions |
+| How Marc decides | `~/.claude/design-judgment.md` |
+
+---
+
+## Position
+
+Branch, PR state, what is pushed and what is not, what is deployed. Verify these
+with commands rather than memory, and never write a fact a command can confirm
+unless it carries meaning on its own.
+
+## In flight
+
+Anything half-done, with enough detail to resume. &quot;Nothing half-edited, tree is
+clean&quot; is a valid and useful entry.
+
+## Next
+
+The actual next actions, in order. Not aspirations. Anything blocked on Marc
+goes first, because it is the only part he can clear.
+
+## Traps
+
+Things that have already cost a round trip. Check these before believing a
+result. This section only grows when something bites, which is what makes it the
+most valuable part of the file.
+
+## Known broken, not ours to fix yet
+
+Pre-existing defects, so they are never rediscovered as news.
+</code></pre></details>
+</article></div>
+    </section>
+
+    <section id="architecture">
+      <header>
+        <h2>Architecture</h2>
+        <p>Files are organised by rate of change, not by topic. A fast-changing fact inside a slow-changing document makes the whole document look stale, and then none of it gets trusted.</p>
+      </header>
+      <div class="tbl"><table>
+        <thead><tr><th>Changes</th><th>File</th><th>Holds</th></tr></thead>
+        <tbody>
+          <tr><td>never</td><td><code>~/.claude/CLAUDE.md</code></td><td>The rules that bind every session</td></tr>
+          <tr><td>rarely</td><td><code>~/.claude/design-judgment.md</code></td><td>How this designer decides</td></tr>
+          <tr><td>occasionally</td><td>the project's contract</td><td>What is true in this project</td></tr>
+          <tr><td>every session</td><td>the project's <code>STATUS.md</code></td><td>Where the work is right now</td></tr>
+        </tbody>
+      </table></div>
+      <p class="intro"><b>Grammar travels, vocabulary does not.</b> A design system copied between projects hands over the values, which belong to the project they came from. What transfers is how many distinct values are allowed, the ratios between them, and which relationship gets which. That is what taste-extract recovers.</p>
+      <h3>Pulling updates</h3>
+      <pre class="usage"><code>git -C ~/design-toolkit pull
+~/design-toolkit/install.sh
+# then open a new session: skills register at start</code></pre>
+      <details class="src"><summary>Read README.md<span class="len">223 lines</span></summary><pre><code># Design toolkit
+
+A toolkit for running design work with Claude Code, between Figma and a
+codebase. One repo, pulled into any project.
+
+It exists because a designer&#x27;s standards get hand-carried into every session as
+pasted prompts, and a pasted prompt is a literal. This makes them tokens:
+written once, applied everywhere, improved in one place.
+
+## Install
+
+First time on a machine:
+
+```bash
+git clone https://github.com/marcbanderson/design-toolkit.git ~/design-toolkit
+~/design-toolkit/install.sh
+```
+
+That is usually all you need. `~/.claude` is personal scope, so the skills are
+live in every repo on the machine. Install into a specific repo only when you
+want repo-local copies, or when a session runs somewhere that cannot see your
+home directory:
+
+```bash
+./install.sh --repo /path/to/repo          # symlinks, local only, never committed
+./install.sh --copy --repo /path/to/repo   # independent copies you can diverge
+./install.sh --judgment TEMPLATE           # install without the personal judgment file
+./install.sh --dry-run                     # show what would happen, change nothing
+```
+
+Repo installs register the path in `.git/info/exclude`, which is per-clone and
+never pushed. Your team sees nothing.
+
+## Pulling updates
+
+The toolkit changes as it learns. To take the latest:
+
+```bash
+git -C ~/design-toolkit pull
+~/design-toolkit/install.sh
+```
+
+Then **open a new session**. Skills and agents register when a session starts,
+so a running session will not see the update.
+
+Three things worth knowing about how updates propagate:
+
+- **A default install copies.** `~/.claude/skills/` holds copies, so pulling
+  alone changes nothing until you re-run `install.sh`.
+- **A repo install symlinks.** A repo installed with `--repo` points at
+  `~/.claude/skills/`, so once you re-run the installer, every linked repo sees
+  the edit at the same time. `--copy` installs do not; they are deliberately
+  frozen until you re-run with `--copy` again.
+- **New skills need the installer re-run per repo.** Repo installs link each
+  skill directory individually, so a repo set up earlier will not see a skill
+  added later until you re-run with the same `--repo`. Edits to existing skills
+  propagate on their own; only new ones need this.
+
+Re-running is always safe. It backs up anything it would replace and never
+overwrites `design-judgment.md`, because that file accumulates and is the one
+part worth more than everything around it.
+
+## Contributing back
+
+The judgment file and the skills both sharpen through use. When a session
+records a new criterion or fixes a method, commit it here and push, so the next
+project starts from what the last one learned:
+
+```bash
+cd ~/design-toolkit &amp;&amp; git add -A &amp;&amp; git commit -m &quot;...&quot; &amp;&amp; git push
+```
+
+## Layout
+
+```
+tools/         executables the skills call, so a check is run rather than rewritten
+overlay/       the on-screen editor: overlay.js, a demo screen, and its README
+skills/        nine skills, the methods. Written neutrally.
+agents/        two read-only agents, so a sweep&#x27;s output stays out of the thread
+judgment/      the only personal layer
+  marc.md        one designer&#x27;s criteria, accumulated
+  TEMPLATE.md    empty, with instructions for building your own
+templates/     a contract and a STATUS file for a project that has nothing
+claude-md-section.md   the enforcement rules, appended to ~/.claude/CLAUDE.md
+```
+
+Everything except `judgment/` is impersonal. That is the point: the methods are
+the same for anyone, the criteria are not.
+
+## The skills
+
+| Skill | Does |
+| --- | --- |
+| `design-contract` | Writes the project&#x27;s contract, or adopts the file already there |
+| `session-state` | Reads and writes `STATUS.md`, so a restart loses nothing |
+| `decision-log` | Records decisions and gaps, and what they reveal about how the designer judges |
+| `taste-extract` | Recovers a designer&#x27;s grammar for spacing, type and colour from work they hand-tuned |
+| `rhythm-model` | Derives spacing from the type rather than choosing it, and sets density |
+| `token-audit` | Finds unbound values in code, in Figma, and checks the two agree |
+| `design-parity` | Puts the build beside its Figma frame at matched width and looks |
+| `rhythm-pass` | Tightens spacing and hierarchy without redesigning anything |
+| `ship-check` | Verifies the thing on screen actually contains the work |
+
+## The tools
+
+Skills are instructions; tools are executables. The difference matters because a
+rewritten check is a check that can be wrong differently each time.
+
+| Tool | Does | Exists because |
+| --- | --- | --- |
+| `measure` | Rendered geometry at a fixed width, as JSON, with `--compare` to diff two runs | Three measurement errors in one day, all from hand-rolling the harness |
+| `guard` | Proves a file survived a bulk edit: braces, comment pairs, stray placeholders, byte delta, selector collapse | A whole-file regex destroyed a stylesheet and was nearly committed |
+| `tokens-manifest` | Reads the contract&#x27;s ladder, ramp and weights and emits the manifest the overlay picks from | The overlay must offer the contract&#x27;s tokens, not a copy of them |
+| `overlay-server` | Serves the overlay to a dev build from one include line and writes its exports to `.toolkit/inbox/` | The paste step between &quot;I changed it on screen&quot; and &quot;the session applies it&quot; |
+| `cssdiff` | Proves a stylesheet edit changes nothing that renders: same DOM, swap the `&lt;link&gt;`, diff every computed property of every element. `--tokens` resolves custom properties per palette and theme | Three refactors passed a careful static safety check and still changed rendering |
+
+They install to `~/.claude/tools/` and the skills call them by that path.
+`measure` drives headless Chrome over the DevTools protocol with no npm
+dependencies. Both exit non-zero on failure, so either can gate a commit.
+
+Their coverage is deliberately complementary. Revert a spacing rule and `guard`
+says the file is fine, because it is; `measure --compare` reports the three gaps
+that went from 24 to 12; `cssdiff` answers the different question of whether a
+refactor that *should* be inert actually is.
+
+Three rules `cssdiff` enforces that a hand-rolled harness will not:
+
+- **It self-tests.** Run it with `--before` and `--after` identical first. It
+  must report zero. An uncached first swap once reported 883 phantom differences
+  on whichever screen was measured first.
+- **It checks the served file against the file on disk** (`--verify PATH`) and
+  aborts on a mismatch. A stale server on a familiar port silently serves a
+  different checkout that looks identical, and every reading off it is a false
+  pass. That cost two separate sessions.
+- **It separates custom properties from rendered ones.** Deleting a variable
+  shows up on every element that inherits it and says nothing about pixels.
+
+`--tokens` exists because **a token system cannot be checked in the mode you
+designed in.** Six semantic aliases once resolved correctly in Light and Dark
+while both brand palettes silently rendered the default palette&#x27;s colours.
+
+## The overlay
+
+A panel that sits on top of the running build. Click an element, see its gap,
+padding, margin and text as tokens, change them only to other tokens, and watch
+the render move. Changes reduce to net decisions (a change you reverse drops
+out) and export as a prompt that asks the session to apply them to the source
+rule, verify by measurement, mirror to Figma and record the decisions.
+
+In the project:
+
+```bash
+~/.claude/tools/overlay-server          # reads the contract, serves the script, receives exports
+```
+
+In the dev build, and only the dev build:
+
+```html
+&lt;script src=&quot;http://localhost:8766/overlay.js&quot;&gt;&lt;/script&gt;
+```
+
+Send to session writes `.toolkit/inbox/&lt;stamp&gt;-overlay.md`, which is local
+only. The standing rule in `claude-md-section.md` says what a session does with
+it. `overlay/demo.html` is a sample screen with seeded defects to try it on.
+
+## The architecture
+
+Files are organised by **rate of change**, not by topic. A fast-changing fact
+inside a slow-changing document makes the whole document look stale, and then
+none of it gets trusted.
+
+| Changes | File | Scope |
+| --- | --- | --- |
+| Never | `~/.claude/CLAUDE.md` | The rules that bind every session |
+| Rarely | `~/.claude/design-judgment.md` | How this designer decides |
+| Occasionally | the project&#x27;s contract | What is true in this project |
+| Every session | the project&#x27;s `STATUS.md` | Where the work is right now |
+
+**Grammar travels, vocabulary does not.** A design system copied between
+projects hands over the values, which belong to the project they came from.
+What transfers is how many distinct values are allowed, the ratios between them,
+and which relationship gets which. `taste-extract` recovers that from work the
+designer has already done, so a new project is informed by their taste without
+inheriting another project&#x27;s numbers.
+
+## Starting on a new project
+
+1. `/design-contract` reads the repo and writes the contract, or adopts the file
+   already there rather than creating a rival.
+2. `/token-audit` on its first run discovers that codebase&#x27;s token dialect and
+   writes it into the contract, so later runs go straight to scanning.
+3. `/session-state` writes `STATUS.md`.
+4. When three to five screens have been hand-tuned, `/taste-extract` recovers
+   the grammar and writes it into the contract.
+
+After that the skills fire on their own descriptions, and `/ship-check` runs
+before any claim that something is done.
+
+## Three rules the whole thing rests on
+
+**Never answer a visual question with a number.** A parity score says &quot;the
+properties I sampled agree&quot;, not &quot;this looks right&quot;. A sweep once reported
+components clean while their thumbnails rendered landscape against portrait,
+because it never measured that property.
+
+**Prove the detector before trusting a clean result.** A scan that silently
+finds nothing is worse than no scan. One pass reported 0 raw values where the
+real number was 862, because BSD grep accepted a `\b` it does not honour.
+
+**Measure the result, do not trust the reasoning.** Four chip heights were
+reasoned correctly and two still rendered wrong. The reasoning is the
+hypothesis. The measurement is the result.
+
+## Maintaining it
+
+When a correction reveals a criterion, it goes in the judgment file. When a
+method fails, the fix goes in the skill that failed, not in a note. When a rule
+stops referring to one project&#x27;s values, it graduates out of the contract and
+into the skill, so every project gets it.
+
+The toolkit is meant to be edited. The skills are opinionated because vague
+instructions produce vague work, but the opinions are a starting position. Where
+one is wrong for how you work, change it rather than working around it.
+</code></pre></details>
+    </section>
+  </main>
+</div>
+
+</body>
+</html>

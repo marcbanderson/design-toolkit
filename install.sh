@@ -58,6 +58,11 @@ for t in "$SRC"/tools/*; do
   run "cp '$t' '$DEST/tools/' && chmod +x '$DEST/tools/$(basename "$t")'"
 done
 
+# the overlay is a browser script, not an executable, but it lives with the
+# tools because overlay-server serves it from there
+say "install overlay.js"
+run "cp '$SRC/overlay/overlay.js' '$DEST/tools/overlay.js'"
+
 # ── the judgment record: never overwrite, it accumulates ───────────────────
 SRC_J="$SRC/judgment/$JUDGMENT.md"
 [ -e "$SRC_J" ] || { echo "No judgment file: $SRC_J" >&2
@@ -114,6 +119,12 @@ On a new project, first session:
 Then /token-audit, /design-parity, /rhythm-pass and /ship-check as the work needs.
 
 Tools are at ~/.claude/tools/ and the skills call them by that path:
-  measure   rendered geometry at a fixed width
-  guard     prove a file survived a bulk edit
+  measure          rendered geometry at a fixed width
+  guard            prove a file survived a bulk edit
+  tokens-manifest  the overlay's token manifest, read from the contract
+  overlay-server   serves the overlay to a dev build and receives its exports
+
+To edit a build on screen with tokens only, in the project:
+  ~/.claude/tools/overlay-server
+and put its one include line in the dev build.
 DONE

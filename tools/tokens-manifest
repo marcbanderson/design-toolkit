@@ -1,0 +1,228 @@
+#!/usr/bin/env python3
+"""tokens-manifest: emit the overlay's token manifest from the project's contract.
+
+  tokens-manifest [DIR|CONTRACT.md] [options]
+
+  --css FILE      also read custom properties from a token stylesheet
+  --unit N        body line-height in px, when the contract does not state it
+  --js            emit `window.__designTokens = {...};` instead of JSON
+  --quiet         no summary on stderr
+
+Reads the rhythm ladder, the type ramp and the weights from the contract the
+project already has (DESIGN_CONTRACT.md, DESIGN_SYSTEM.md, DESIGN.md, or the
+design section of CLAUDE.md) and prints the manifest the overlay picks from:
+
+  { "unit": 24,
+    "space": { "space-6": 24, ... },
+    "text":  { "text-body": { "size": 16, "line": 24, "weight": 400 }, ... } }
+
+The contract is the source; this only reads it. If a value is not in the
+contract, it is not in the manifest, and the summary says what was missing so
+the contract gets fixed rather than the manifest.
+Exit code is 0 when a manifest with at least one spacing token was produced.
+"""
+import sys, os, re, json
+
+CONTRACT_NAMES = ["DESIGN_CONTRACT.md", "DESIGN_SYSTEM.md", "DESIGN.md", "design-contract.md", "CLAUDE.md"]
+FRACTIONS = [(1, 6), (1, 4), (1, 3), (1, 2), (2, 3), (1, 1), (4, 3), (3, 2), (2, 1), (3, 1)]
+
+def find_contract(arg):
+    if arg and os.path.isfile(arg):
+        return arg
+    base = arg if arg and os.path.isdir(arg) else os.getcwd()
+    for n in CONTRACT_NAMES:
+        p = os.path.join(base, n)
+        if os.path.isfile(p):
+            return p
+    return None
+
+def px(s):
+    m = re.fullmatch(r"\s*`?\$?(-?\d*\.?\d+)\s*(px|rem)?`?\s*", s or "")
+    if not m:
+        return None
+    v = float(m.group(1))
+    return v * 16 if m.group(2) == "rem" else v
+
+def token_name(s):
+    s = (s or "").strip().strip("`").strip()
+    m = re.fullmatch(r"(?:--|\$|var\(--)?([A-Za-z][\w.-]*)\)?", s)
+    if not m:
+        return None
+    name = m.group(1)
+    return name if re.search(r"\d|space|gap|sp|size|text|type|font", name, re.I) else None
+
+def tables(md):
+    rows, cur = [], []
+    for line in md.splitlines():
+        if line.strip().startswith("|"):
+            cells = [c.strip() for c in line.strip().strip("|").split("|")]
+            if all(re.fullmatch(r":?-{2,}:?", c) for c in cells if c):
+                continue
+            cur.append(cells)
+        else:
+            if cur:
+                rows.append(cur); cur = []
+    if cur:
+        rows.append(cur)
+    return rows
+
+def section(md, title_re):
+    m = re.search(r"^##+\s*(" + title_re + r")[^\n]*\n(.*?)(?=^##\s|\Z)", md, re.S | re.M | re.I)
+    return m.group(2) if m else ""
+
+def read_space(md, notes):
+    space = {}
+    # 1. any table with a token-looking cell and a px-looking cell
+    for t in tables(md):
+        for cells in t:
+            names = [token_name(c) for c in cells]
+            vals = [px(c) for c in cells]
+            ti = next((i for i, n in enumerate(names) if n and vals[i] is None), None)
+            vi = next((i for i, v in enumerate(vals) if v is not None), None)
+            if ti is not None and vi is not None and ti != vi:
+                space[names[ti]] = vals[vi]
+    if space:
+        notes.append(f"{len(space)} spacing tokens from a contract table")
+    # 2. inline `--space-6: 24px` or `space-6 = 24`
+    inline = {}
+    for m in re.finditer(r"(?:--|\$)?((?:space|spacing|gap|sp|s)-?[\w-]*\d[\w-]*)\s*[:=]\s*(\d*\.?\d+)\s*(px|rem)?", md, re.I):
+        v = float(m.group(2)) * (16 if m.group(3) == "rem" else 1)
+        inline.setdefault(m.group(1), v)
+    if inline:
+        for k, v in inline.items():
+            space.setdefault(k, v)
+        notes.append(f"{len(inline)} spacing tokens from inline definitions")
+    return space
+
+def read_css(path, notes):
+    space, text = {}, {}
+    try:
+        css = open(path, encoding="utf-8").read()
+    except OSError as e:
+        notes.append(f"could not read {path}: {e}"); return space, text
+    for m in re.finditer(r"--([\w-]+)\s*:\s*(-?\d*\.?\d+)(px|rem)\s*;", css):
+        name, v, u = m.group(1), float(m.group(2)), m.group(3)
+        if re.search(r"space|spacing|gap|^sp-|^s-\d", name, re.I):
+            space[name] = v * 16 if u == "rem" else v
+    if space:
+        notes.append(f"{len(space)} spacing tokens from {os.path.basename(path)}")
+    return space, text
+
+def read_unit(md, space, opt_unit, notes):
+    if opt_unit:
+        return opt_unit
+    m = re.search(r"\b(?:u|unit|body line|line-height)\b[^\d\n]{0,40}?(\d{2})\s*px", md, re.I) or re.search(r"\bu\s*=\s*(\d{2})", md)
+    if m:
+        notes.append(f"unit {m.group(1)} stated in the contract"); return int(m.group(1))
+    vals = sorted(set(v for v in space.values() if v > 0))
+    for cand in (24, 20, 28, 32, 16, 36, 40):
+        if all(any(abs(v - cand * a / b) < 0.5 for a, b in FRACTIONS) for v in vals):
+            notes.append(f"unit {cand} inferred: every spacing token is a simple fraction of it; state it in the contract"); return cand
+    notes.append("unit not found; defaulting to 24, pass --unit or state it in the contract")
+    return 24
+
+def read_text(md, notes):
+    text = {}
+    # 1. a table with size and line columns
+    for t in tables(md):
+        if not t:
+            continue
+        head = [c.lower() for c in t[0]]
+        si = next((i for i, h in enumerate(head) if "size" in h), None)
+        li = next((i for i, h in enumerate(head) if "line" in h or "leading" in h), None)
+        wi = next((i for i, h in enumerate(head) if "weight" in h), None)
+        ni = next((i for i, h in enumerate(head) if h in ("name", "style", "token", "role")), 0)
+        if si is None:
+            continue
+        for cells in t[1:]:
+            if len(cells) <= si:
+                continue
+            m = re.match(r"(\d+)\s*/\s*(\d+)", cells[si])
+            size = int(m.group(1)) if m else px(cells[si])
+            line = int(m.group(2)) if m else (px(cells[li]) if li is not None and li < len(cells) else None)
+            weight = int(re.sub(r"\D", "", cells[wi]) or 400) if wi is not None and wi < len(cells) and re.search(r"\d", cells[wi]) else 400
+            if size:
+                name = (cells[ni].strip("`") if ni < len(cells) and cells[ni] and not px(cells[ni]) else f"text-{int(size)}")
+                text[name] = {"size": int(size), "line": int(line) if line else None, "weight": weight}
+        if text:
+            notes.append(f"{len(text)} text styles from a contract table"); return text
+    # 2. the template's "Ramp:" and "Weights:" lines
+    sec = section(md, r"type|typography") or md
+    ramp = re.search(r"ramp\s*[:=]\s*`?([^`\n]+)`?", sec, re.I)
+    weights = re.search(r"weights?\s*[:=]\s*`?([^`\n]+)`?", sec, re.I)
+    ws = [int(w) for w in re.findall(r"\b([1-9]00)\b", weights.group(1))] if weights else []
+    if ramp:
+        pairs = re.findall(r"(\d{2})\s*/\s*(\d{2})", ramp.group(1))
+        if pairs:
+            for s, l in pairs:
+                text[f"text-{s}"] = {"size": int(s), "line": int(l), "weight": ws[0] if ws else 400}
+            notes.append(f"{len(pairs)} text sizes with line-heights from the Ramp line")
+        else:
+            sizes = [int(s) for s in re.findall(r"\b(\d{2})\b", ramp.group(1))]
+            for s in sizes:
+                text[f"text-{s}"] = {"size": s, "line": None, "weight": ws[0] if ws else 400}
+            if sizes:
+                notes.append(f"{len(sizes)} text sizes from the Ramp line, no line-heights stated")
+        if ws and len(ws) > 1:
+            # every size at every permitted weight is too many; keep the first weight per size
+            # and add the heavier weights on the two largest sizes, which is where they get used
+            big = sorted(text.keys(), key=lambda k: -text[k]["size"])[:2]
+            for k in big:
+                for w in ws[1:]:
+                    text[f"{k}-{w}"] = dict(text[k], weight=w)
+    return text
+
+def fill_lines(text, unit, notes):
+    missing = [k for k, v in text.items() if not v["line"]]
+    for k in missing:
+        s = text[k]["size"]
+        # smallest ladder fraction of the unit that gives at least 1.25x the size
+        cands = sorted(set(round(unit * a / b) for a, b in FRACTIONS))
+        text[k]["line"] = next((c for c in cands if c >= s * 1.25), s + 8)
+        text[k]["inferred_line"] = True
+    if missing:
+        notes.append(f"line-heights inferred for {len(missing)} styles; state them in the contract as size/line")
+
+def main():
+    args = sys.argv[1:]
+    opt = {"css": None, "unit": None, "js": False, "quiet": False}
+    pos = []
+    i = 0
+    while i < len(args):
+        a = args[i]
+        if a == "--css": opt["css"] = args[i + 1]; i += 2
+        elif a == "--unit": opt["unit"] = int(args[i + 1]); i += 2
+        elif a == "--js": opt["js"] = True; i += 1
+        elif a == "--quiet": opt["quiet"] = True; i += 1
+        elif a in ("-h", "--help"): print(__doc__); return 0
+        else: pos.append(a); i += 1
+    notes = []
+    contract = find_contract(pos[0] if pos else None)
+    md = ""
+    if contract:
+        md = open(contract, encoding="utf-8").read()
+        if os.path.basename(contract) == "CLAUDE.md":
+            md = section(md, r"design[^\n]*") or md
+        notes.append(f"contract {os.path.relpath(contract)}")
+    else:
+        notes.append("no contract found; run /design-contract first")
+    space = read_space(md, notes) if md else {}
+    if opt["css"]:
+        cs, _ = read_css(opt["css"], notes)
+        for k, v in cs.items():
+            space.setdefault(k, v)
+    unit = read_unit(md, space, opt["unit"], notes)
+    text = read_text(md, notes) if md else {}
+    fill_lines(text, unit, notes)
+    space = {k: (int(v) if float(v).is_integer() else v) for k, v in sorted(space.items(), key=lambda kv: kv[1])}
+    manifest = {"unit": unit, "space": space, "text": text, "source": os.path.relpath(contract) if contract else None}
+    out = json.dumps(manifest, indent=2)
+    if opt["js"]:
+        out = "window.__designTokens = " + out + ";"
+    print(out)
+    if not opt["quiet"]:
+        sys.stderr.write("tokens-manifest: " + "; ".join(notes) + "\n")
+    return 0 if space else 1
+
+if __name__ == "__main__":
+    sys.exit(main())
