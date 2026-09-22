@@ -43,6 +43,11 @@ Each property is a field: label on the left, value on the right. Drag across
 the label to step through the ladder; click the value for the list. Only
 tokens are offered, and an off-ladder value is marked until it is changed.
 
+The header's Dock / Beside toggle chooses where the fields appear. Beside puts
+them in a popover level with the selected element, in the gutter next to its
+frame and never over it; the dock keeps the changes and the export. When there
+is no gutter wide enough, the fields stay in the dock.
+
 `Alt+Shift+D` hides and shows the panel. `Escape` closes a list, then clears
 the selection.
 

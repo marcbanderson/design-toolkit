@@ -320,10 +320,18 @@
     .hl.hover { outline:1px dashed rgba(140,160,155,.6); outline-offset:-1px; }
     .hl.sel { outline:2px solid var(--accent); outline-offset:-2px; }
     .hl .tag { position:absolute; left:-2px; top:-22px; background:var(--accent); color:#0B1512; font:500 12px/20px var(--mono); padding:0 6px; white-space:nowrap; }
+    .pop { position:fixed; width:320px; max-height:calc(100vh - 16px); overflow:auto; background:var(--ground); color:var(--ink); font:400 14px/20px var(--sans); pointer-events:auto; border:1px solid var(--line); border-radius:8px; box-shadow:0 12px 32px rgba(0,0,0,.35); display:flex; flex-direction:column; }
+    .pop .sec { padding:var(--s3) var(--s4); }
+    .pop .sec:last-child { border-bottom:0; }
+    .pop .id .name { font-size:13px; }
+    .pop .field { height:28px; }
+    .pop details { display:flex; flex-direction:column; gap:var(--s2); }
+    .pop summary { cursor:pointer; list-style:none; font:500 11px/16px var(--sans); letter-spacing:.08em; text-transform:uppercase; color:var(--ink3); }
+    .pop summary::-webkit-details-marker { display:none; } .pop summary::after { content:" +"; } .pop details[open] summary::after { content:" \\2212"; }
     .panel { position:fixed; top:0; right:0; bottom:0; width:344px; background:var(--ground); color:var(--ink); font:400 14px/20px var(--sans); pointer-events:auto; display:flex; flex-direction:column; border-left:1px solid var(--line); box-shadow:-8px 0 24px rgba(0,0,0,.25); }
-    .head { padding:var(--s3) var(--s4); border-bottom:1px solid var(--line); display:flex; align-items:center; gap:var(--s2); }
+    .head { padding:var(--s3) var(--s4); border-bottom:1px solid var(--line); display:flex; align-items:center; gap:var(--s2); flex-wrap:wrap; }
     .head b { font-weight:600; flex:1; white-space:nowrap; }
-    .head small { color:var(--ink3); font:400 12px/16px var(--mono); }
+    .head small { color:var(--ink3); font:400 12px/16px var(--mono); flex-basis:100%; }
     .btn { font:500 12px/20px var(--sans); color:var(--ink); background:transparent; border:1px solid var(--line); border-radius:6px; padding:2px 8px; cursor:pointer; white-space:nowrap; }
     .btn:hover { border-color:var(--ink3); } .btn.on { background:var(--accent); color:#0B1512; border-color:var(--accent); } .btn[disabled] { opacity:.5; cursor:default; }
     .btn:focus-visible, .tok:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
@@ -365,14 +373,31 @@
     .foot .cnt { flex:1; color:var(--ink2); font:400 12px/16px var(--mono); }
     textarea { width:100%; height:260px; background:var(--sunk); color:var(--ink); border:1px solid var(--line); border-radius:6px; padding:var(--s2); font:400 12px/16px var(--mono); resize:vertical; }
   `;
-  root.innerHTML = `<style>${css}</style><div class="hl hover" hidden></div><div class="hl sel" hidden><span class="tag"></span></div><div class="panel"></div>`;
-  const hoverBox = root.querySelector(".hl.hover"), selBox = root.querySelector(".hl.sel"), panel = root.querySelector(".panel");
+  root.innerHTML = `<style>${css}</style><div class="hl hover" hidden></div><div class="hl sel" hidden><span class="tag"></span></div><div class="pop" hidden></div><div class="panel"></div>`;
+  const hoverBox = root.querySelector(".hl.hover"), selBox = root.querySelector(".hl.sel"), panel = root.querySelector(".panel"), pop = root.querySelector(".pop");
   document.documentElement.appendChild(host);
 
   function place(box, el) {
     if (!el || !el.isConnected) { box.hidden = true; return; }
     const r = el.getBoundingClientRect();
     box.hidden = false; box.style.left = r.left + "px"; box.style.top = r.top + "px"; box.style.width = r.width + "px"; box.style.height = r.height + "px";
+  }
+  function frameRect(el) {
+    const avail = innerWidth - DOCK_W; let frame = null, n = el;
+    while (n && n !== document.body) { const r = n.getBoundingClientRect(); if (r.width > 0 && r.width <= avail - POP_W - 2 * GUT) frame = n; n = n.parentElement; }
+    return (frame || el).getBoundingClientRect();
+  }
+  function placePop() {
+    if (pop.hidden || !selected || !selected.isConnected) return false;
+    const avail = innerWidth - DOCK_W, f = frameRect(selected), r = selected.getBoundingClientRect();
+    let left = null;
+    if (f.right + GUT + POP_W <= avail - 8) left = f.right + GUT;
+    else if (f.left - GUT - POP_W >= 8) left = f.left - GUT - POP_W;
+    else if (f.right + 8 + POP_W <= avail) left = f.right + 8;
+    if (left === null) return false;
+    const hgt = pop.offsetHeight || 300;
+    pop.style.left = left + "px"; pop.style.top = Math.max(8, Math.min(r.top, innerHeight - hgt - 8)) + "px";
+    return true;
   }
   function h(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
 
@@ -422,18 +447,30 @@
   }
 
   let exporting = false, sent = "", confirming = null, menuFor = null, drag = null;
+  let mode = "dock"; try { mode = localStorage.getItem("toolkit-overlay:mode") || "dock"; } catch (e) {}
+  const DOCK_W = 344, POP_W = 320, GUT = 16; let marginOpen = false;
   function render() {
     const prevBody = panel.querySelector(".body"); const scrollAt = prevBody ? prevBody.scrollTop : 0;
     const info = selected && selected.isConnected ? inspect(selected) : null;
-    let body = "";
+    const prevPop = pop.scrollTop;
+    let body = "", fields = "";
     body += `<div class="sec"><h3>Selected</h3>${info ? `<div class="id"><div class="name">${info.el === document.body ? "body" : h(identity(info.el).component || identity(info.el).tag)}</div><div class="path">${h(pathOf(info.el))}</div>${identity(info.el).text ? `<div class="txt">${h(identity(info.el).text)}</div>` : ""}</div>` : `<div class="empty">Click anything on the page. Escape clears the selection.</div>`}${info && !records.length ? `<div class="note">Drag a field's label to step through the ladder. Click its value to choose.</div>` : ""}</div>`;
     if (info) {
-      if (info.lints.length) body += `<div class="sec"><h3>Judgment</h3>${info.lints.map((l, i) => `<div class="lint ${l.level}"><span>${h(l.msg)}</span>${l.fix && l.fix.token ? `<button class="btn fix" data-lint="${i}">Set ${h(l.fix.prop)} to ${h(l.fix.token.name)}</button>` : ""}</div>`).join("")}</div>`;
-      if (info.gaps) body += `<div class="sec"><h3>Gap</h3><div class="fields">${fieldRow("Row", "row-gap", info.gaps["row-gap"])}${fieldRow("Column", "column-gap", info.gaps["column-gap"])}</div></div>`;
-      body += `<div class="sec"><h3>Padding</h3><div class="fields">${PADS.map(p => fieldRow(p.replace("padding-", "").replace(/^./, c => c.toUpperCase()), p, info.pads[p])).join("")}</div></div>`;
-      body += `<div class="sec"><h3>Margin</h3><div class="fields">${MARGS.map(p => fieldRow(p.replace("margin-", "").replace(/^./, c => c.toUpperCase()), p, info.margs[p])).join("")}</div><div class="note">The air belongs to the component, as padding. Reach for margin only when the space is not the component's own.</div></div>`;
-      if (info.text) body += `<div class="sec"><h3>Text</h3><div class="fields">${textFieldRow(info)}</div><div class="note">Ramp ${h(T.textSource)}.</div></div>`;
+      if (info.lints.length) fields += `<div class="sec"><h3>Judgment</h3>${info.lints.map((l, i) => `<div class="lint ${l.level}"><span>${h(l.msg)}</span>${l.fix && l.fix.token ? `<button class="btn fix" data-lint="${i}">Set ${h(l.fix.prop)} to ${h(l.fix.token.name)}</button>` : ""}</div>`).join("")}</div>`;
+      if (info.gaps) fields += `<div class="sec"><h3>Gap</h3><div class="fields">${fieldRow("Row", "row-gap", info.gaps["row-gap"])}${fieldRow("Column", "column-gap", info.gaps["column-gap"])}</div></div>`;
+      fields += `<div class="sec"><h3>Padding</h3><div class="fields">${PADS.map(p => fieldRow(p.replace("padding-", "").replace(/^./, c => c.toUpperCase()), p, info.pads[p])).join("")}</div></div>`;
+      const marginFields = `<div class="fields">${MARGS.map(p => fieldRow(p.replace("margin-", "").replace(/^./, c => c.toUpperCase()), p, info.margs[p])).join("")}</div><div class="note">The air belongs to the component, as padding. Reach for margin only when the space is not the component's own.</div>`;
+      fields += mode === "beside" ? `<div class="sec"><details ${marginOpen ? "open" : ""}><summary>Margin</summary>${marginFields}</details></div>` : `<div class="sec"><h3>Margin</h3>${marginFields}</div>`;
+      if (info.text) fields += `<div class="sec"><h3>Text</h3><div class="fields">${textFieldRow(info)}</div><div class="note">Ramp ${h(T.textSource)}.</div></div>`;
     }
+    let beside = false;
+    if (mode === "beside" && info) {
+      pop.hidden = false;
+      pop.innerHTML = `<div class="sec"><div class="id"><div class="name">${h(identity(info.el).component || identity(info.el).tag)}</div><div class="path">${h(pathOf(info.el).split(" > ").slice(-2).join(" > "))}</div></div></div>${fields}`;
+      beside = placePop();
+      if (!beside) pop.hidden = true; else pop.scrollTop = prevPop;
+    } else pop.hidden = true;
+    if (!beside) body += fields;
     // changes, each with its tier
     const net = netRecords();
     let applyable = 0;
@@ -449,14 +486,14 @@
       return `<div class="chg"><div class="what"><span><b>${h(r.prop)}</b> ${h(r.fromToken)} to ${h(r.toToken)}</span><span>${h(r.identity.component || r.identity.tag)}</span></div><div class="who">${h(r.identity.path)}</div><div class="tier t${t.tier}${r.verified === false ? " bad" : ""}"><span>${h(t.label)}</span>${action}</div>${diff}</div>`;
     }).join("");
     body += `<div class="sec"><h3>Changes</h3>${net.length ? chgs : `<div class="empty">${records.length ? "Everything is back where it started. Nothing to export." : "Nothing yet. A change you reverse drops out. Each change shows where in the source it lands, or that it needs the session."}</div>`}${sent ? `<div class="note">Sent to <b>${h(sent)}</b>. The session applies what is left, mirrors, and records.</div>` : ""}${exporting ? `<textarea readonly>${h(buildPrompt())}</textarea><div style="display:flex;gap:8px">${ENDPOINT ? `<button class="btn on" data-act="send">Send to session</button>` : ""}<button class="btn" data-act="copy">Copy prompt</button><button class="btn" data-act="closex">Close</button></div>` : ""}</div>`;
-    panel.innerHTML = `<div class="head"><b>Overlay</b><small>u = ${T.unit}px, ${T.ladder.length} tokens, ${h(T.spaceSource)}${ENDPOINT ? ", connected" : ""}</small><button class="btn ${picking ? "on" : ""}" data-act="pick" title="Alt+Shift+D">Select</button><button class="btn" data-act="hide">Hide</button></div><div class="body">${body}</div>
+    panel.innerHTML = `<div class="head"><b>Overlay</b><button class="btn" data-act="mode" title="Where the fields appear">${mode === "beside" ? "Beside" : "Dock"}</button><button class="btn ${picking ? "on" : ""}" data-act="pick" title="Alt+Shift+D">Select</button><button class="btn" data-act="hide">Hide</button><small>u = ${T.unit}px, ${T.ladder.length} tokens, ${h(T.spaceSource)}${ENDPOINT ? ", connected" : ""}</small></div><div class="body">${body}</div>
       <div class="foot"><span class="cnt">${net.length} net change${net.length === 1 ? "" : "s"}${records.length !== net.length ? `, ${records.length} made` : ""}</span><button class="btn" data-act="undo" ${undoStack.length ? "" : "disabled"}>Undo</button><button class="btn" data-act="clear" ${records.length ? "" : "disabled"} title="Forget every change here. Applied edits stay in the source.">Clear</button>${applyable > 1 ? `<button class="btn" data-act="applyall">Apply ${applyable}</button>` : ""}<button class="btn on" data-act="export" ${net.length ? "" : "disabled"}>Export</button></div>`;
     panel.querySelector(".body").scrollTop = scrollAt;
     place(selBox, selected); if (selected) selBox.querySelector(".tag").textContent = identity(selected).component || pathOf(selected).split(" > ").pop();
   }
 
   // drag across a label: each 14px of travel is one rung; the record is written on release
-  panel.addEventListener("pointerdown", ev => {
+  const onPointerDown = ev => {
     const lab = ev.target.closest("[data-drag]"); if (!lab || !selected || ev.button !== 0) return;
     const prop = lab.dataset.drag; menuFor = null;
     let list, idx, startPx;
@@ -464,17 +501,17 @@
     else { list = steps(); startPx = parseFloat(getComputedStyle(selected).getPropertyValue(prop)) || 0; idx = list.findIndex(k => Math.abs(k.px - startPx) < 0.5); if (idx < 0) idx = list.findIndex(k => k.px > startPx); if (idx < 0) idx = list.length - 1; }
     drag = { prop, list, idx0: idx, idx, x0: ev.clientX, startPx, moved: false, el: selected, lab };
     lab.setPointerCapture(ev.pointerId); ev.preventDefault();
-  });
-  panel.addEventListener("pointermove", ev => {
+  };
+  const onPointerMove = ev => {
     if (!drag) return;
     const dx = ev.clientX - drag.x0; if (Math.abs(dx) > 3) drag.moved = true;
     const idx = Math.max(0, Math.min(drag.list.length - 1, drag.idx0 + Math.round(dx / 14)));
     if (idx === drag.idx) return; drag.idx = idx;
-    const val = panel.querySelector(`.field[data-field="${drag.prop}"] .fval`);
+    const val = root.querySelector(`.field[data-field="${drag.prop}"] .fval`);
     if (drag.prop === "text-style") { const st = T.text[drag.list[idx]]; drag.el.style.setProperty("font-size", st.size + "px", "important"); drag.el.style.setProperty("line-height", st.line + "px", "important"); drag.el.style.setProperty("font-weight", st.weight, "important"); if (val) val.innerHTML = `${st.size}/${st.line} ${st.weight}<small>${h(drag.list[idx])}</small>`; }
     else { const k = drag.list[idx]; drag.el.style.setProperty(drag.prop, k.px + "px", "important"); if (val) { val.className = "fval"; val.innerHTML = `${k.px}px<small>${h(k.px ? k.name : "")}</small>`; } }
     place(selBox, selected);
-  });
+  };
   const endDrag = ev => {
     if (!drag) return; const d = drag; drag = null;
     if (!d.moved) { menuFor = d.prop; render(); return; }
@@ -483,8 +520,7 @@
     if (Math.abs(k.px - d.startPx) < 0.5) { d.el.style.removeProperty(d.prop); render(); return; }
     d.el.style.removeProperty(d.prop); applyChange(d.el, d.prop, k.px, k.name, d.startPx);
   };
-  panel.addEventListener("pointerup", endDrag); panel.addEventListener("pointercancel", endDrag);
-  panel.addEventListener("click", ev => {
+  const onSurfaceClick = ev => {
     const b = ev.target.closest("button");
     if (menuFor && !(b && (b.dataset.menu || b.classList.contains("mi")))) { menuFor = null; render(); }
     if (!b) return;
@@ -492,6 +528,7 @@
     if (b.dataset.menu) { menuFor = menuFor === b.dataset.menu ? null : b.dataset.menu; render(); return; }
     if (b.classList.contains("mi")) { menuFor = null; if (b.dataset.text) { const i = inspect(selected); if (i.text && i.text.style !== b.dataset.text) applyText(selected, b.dataset.text, i.text); else render(); return; } }
     if (act === "pick") { picking = !picking; render(); return; }
+    if (act === "mode") { mode = mode === "beside" ? "dock" : "beside"; try { localStorage.setItem("toolkit-overlay:mode", mode); } catch (e) {} render(); return; }
     if (act === "hide") { api.toggle(); return; }
     if (act === "undo") { undo(); return; }
     if (act === "clear") { while (undoStack.length) undo(); records.length = 0; persist(); sent = ""; render(); return; }
@@ -514,13 +551,19 @@
     if (b.dataset.lint != null) { const l = inspect(selected).lints[+b.dataset.lint]; if (l && l.fix && l.fix.token) { const cur = parseFloat(getComputedStyle(selected).getPropertyValue(l.fix.prop)) || 0; applyChange(selected, l.fix.prop, l.fix.token.px, l.fix.token.name, cur); } return; }
     if (b.dataset.prop) { const cur = parseFloat(getComputedStyle(selected).getPropertyValue(b.dataset.prop)) || 0; if (Math.abs(cur - +b.dataset.px) < 0.5) return; applyChange(selected, b.dataset.prop, +b.dataset.px, b.dataset.tok, cur); return; }
     if (b.dataset.text) { const i = inspect(selected); if (i.text && i.text.style !== b.dataset.text) applyText(selected, b.dataset.text, i.text); }
-  });
+  };
+  pop.addEventListener("toggle", ev => { if (ev.target.tagName === "DETAILS") marginOpen = ev.target.open; }, true);
+  for (const surface of [panel, pop]) {
+    surface.addEventListener("pointerdown", onPointerDown); surface.addEventListener("pointermove", onPointerMove);
+    surface.addEventListener("pointerup", endDrag); surface.addEventListener("pointercancel", endDrag);
+    surface.addEventListener("click", onSurfaceClick);
+  }
 
   function targetFrom(ev) { const t = ev.target; if (t === host || host.contains(t) || ev.composedPath().includes(host)) return null; const el = ev.composedPath()[0]; if (!(el instanceof Element)) return null; return el; }
   function onMove(ev) { if (!picking || !visible) return; const el = targetFrom(ev); if (!el) { hoverEl = null; hoverBox.hidden = true; return; } if (el === hoverEl || el === selected) { if (el === selected) hoverBox.hidden = true; return; } hoverEl = el; place(hoverBox, el); }
   function onClick(ev) { if (!picking || !visible) return; const el = targetFrom(ev); if (!el) return; ev.preventDefault(); ev.stopPropagation(); selected = el; exporting = false; render(); }
   function onKey(ev) { if (ev.altKey && ev.shiftKey && ev.code === "KeyD") { ev.preventDefault(); api.toggle(); } else if (ev.key === "Escape" && visible) { if (menuFor) menuFor = null; else selected = null; render(); } }
-  function onScroll() { place(selBox, selected); if (hoverEl) place(hoverBox, hoverEl); }
+  function onScroll() { place(selBox, selected); if (hoverEl) place(hoverBox, hoverEl); if (!pop.hidden && !placePop()) render(); }
   document.addEventListener("mousemove", onMove, true);
   document.addEventListener("click", onClick, true);
   document.addEventListener("keydown", onKey, true);
