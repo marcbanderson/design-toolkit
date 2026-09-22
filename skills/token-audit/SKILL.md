@@ -213,6 +213,34 @@ Three findings that only exist on this side:
 Report per component, not per node. Ten unbound paddings inside one component is
 one fix, not ten findings.
 
+### The alias that is defined twice, and the dead one wins
+
+Phase 1 asks whether a value is bound. It does not ask whether the **binding
+survives**, and on a real project that was the expensive gap.
+
+Seven semantic aliases correctly aliased the generated layer near the top of the
+stylesheet, then were redefined as literals in a later section. Same specificity,
+later definition wins, so every one of those aliases was dead code and those
+seven values had silently stopped following the design tool.
+
+So, for every semantic token:
+
+1. **Count its definitions.** More than one at the same specificity is a defect
+   even when every definition looks reasonable on its own.
+2. **Resolve it in the browser, per mode.** Read the computed value off
+   `document.documentElement`, do not read the stylesheet and reason about it.
+
+**Check every mode, not the one you designed in.** This is the part that makes
+it findable. The shadowing literals happened to match the default palette's
+values exactly, so light and dark both looked perfect and the bug was visible
+only under two alternate palettes that were not shipped. A coverage audit
+scores this file as fully tokenized, which it is, and completely misses that
+the tokens no longer move.
+
+`~/.claude/tools/cssdiff <url> --tokens '--t-link,--t-focus'` resolves a list of
+custom properties in every palette and theme and prints them as a table. Two
+palettes returning identical values is the signature.
+
 ---
 
 ## Phase 3: reconcile

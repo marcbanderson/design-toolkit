@@ -277,6 +277,18 @@ having him find it costs the claim its credibility. *Observed.*
 colour vision deficiency. In charts especially, two series must differ in
 lightness, not only in hue. This is a requirement. *Stated.*
 
+**Measure the pair, do not eyeball it.** Convert to relative luminance and
+report the difference. Under about 10 points is separated by hue alone,
+whatever it looks like on your screen. On this project every positive/negative
+pair came in under 10, the worst at 2.5, and two of those pairs were defined in
+Figma itself, so tokenising the code faithfully would have propagated the
+problem rather than fixed it. **Where a hue-only pair lives upstream, the fix
+is upstream.** *Observed 2026-09-21.*
+
+**A colour change to satisfy a contrast rule is still a design change.** It
+gets asked, not flagged afterwards. Raising a failing pair is right; changing
+the swatch without asking is not. *Correction, 2026-09-21.*
+
 ---
 
 ## Ask, do not assume
