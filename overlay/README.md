@@ -48,6 +48,22 @@ them in a popover level with the selected element, in the gutter next to its
 frame and never over it; the dock keeps the changes and the export. When there
 is no gutter wide enough, the fields stay in the dock.
 
+Select / Navigate in the header, or `Alt+Shift+N`, decides who gets the click.
+In Select the overlay takes it and shows the element. In Navigate the page
+gets it, so you can press buttons and move between screens; the selection and
+the changes stay.
+
+If the project's tokens are layered, primitives that the alias layer points
+at, start the server with the stylesheets so the manifest follows the chains
+and offers the alias: `overlay-server --css src/primitives.css --css
+src/aliases.css`, and `--layer t-` to force a prefix. Without a server the
+overlay infers the same way from custom properties on `:root`.
+
+The contract must state the unit and the ladder in the shape the template
+uses, a `Unit:` line and a table with Token and Value columns. What
+`tokens-manifest` cannot read it does not offer, and the panel header says in
+yellow when the unit came from the body line-height instead of the contract.
+
 `Alt+Shift+D` hides and shows the panel. `Escape` closes a list, then clears
 the selection.
 

@@ -30,16 +30,21 @@ Two contracts in one repo is worse than none.
 
 ## Rhythm ladder
 
+Unit: <n>px, the body line-height. Every vertical distance is a count of it.
+
 Values are this project's. The ratio is what carries across projects: roughly
-3x between "inside a thought" and "between thoughts".
+3x between "inside a thought" and "between thoughts". Keep the `Unit:` line and
+the Token and Value columns as they are: `tokens-manifest` reads them for the
+overlay, and a ladder it cannot read is a ladder the tool does not offer. Name
+the token components consume, not the primitive it aliases.
 
 | Relationship | Token | Value |
 | --- | --- | --- |
-| Turn to turn, header to content | | |
-| Between blocks and sections | | |
-| List rows | | |
-| Under a control | | |
-| Inside a group | | |
+| Turn to turn, header to content | `--<token>` | <n>px |
+| Between blocks and sections | `--<token>` | <n>px |
+| List rows | `--<token>` | <n>px |
+| Under a control | `--<token>` | <n>px |
+| Inside a group | `--<token>` | <n>px |
 
 **Group first, then stack.** Decide what reads as one thing, set it tight, and
 let the group enter the block stack. Never run a flat gap across unrelated

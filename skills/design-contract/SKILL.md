@@ -43,13 +43,22 @@ Template:
 - If it cannot run locally, say so here and name the fallback.
 
 ## Rhythm ladder
-Values are this project's. The ratio is what carries across projects: roughly
-3x between "inside a thought" and "between thoughts".
-- <n> turn to turn, and header to content
-- <n> between blocks and sections
-- <n> list rows
-- <n> under a control
-- <n> inside a group
+Unit: <n>px, the body line-height. Every vertical distance is a count of it.
+
+| Relationship | Token | Value |
+| --- | --- | --- |
+| Turn to turn, header to content | `--<token>` | <n>px |
+| Between blocks and sections | `--<token>` | <n>px |
+| List rows | `--<token>` | <n>px |
+| Under a control | `--<token>` | <n>px |
+| Inside a group | `--<token>` | <n>px |
+
+Write it exactly this shape: a `Unit:` line and a table with Token and Value
+columns. `tokens-manifest` reads it for the overlay, and anything it cannot
+read it does not offer, so a ladder written as prose defaults the tool. The
+token column names the layer components consume (the alias), not the primitive
+it points at. Values are this project's; the ratio is what carries across
+projects, roughly 3x between "inside a thought" and "between thoughts".
 Rule: group first, then stack. A tight pair is grouped, and the group is what
 enters the block stack. Never flatten a pair into the block gap.
 

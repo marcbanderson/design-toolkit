@@ -154,8 +154,8 @@ td code { font-size: 14px; }
       <li><b>9</b> skills</li>
       <li><b>2</b> agents</li>
       <li><b>4</b> executables</li>
-      <li><b>17</b> commits</li>
-      <li>last commit <b>2026-09-22</b> 1e4773c  Overlay: fields you drag or pick from, and the panel keeps its scroll</li>
+      <li><b>20</b> commits</li>
+      <li>last commit <b>2026-09-22</b> 583d714  README: link the web view and the demo on GitHub Pages</li>
       <li>built 2026-09-22</li>
     </ul>
   </header>
@@ -560,7 +560,7 @@ should get sharper, not longer.
   <p class="does">Writes the project&#x27;s DESIGN_CONTRACT.md, or extends whatever contract file the repo already has, holding the values that change per project: source of truth, where the work runs, rhythm ladder, type ramp, token layers, component inventory, copy rules and open decisions. It reads the codebase and Figma file first and asks the designer only about genuine decisions. Rules that stop referring to the project&#x27;s own values graduate out of the contract and into a skill.</p>
   <dl class="kv"><div><dt>When</dt><dd>At the start of a new project, or when the designer asks what the rules are, what the rhythm ladder is, or where the source of truth lives.</dd></div><div><dt>Produces</dt><dd>A single contract file at the repo root, updated in the same session whenever the designer states a rule or corrects a value.</dd></div><div><dt>Holds</dt><dd><q>Two contracts in one repo is worse than none, because they will disagree and neither will be trusted.</q></dd></div></dl>
   
-  <details class="src"><summary>Read skills/design-contract/SKILL.md<span class="len">88 lines</span></summary><pre><code>---
+  <details class="src"><summary>Read skills/design-contract/SKILL.md<span class="len">97 lines</span></summary><pre><code>---
 name: design-contract
 description: Create or update the DESIGN_CONTRACT.md for a design project. Use at the start of a new project, or when the designer asks what the rules are, what the rhythm ladder is, or where the source of truth lives. Every other design skill reads this file.
 ---
@@ -605,13 +605,22 @@ Template:
 - If it cannot run locally, say so here and name the fallback.
 
 ## Rhythm ladder
-Values are this project&#x27;s. The ratio is what carries across projects: roughly
-3x between &quot;inside a thought&quot; and &quot;between thoughts&quot;.
-- &lt;n&gt; turn to turn, and header to content
-- &lt;n&gt; between blocks and sections
-- &lt;n&gt; list rows
-- &lt;n&gt; under a control
-- &lt;n&gt; inside a group
+Unit: &lt;n&gt;px, the body line-height. Every vertical distance is a count of it.
+
+| Relationship | Token | Value |
+| --- | --- | --- |
+| Turn to turn, header to content | `--&lt;token&gt;` | &lt;n&gt;px |
+| Between blocks and sections | `--&lt;token&gt;` | &lt;n&gt;px |
+| List rows | `--&lt;token&gt;` | &lt;n&gt;px |
+| Under a control | `--&lt;token&gt;` | &lt;n&gt;px |
+| Inside a group | `--&lt;token&gt;` | &lt;n&gt;px |
+
+Write it exactly this shape: a `Unit:` line and a table with Token and Value
+columns. `tokens-manifest` reads it for the overlay, and anything it cannot
+read it does not offer, so a ladder written as prose defaults the tool. The
+token column names the layer components consume (the alias), not the primitive
+it points at. Values are this project&#x27;s; the ratio is what carries across
+projects, roughly 3x between &quot;inside a thought&quot; and &quot;between thoughts&quot;.
 Rule: group first, then stack. A tight pair is grouped, and the group is what
 enters the block stack. Never flatten a pair into the block gap.
 
@@ -2686,12 +2695,15 @@ if __name__ == &quot;__main__&quot;:
 --unit N        body line-height, when the contract does not state it
 --js            emit window.__designTokens = {...} instead of JSON</code></pre>
   <dl class="kv"><div><dt>Exists because</dt><dd>The overlay must offer the contract&#x27;s tokens, not a copy of them that drifts.</dd></div><div><dt>Checks</dt><dd><ul class='plain'><li>unit, stated in the contract or inferred from the ladder</li><li>spacing tokens from the rhythm ladder table or inline definitions</li><li>text styles from a size/line table or the Ramp and Weights lines</li><li>line-heights inferred and flagged when the contract gives only sizes</li></ul></dd></div></dl>
-  <details class="src"><summary>Read tools/tokens-manifest<span class="len">228 lines</span></summary><pre><code>#!/usr/bin/env python3
+  <details class="src"><summary>Read tools/tokens-manifest<span class="len">261 lines</span></summary><pre><code>#!/usr/bin/env python3
 &quot;&quot;&quot;tokens-manifest: emit the overlay&#x27;s token manifest from the project&#x27;s contract.
 
   tokens-manifest [DIR|CONTRACT.md] [options]
 
-  --css FILE      also read custom properties from a token stylesheet
+  --css FILE      also read custom properties from a token stylesheet (repeatable;
+                  var() chains are followed and the alias layer is preferred)
+  --layer PREFIX  prefer token names starting with this prefix when several
+                  resolve to the same value, e.g. --layer t-
   --unit N        body line-height in px, when the contract does not state it
   --js            emit `window.__designTokens = {...};` instead of JSON
   --quiet         no summary on stderr
@@ -2782,19 +2794,48 @@ def read_space(md, notes):
         notes.append(f&quot;{len(inline)} spacing tokens from inline definitions&quot;)
     return space
 
-def read_css(path, notes):
-    space, text = {}, {}
-    try:
-        css = open(path, encoding=&quot;utf-8&quot;).read()
-    except OSError as e:
-        notes.append(f&quot;could not read {path}: {e}&quot;); return space, text
-    for m in re.finditer(r&quot;--([\w-]+)\s*:\s*(-?\d*\.?\d+)(px|rem)\s*;&quot;, css):
-        name, v, u = m.group(1), float(m.group(2)), m.group(3)
-        if re.search(r&quot;space|spacing|gap|^sp-|^s-\d&quot;, name, re.I):
-            space[name] = v * 16 if u == &quot;rem&quot; else v
+SPACE_NAME = re.compile(r&quot;space|spacing|gap|^sp-|^s-\d|(^|-)s-&quot;, re.I)
+
+def read_css(paths, layer, notes):
+    &quot;&quot;&quot;Custom properties from token stylesheets. Follows var() chains, so an
+    alias like --t-s-xl: var(--fig-spacing-xl) resolves to 24, and prefers the
+    alias over the primitive when both land on the same value.&quot;&quot;&quot;
+    decls = {}
+    for path in paths:
+        try:
+            css = open(path, encoding=&quot;utf-8&quot;).read()
+        except OSError as e:
+            notes.append(f&quot;could not read {path}: {e}&quot;); continue
+        for m in re.finditer(r&quot;--([\w-]+)\s*:\s*([^;{}]+);&quot;, css):
+            decls.setdefault(m.group(1), m.group(2).strip())
+    def resolve(name, depth=0):
+        v = decls.get(name)
+        if v is None or depth &gt; 8:
+            return None, depth, []
+        m = re.fullmatch(r&quot;var\(\s*--([\w-]+)\s*(?:,\s*([^)]*))?\)&quot;, v)
+        if m:
+            px_, d, chain = resolve(m.group(1), depth + 1)
+            return px_, d, [m.group(1)] + chain
+        m = re.fullmatch(r&quot;(-?\d*\.?\d+)(px|rem)&quot;, v)
+        if m:
+            return (float(m.group(1)) * (16 if m.group(2) == &quot;rem&quot; else 1)), depth, []
+        return None, depth, []
+    by_px = {}
+    for name in decls:
+        px_, depth, chain = resolve(name)
+        if px_ is None:
+            continue
+        if not (SPACE_NAME.search(name) or any(SPACE_NAME.search(c) for c in chain)):
+            continue
+        by_px.setdefault(px_, []).append((name, depth))
+    space = {}
+    for px_, names in by_px.items():
+        # the alias layer is the one furthest from the literal; --layer wins outright
+        names.sort(key=lambda nd: (0 if layer and nd[0].startswith(layer) else 1, -nd[1], len(nd[0])))
+        space[names[0][0]] = px_
     if space:
-        notes.append(f&quot;{len(space)} spacing tokens from {os.path.basename(path)}&quot;)
-    return space, text
+        notes.append(f&quot;{len(space)} spacing tokens from {&#x27;, &#x27;.join(os.path.basename(p) for p in paths)}, var() chains followed, alias layer preferred&quot;)
+    return space, {}
 
 def read_unit(md, space, opt_unit, notes):
     if opt_unit:
@@ -2806,8 +2847,8 @@ def read_unit(md, space, opt_unit, notes):
     for cand in (24, 20, 28, 32, 16, 36, 40):
         if all(any(abs(v - cand * a / b) &lt; 0.5 for a, b in FRACTIONS) for v in vals):
             notes.append(f&quot;unit {cand} inferred: every spacing token is a simple fraction of it; state it in the contract&quot;); return cand
-    notes.append(&quot;unit not found; defaulting to 24, pass --unit or state it in the contract&quot;)
-    return 24
+    notes.append(&quot;UNIT NOT STATED: add a `Unit: &lt;px&gt;` line under the rhythm ladder in the contract, or pass --unit; the overlay will fall back to the body line-height and say so&quot;)
+    return None
 
 def read_text(md, notes):
     text = {}
@@ -2873,12 +2914,13 @@ def fill_lines(text, unit, notes):
 
 def main():
     args = sys.argv[1:]
-    opt = {&quot;css&quot;: None, &quot;unit&quot;: None, &quot;js&quot;: False, &quot;quiet&quot;: False}
+    opt = {&quot;css&quot;: [], &quot;unit&quot;: None, &quot;layer&quot;: None, &quot;js&quot;: False, &quot;quiet&quot;: False}
     pos = []
     i = 0
     while i &lt; len(args):
         a = args[i]
-        if a == &quot;--css&quot;: opt[&quot;css&quot;] = args[i + 1]; i += 2
+        if a == &quot;--css&quot;: opt[&quot;css&quot;].append(args[i + 1]); i += 2
+        elif a == &quot;--layer&quot;: opt[&quot;layer&quot;] = args[i + 1].lstrip(&quot;-&quot;); i += 2
         elif a == &quot;--unit&quot;: opt[&quot;unit&quot;] = int(args[i + 1]); i += 2
         elif a == &quot;--js&quot;: opt[&quot;js&quot;] = True; i += 1
         elif a == &quot;--quiet&quot;: opt[&quot;quiet&quot;] = True; i += 1
@@ -2896,14 +2938,14 @@ def main():
         notes.append(&quot;no contract found; run /design-contract first&quot;)
     space = read_space(md, notes) if md else {}
     if opt[&quot;css&quot;]:
-        cs, _ = read_css(opt[&quot;css&quot;], notes)
+        cs, _ = read_css(opt[&quot;css&quot;], opt[&quot;layer&quot;], notes)
         for k, v in cs.items():
             space.setdefault(k, v)
     unit = read_unit(md, space, opt[&quot;unit&quot;], notes)
     text = read_text(md, notes) if md else {}
-    fill_lines(text, unit, notes)
+    fill_lines(text, unit or 24, notes)
     space = {k: (int(v) if float(v).is_integer() else v) for k, v in sorted(space.items(), key=lambda kv: kv[1])}
-    manifest = {&quot;unit&quot;: unit, &quot;space&quot;: space, &quot;text&quot;: text, &quot;source&quot;: os.path.relpath(contract) if contract else None}
+    manifest = {&quot;unit&quot;: unit, &quot;space&quot;: space, &quot;text&quot;: text, &quot;source&quot;: os.path.relpath(contract) if contract else None, &quot;notes&quot;: notes}
     out = json.dumps(manifest, indent=2)
     if opt[&quot;js&quot;]:
         out = &quot;window.__designTokens = &quot; + out + &quot;;&quot;
@@ -2928,7 +2970,7 @@ if __name__ == &quot;__main__&quot;:
 GET /overlay.js  GET /tokens.json  GET /include
 POST /locate  POST /apply  POST /export</code></pre>
   <dl class="kv"><div><dt>Exists because</dt><dd>The paste step between changing something on screen and the session applying it.</dd></div><div><dt>Checks</dt><dd><ul class='plain'><li>/locate, sheet URL to file, rule to line</li><li>/apply, rewrite the declaration, guard the file, back it up</li><li>/export, writes .toolkit/inbox/&lt;stamp&gt;-overlay.md</li><li>/tokens.json, the contract tokens for the pickers</li></ul></dd></div></dl>
-  <details class="src"><summary>Read tools/overlay-server<span class="len">214 lines</span></summary><pre><code>#!/usr/bin/env node
+  <details class="src"><summary>Read tools/overlay-server<span class="len">216 lines</span></summary><pre><code>#!/usr/bin/env node
 /**
  * overlay-server: serve the overlay to a dev build and receive its exports.
  *
@@ -2938,7 +2980,8 @@ POST /locate  POST /apply  POST /export</code></pre>
  *   --root DIR       the project, default cwd. The contract is read here and
  *                    exports land in DIR/.toolkit/inbox/
  *   --manifest FILE  serve this manifest instead of reading the contract
- *   --css FILE       passed to tokens-manifest, to read a token stylesheet too
+ *   --css FILE       passed to tokens-manifest, to read a token stylesheet too (repeatable)
+ *   --layer PREFIX   passed to tokens-manifest: prefer this token layer
  *
  * One include line in the dev build is the whole integration:
  *
@@ -2960,13 +3003,14 @@ const path = require(&quot;path&quot;);
 const { execFileSync } = require(&quot;child_process&quot;);
 
 const args = process.argv.slice(2);
-const opt = { port: 8766, root: process.cwd(), manifest: null, css: null };
+const opt = { port: 8766, root: process.cwd(), manifest: null, css: [], layer: null };
 for (let i = 0; i &lt; args.length; i++) {
   const a = args[i];
   if (a === &quot;--port&quot;) opt.port = +args[++i];
   else if (a === &quot;--root&quot;) opt.root = path.resolve(args[++i]);
   else if (a === &quot;--manifest&quot;) opt.manifest = path.resolve(args[++i]);
-  else if (a === &quot;--css&quot;) opt.css = path.resolve(args[++i]);
+  else if (a === &quot;--css&quot;) opt.css.push(path.resolve(args[++i]));
+  else if (a === &quot;--layer&quot;) opt.layer = args[++i];
   else if (a === &quot;-h&quot; || a === &quot;--help&quot;) { console.log(fs.readFileSync(__filename, &quot;utf8&quot;).split(&quot;*/&quot;)[0].replace(/^\/\*\*?|^ \* ?/gm, &quot;&quot;)); process.exit(0); }
 }
 
@@ -2994,7 +3038,7 @@ function manifest() {
   if (Date.now() - cache.at &lt; 2000) return cache;
   let body = &quot;{}&quot;, note = &quot;&quot;;
   try {
-    const a = [opt.root, &quot;--quiet&quot;]; if (opt.css) a.push(&quot;--css&quot;, opt.css);
+    const a = [opt.root, &quot;--quiet&quot;]; for (const c of opt.css) a.push(&quot;--css&quot;, c); if (opt.layer) a.push(&quot;--layer&quot;, opt.layer);
     body = execFileSync(EMITTER, a, { encoding: &quot;utf8&quot;, stdio: [&quot;ignore&quot;, &quot;pipe&quot;, &quot;pipe&quot;] });
     note = &quot;from the contract&quot;;
   } catch (e) {
@@ -3240,7 +3284,7 @@ twenty lines.
 <article class="entry compact">
   <header class="entry-head"><h3>DESIGN_CONTRACT.md<span class="badge">template</span></h3></header>
   <p class="does">The slow-changing rules of a project: source of truth and mirror direction, where the work runs, rhythm ladder, type ramp and permitted weights, token layers and dialect, component inventory, copy rules, and a Settled / Open / Owed decisions log.</p>
-  <details class="src"><summary>Read templates/DESIGN_CONTRACT.md<span class="len">89 lines</span></summary><pre><code># Design contract
+  <details class="src"><summary>Read templates/DESIGN_CONTRACT.md<span class="len">94 lines</span></summary><pre><code># Design contract
 
 The rules of this project. Slow-changing. What is **true** here.
 
@@ -3272,16 +3316,21 @@ Two contracts in one repo is worse than none.
 
 ## Rhythm ladder
 
+Unit: &lt;n&gt;px, the body line-height. Every vertical distance is a count of it.
+
 Values are this project&#x27;s. The ratio is what carries across projects: roughly
-3x between &quot;inside a thought&quot; and &quot;between thoughts&quot;.
+3x between &quot;inside a thought&quot; and &quot;between thoughts&quot;. Keep the `Unit:` line and
+the Token and Value columns as they are: `tokens-manifest` reads them for the
+overlay, and a ladder it cannot read is a ladder the tool does not offer. Name
+the token components consume, not the primitive it aliases.
 
 | Relationship | Token | Value |
 | --- | --- | --- |
-| Turn to turn, header to content | | |
-| Between blocks and sections | | |
-| List rows | | |
-| Under a control | | |
-| Inside a group | | |
+| Turn to turn, header to content | `--&lt;token&gt;` | &lt;n&gt;px |
+| Between blocks and sections | `--&lt;token&gt;` | &lt;n&gt;px |
+| List rows | `--&lt;token&gt;` | &lt;n&gt;px |
+| Under a control | `--&lt;token&gt;` | &lt;n&gt;px |
+| Inside a group | `--&lt;token&gt;` | &lt;n&gt;px |
 
 **Group first, then stack.** Decide what reads as one thing, set it tight, and
 let the group enter the block stack. Never run a flat gap across unrelated
@@ -3404,10 +3453,15 @@ Pre-existing defects, so they are never rediscovered as news.
       <pre class="usage"><code>git -C ~/design-toolkit pull
 ~/design-toolkit/install.sh
 # then open a new session: skills register at start</code></pre>
-      <details class="src"><summary>Read README.md<span class="len">236 lines</span></summary><pre><code># Design toolkit
+      <details class="src"><summary>Read README.md<span class="len">242 lines</span></summary><pre><code># Design toolkit
 
 A toolkit for running design work with Claude Code, between Figma and a
 codebase. One repo, pulled into any project.
+
+**See it:** [the web view](https://marcbanderson.github.io/design-toolkit/),
+every skill, agent and executable with what it does, and
+[the overlay demo](https://marcbanderson.github.io/design-toolkit/demo/), where
+you change a sample screen with tokens only.
 
 It exists because a designer&#x27;s standards get hand-carried into every session as
 pasted prompts, and a pasted prompt is a literal. This makes them tokens:
@@ -3499,7 +3553,7 @@ the same for anyone, the criteria are not.
 
 `docs/index.html` is one self-contained page: every skill, agent and executable
 with what it does and its full source, plus the judgment file rendered as prose.
-Open it in a browser, or through GitHub Pages. Rebuild after a change with
+It is served at https://marcbanderson.github.io/design-toolkit/ by GitHub Pages. Rebuild after a change with
 `python3 docs/build.py`; add `--vision` to include the vision
 record section, which is left out of the committed copy because that file is
 not in this repo.
@@ -3579,8 +3633,9 @@ In the dev build, and only the dev build:
 Send to session writes `.toolkit/inbox/&lt;stamp&gt;-overlay.md`, which is local
 only. The standing rule in `claude-md-section.md` says what a session does with
 it. `overlay/demo.html` is a sample screen with seeded defects to try it on, and
-`docs/demo/` is the same page for anyone viewing the repo: preview and export
-work there, apply needs the server.
+`docs/demo/` is the same page for anyone viewing the repo, at
+https://marcbanderson.github.io/design-toolkit/demo/: preview and export work
+there, apply needs the server.
 
 ## The architecture
 

@@ -8,7 +8,8 @@
  *   --root DIR       the project, default cwd. The contract is read here and
  *                    exports land in DIR/.toolkit/inbox/
  *   --manifest FILE  serve this manifest instead of reading the contract
- *   --css FILE       passed to tokens-manifest, to read a token stylesheet too
+ *   --css FILE       passed to tokens-manifest, to read a token stylesheet too (repeatable)
+ *   --layer PREFIX   passed to tokens-manifest: prefer this token layer
  *
  * One include line in the dev build is the whole integration:
  *
@@ -30,13 +31,14 @@ const path = require("path");
 const { execFileSync } = require("child_process");
 
 const args = process.argv.slice(2);
-const opt = { port: 8766, root: process.cwd(), manifest: null, css: null };
+const opt = { port: 8766, root: process.cwd(), manifest: null, css: [], layer: null };
 for (let i = 0; i < args.length; i++) {
   const a = args[i];
   if (a === "--port") opt.port = +args[++i];
   else if (a === "--root") opt.root = path.resolve(args[++i]);
   else if (a === "--manifest") opt.manifest = path.resolve(args[++i]);
-  else if (a === "--css") opt.css = path.resolve(args[++i]);
+  else if (a === "--css") opt.css.push(path.resolve(args[++i]));
+  else if (a === "--layer") opt.layer = args[++i];
   else if (a === "-h" || a === "--help") { console.log(fs.readFileSync(__filename, "utf8").split("*/")[0].replace(/^\/\*\*?|^ \* ?/gm, "")); process.exit(0); }
 }
 
@@ -64,7 +66,7 @@ function manifest() {
   if (Date.now() - cache.at < 2000) return cache;
   let body = "{}", note = "";
   try {
-    const a = [opt.root, "--quiet"]; if (opt.css) a.push("--css", opt.css);
+    const a = [opt.root, "--quiet"]; for (const c of opt.css) a.push("--css", c); if (opt.layer) a.push("--layer", opt.layer);
     body = execFileSync(EMITTER, a, { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
     note = "from the contract";
   } catch (e) {

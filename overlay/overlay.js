@@ -33,23 +33,32 @@
     const given = window.__designTokens || {};
     const bodyLH = parseFloat(getComputedStyle(document.body).lineHeight);
     const unit = given.unit || (isFinite(bodyLH) ? Math.round(bodyLH) : 24);
+    const unitNote = given.unit ? "" : `unit ${unit} from the body line-height, not stated in the contract`;
     let space = given.space, spaceSource = given.source ? "contract" : "manifest";
     if (!space) {
+      // custom properties on :root; var() chains are followed and the alias layer wins
       space = {}; spaceSource = "inferred from :root";
+      const decls = {};
       for (const sheet of document.styleSheets) {
         let rules; try { rules = sheet.cssRules; } catch (e) { continue; }
         for (const r of rules) {
           if (!r.selectorText || !/(^|,)\s*(:root|html)\s*(,|$)/.test(r.selectorText)) continue;
-          for (const name of r.style) {
-            if (!name.startsWith("--")) continue;
-            const v = r.style.getPropertyValue(name).trim();
-            const m = /^(-?\d*\.?\d+)(px|rem)$/.exec(v);
-            if (!m) continue;
-            if (!/(space|spacing|gap|^--s-?\d|^--sp)/i.test(name)) continue;
-            space[name.replace(/^--/, "")] = m[2] === "rem" ? parseFloat(m[1]) * 16 : parseFloat(m[1]);
-          }
+          for (const name of r.style) if (name.startsWith("--") && !(name in decls)) decls[name] = r.style.getPropertyValue(name).trim();
         }
       }
+      const SPACEY = /space|spacing|gap|^--sp|^--s-\d|-s-/i;
+      const resolve = (name, depth) => {
+        const v = decls[name]; if (v == null || depth > 8) return null;
+        const a = /^var\(\s*(--[\w-]+)/.exec(v); if (a) { const r = resolve(a[1], depth + 1); return r && { px: r.px, depth: r.depth, chain: [a[1]].concat(r.chain) }; }
+        const m = /^(-?\d*\.?\d+)(px|rem)$/.exec(v); return m ? { px: m[2] === "rem" ? parseFloat(m[1]) * 16 : parseFloat(m[1]), depth, chain: [] } : null;
+      };
+      const byPx = new Map();
+      for (const name in decls) {
+        const r = resolve(name, 0); if (!r) continue;
+        if (!SPACEY.test(name) && !r.chain.some(c => SPACEY.test(c))) continue;
+        if (!byPx.has(r.px)) byPx.set(r.px, []); byPx.get(r.px).push({ name, depth: r.depth });
+      }
+      for (const [px, names] of byPx) { names.sort((a, b) => (b.depth - a.depth) || (a.name.length - b.name.length)); space[names[0].name.replace(/^--/, "")] = px; }
     }
     let text = given.text, textSource = given.source ? "contract" : "manifest";
     if (!text) {
@@ -66,7 +75,7 @@
     }
     const bind = given.bind || "var(--{name})";
     const ladder = Object.entries(space).map(([name, px]) => ({ name, px })).sort((a, b) => a.px - b.px);
-    return { unit, space, ladder, text, spaceSource, textSource, bind };
+    return { unit, space, ladder, text, spaceSource, textSource, bind, unitNote, notes: given.notes || [] };
   }
   function hasOwnText(el) { for (const n of el.childNodes) if (n.nodeType === 3 && n.textContent.trim()) return true; return false; }
   function tokenFor(px) {
@@ -159,7 +168,7 @@
   let T = discoverTokens();
   const records = [];
   const undoStack = [];
-  let selected = null, hoverEl = null, picking = true;
+  let selected = null, hoverEl = null, picking = true; // picking false is Navigate: the page gets every click
   const STORE = "toolkit-overlay:" + location.pathname;
   try { const saved = JSON.parse(localStorage.getItem(STORE) || "[]"); saved.forEach(r => records.push(r)); } catch (e) {}
   function persist() { try { localStorage.setItem(STORE, JSON.stringify(records.map(r => Object.assign({}, r, { el: undefined, loc: undefined, busy: undefined })))); } catch (e) {} }
@@ -332,6 +341,8 @@
     .head { padding:var(--s3) var(--s4); border-bottom:1px solid var(--line); display:flex; align-items:center; gap:var(--s2); flex-wrap:wrap; }
     .head b { font-weight:600; flex:1; white-space:nowrap; }
     .head small { color:var(--ink3); font:400 12px/16px var(--mono); flex-basis:100%; }
+    .head small.warnnote { color:var(--warn); }
+    .seg { display:inline-flex; } .seg .btn { border-radius:0; } .seg .btn:first-child { border-radius:6px 0 0 6px; } .seg .btn:last-child { border-radius:0 6px 6px 0; margin-left:-1px; }
     .btn { font:500 12px/20px var(--sans); color:var(--ink); background:transparent; border:1px solid var(--line); border-radius:6px; padding:2px 8px; cursor:pointer; white-space:nowrap; }
     .btn:hover { border-color:var(--ink3); } .btn.on { background:var(--accent); color:#0B1512; border-color:var(--accent); } .btn[disabled] { opacity:.5; cursor:default; }
     .btn:focus-visible, .tok:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
@@ -486,7 +497,7 @@
       return `<div class="chg"><div class="what"><span><b>${h(r.prop)}</b> ${h(r.fromToken)} to ${h(r.toToken)}</span><span>${h(r.identity.component || r.identity.tag)}</span></div><div class="who">${h(r.identity.path)}</div><div class="tier t${t.tier}${r.verified === false ? " bad" : ""}"><span>${h(t.label)}</span>${action}</div>${diff}</div>`;
     }).join("");
     body += `<div class="sec"><h3>Changes</h3>${net.length ? chgs : `<div class="empty">${records.length ? "Everything is back where it started. Nothing to export." : "Nothing yet. A change you reverse drops out. Each change shows where in the source it lands, or that it needs the session."}</div>`}${sent ? `<div class="note">Sent to <b>${h(sent)}</b>. The session applies what is left, mirrors, and records.</div>` : ""}${exporting ? `<textarea readonly>${h(buildPrompt())}</textarea><div style="display:flex;gap:8px">${ENDPOINT ? `<button class="btn on" data-act="send">Send to session</button>` : ""}<button class="btn" data-act="copy">Copy prompt</button><button class="btn" data-act="closex">Close</button></div>` : ""}</div>`;
-    panel.innerHTML = `<div class="head"><b>Overlay</b><button class="btn" data-act="mode" title="Where the fields appear">${mode === "beside" ? "Beside" : "Dock"}</button><button class="btn ${picking ? "on" : ""}" data-act="pick" title="Alt+Shift+D">Select</button><button class="btn" data-act="hide">Hide</button><small>u = ${T.unit}px, ${T.ladder.length} tokens, ${h(T.spaceSource)}${ENDPOINT ? ", connected" : ""}</small></div><div class="body">${body}</div>
+    panel.innerHTML = `<div class="head"><b>Overlay</b><span class="seg"><button class="btn ${picking ? "on" : ""}" data-act="pick" title="Alt+Shift+N switches">Select</button><button class="btn ${picking ? "" : "on"}" data-act="nav" title="Clicks reach the page, so you can move between screens">Navigate</button></span><button class="btn" data-act="mode" title="Where the fields appear">${mode === "beside" ? "Beside" : "Dock"}</button><button class="btn" data-act="hide">Hide</button><small>u = ${T.unit}px, ${T.ladder.length} tokens, ${h(T.spaceSource)}${ENDPOINT ? ", connected" : ""}</small>${T.unitNote ? `<small class="warnnote">${h(T.unitNote)}</small>` : ""}</div><div class="body">${body}</div>
       <div class="foot"><span class="cnt">${net.length} net change${net.length === 1 ? "" : "s"}${records.length !== net.length ? `, ${records.length} made` : ""}</span><button class="btn" data-act="undo" ${undoStack.length ? "" : "disabled"}>Undo</button><button class="btn" data-act="clear" ${records.length ? "" : "disabled"} title="Forget every change here. Applied edits stay in the source.">Clear</button>${applyable > 1 ? `<button class="btn" data-act="applyall">Apply ${applyable}</button>` : ""}<button class="btn on" data-act="export" ${net.length ? "" : "disabled"}>Export</button></div>`;
     panel.querySelector(".body").scrollTop = scrollAt;
     place(selBox, selected); if (selected) selBox.querySelector(".tag").textContent = identity(selected).component || pathOf(selected).split(" > ").pop();
@@ -527,7 +538,8 @@
     const act = b.dataset.act;
     if (b.dataset.menu) { menuFor = menuFor === b.dataset.menu ? null : b.dataset.menu; render(); return; }
     if (b.classList.contains("mi")) { menuFor = null; if (b.dataset.text) { const i = inspect(selected); if (i.text && i.text.style !== b.dataset.text) applyText(selected, b.dataset.text, i.text); else render(); return; } }
-    if (act === "pick") { picking = !picking; render(); return; }
+    if (act === "pick") { picking = true; render(); return; }
+    if (act === "nav") { picking = false; hoverBox.hidden = true; render(); return; }
     if (act === "mode") { mode = mode === "beside" ? "dock" : "beside"; try { localStorage.setItem("toolkit-overlay:mode", mode); } catch (e) {} render(); return; }
     if (act === "hide") { api.toggle(); return; }
     if (act === "undo") { undo(); return; }
@@ -562,7 +574,7 @@
   function targetFrom(ev) { const t = ev.target; if (t === host || host.contains(t) || ev.composedPath().includes(host)) return null; const el = ev.composedPath()[0]; if (!(el instanceof Element)) return null; return el; }
   function onMove(ev) { if (!picking || !visible) return; const el = targetFrom(ev); if (!el) { hoverEl = null; hoverBox.hidden = true; return; } if (el === hoverEl || el === selected) { if (el === selected) hoverBox.hidden = true; return; } hoverEl = el; place(hoverBox, el); }
   function onClick(ev) { if (!picking || !visible) return; const el = targetFrom(ev); if (!el) return; ev.preventDefault(); ev.stopPropagation(); selected = el; exporting = false; render(); }
-  function onKey(ev) { if (ev.altKey && ev.shiftKey && ev.code === "KeyD") { ev.preventDefault(); api.toggle(); } else if (ev.key === "Escape" && visible) { if (menuFor) menuFor = null; else selected = null; render(); } }
+  function onKey(ev) { if (ev.altKey && ev.shiftKey && ev.code === "KeyD") { ev.preventDefault(); api.toggle(); } else if (ev.altKey && ev.shiftKey && ev.code === "KeyN") { ev.preventDefault(); picking = !picking; hoverBox.hidden = true; render(); } else if (ev.key === "Escape" && visible) { if (menuFor) menuFor = null; else selected = null; render(); } }
   function onScroll() { place(selBox, selected); if (hoverEl) place(hoverBox, hoverEl); if (!pop.hidden && !placePop()) render(); }
   document.addEventListener("mousemove", onMove, true);
   document.addEventListener("click", onClick, true);

@@ -3,7 +3,10 @@
 
   tokens-manifest [DIR|CONTRACT.md] [options]
 
-  --css FILE      also read custom properties from a token stylesheet
+  --css FILE      also read custom properties from a token stylesheet (repeatable;
+                  var() chains are followed and the alias layer is preferred)
+  --layer PREFIX  prefer token names starting with this prefix when several
+                  resolve to the same value, e.g. --layer t-
   --unit N        body line-height in px, when the contract does not state it
   --js            emit `window.__designTokens = {...};` instead of JSON
   --quiet         no summary on stderr
@@ -94,19 +97,48 @@ def read_space(md, notes):
         notes.append(f"{len(inline)} spacing tokens from inline definitions")
     return space
 
-def read_css(path, notes):
-    space, text = {}, {}
-    try:
-        css = open(path, encoding="utf-8").read()
-    except OSError as e:
-        notes.append(f"could not read {path}: {e}"); return space, text
-    for m in re.finditer(r"--([\w-]+)\s*:\s*(-?\d*\.?\d+)(px|rem)\s*;", css):
-        name, v, u = m.group(1), float(m.group(2)), m.group(3)
-        if re.search(r"space|spacing|gap|^sp-|^s-\d", name, re.I):
-            space[name] = v * 16 if u == "rem" else v
+SPACE_NAME = re.compile(r"space|spacing|gap|^sp-|^s-\d|(^|-)s-", re.I)
+
+def read_css(paths, layer, notes):
+    """Custom properties from token stylesheets. Follows var() chains, so an
+    alias like --t-s-xl: var(--fig-spacing-xl) resolves to 24, and prefers the
+    alias over the primitive when both land on the same value."""
+    decls = {}
+    for path in paths:
+        try:
+            css = open(path, encoding="utf-8").read()
+        except OSError as e:
+            notes.append(f"could not read {path}: {e}"); continue
+        for m in re.finditer(r"--([\w-]+)\s*:\s*([^;{}]+);", css):
+            decls.setdefault(m.group(1), m.group(2).strip())
+    def resolve(name, depth=0):
+        v = decls.get(name)
+        if v is None or depth > 8:
+            return None, depth, []
+        m = re.fullmatch(r"var\(\s*--([\w-]+)\s*(?:,\s*([^)]*))?\)", v)
+        if m:
+            px_, d, chain = resolve(m.group(1), depth + 1)
+            return px_, d, [m.group(1)] + chain
+        m = re.fullmatch(r"(-?\d*\.?\d+)(px|rem)", v)
+        if m:
+            return (float(m.group(1)) * (16 if m.group(2) == "rem" else 1)), depth, []
+        return None, depth, []
+    by_px = {}
+    for name in decls:
+        px_, depth, chain = resolve(name)
+        if px_ is None:
+            continue
+        if not (SPACE_NAME.search(name) or any(SPACE_NAME.search(c) for c in chain)):
+            continue
+        by_px.setdefault(px_, []).append((name, depth))
+    space = {}
+    for px_, names in by_px.items():
+        # the alias layer is the one furthest from the literal; --layer wins outright
+        names.sort(key=lambda nd: (0 if layer and nd[0].startswith(layer) else 1, -nd[1], len(nd[0])))
+        space[names[0][0]] = px_
     if space:
-        notes.append(f"{len(space)} spacing tokens from {os.path.basename(path)}")
-    return space, text
+        notes.append(f"{len(space)} spacing tokens from {', '.join(os.path.basename(p) for p in paths)}, var() chains followed, alias layer preferred")
+    return space, {}
 
 def read_unit(md, space, opt_unit, notes):
     if opt_unit:
@@ -118,8 +150,8 @@ def read_unit(md, space, opt_unit, notes):
     for cand in (24, 20, 28, 32, 16, 36, 40):
         if all(any(abs(v - cand * a / b) < 0.5 for a, b in FRACTIONS) for v in vals):
             notes.append(f"unit {cand} inferred: every spacing token is a simple fraction of it; state it in the contract"); return cand
-    notes.append("unit not found; defaulting to 24, pass --unit or state it in the contract")
-    return 24
+    notes.append("UNIT NOT STATED: add a `Unit: <px>` line under the rhythm ladder in the contract, or pass --unit; the overlay will fall back to the body line-height and say so")
+    return None
 
 def read_text(md, notes):
     text = {}
@@ -185,12 +217,13 @@ def fill_lines(text, unit, notes):
 
 def main():
     args = sys.argv[1:]
-    opt = {"css": None, "unit": None, "js": False, "quiet": False}
+    opt = {"css": [], "unit": None, "layer": None, "js": False, "quiet": False}
     pos = []
     i = 0
     while i < len(args):
         a = args[i]
-        if a == "--css": opt["css"] = args[i + 1]; i += 2
+        if a == "--css": opt["css"].append(args[i + 1]); i += 2
+        elif a == "--layer": opt["layer"] = args[i + 1].lstrip("-"); i += 2
         elif a == "--unit": opt["unit"] = int(args[i + 1]); i += 2
         elif a == "--js": opt["js"] = True; i += 1
         elif a == "--quiet": opt["quiet"] = True; i += 1
@@ -208,14 +241,14 @@ def main():
         notes.append("no contract found; run /design-contract first")
     space = read_space(md, notes) if md else {}
     if opt["css"]:
-        cs, _ = read_css(opt["css"], notes)
+        cs, _ = read_css(opt["css"], opt["layer"], notes)
         for k, v in cs.items():
             space.setdefault(k, v)
     unit = read_unit(md, space, opt["unit"], notes)
     text = read_text(md, notes) if md else {}
-    fill_lines(text, unit, notes)
+    fill_lines(text, unit or 24, notes)
     space = {k: (int(v) if float(v).is_integer() else v) for k, v in sorted(space.items(), key=lambda kv: kv[1])}
-    manifest = {"unit": unit, "space": space, "text": text, "source": os.path.relpath(contract) if contract else None}
+    manifest = {"unit": unit, "space": space, "text": text, "source": os.path.relpath(contract) if contract else None, "notes": notes}
     out = json.dumps(manifest, indent=2)
     if opt["js"]:
         out = "window.__designTokens = " + out + ";"
