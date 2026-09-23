@@ -154,9 +154,9 @@ td code { font-size: 14px; }
       <li><b>9</b> skills</li>
       <li><b>2</b> agents</li>
       <li><b>4</b> executables</li>
-      <li><b>20</b> commits</li>
-      <li>last commit <b>2026-09-22</b> 583d714  README: link the web view and the demo on GitHub Pages</li>
-      <li>built 2026-09-22</li>
+      <li><b>21</b> commits</li>
+      <li>last commit <b>2026-09-22</b> 684944f  Manifest follows var() chains and prefers the alias layer; a Navigate mode</li>
+      <li>built 2026-09-23</li>
     </ul>
   </header>
 
@@ -227,9 +227,9 @@ td code { font-size: 14px; }
 <h3>How an entry earns its place</h3>
 <p><q>A rule that produces a number fires. A rule that produces a sentiment does not.</q> So each entry that can be made executable carries a Rule in his words, a Detect that can actually be run, and a Default so no judgment is needed to apply it. The loop: he corrects one case, the rule is extracted rather than the fix, a detector is written, the detector finds the whole class, he confirms on the cheapest second case, and the result is verified by measurement. One correction covered twelve screens that way.</p>
 </div>
-      <details class="src"><summary>Read judgment/marc.md<span class="len">315 lines</span></summary><pre><code># How Marc judges design
+      <details class="src"><summary>Read judgment/marc.md<span class="len">344 lines</span></summary><pre><code># How Marc judges design
 
-Last updated: 2026-09-18
+Last updated: 2026-09-23
 
 A working file, not a diary. Each entry is meant to be **predictive**: when you
 hit the situation on the left, this is what he will want, and why. Use it to
@@ -482,6 +482,35 @@ are never new requirements. They are the same rule, unheld. *Observed.*
 **Colleague reactions are design input, relayed without ceremony.** &quot;My
 colleague doesn&#x27;t like the gold&quot; is a real constraint, not a suggestion to
 evaluate. *Observed.*
+
+**A tool that cannot read a value says so. Nothing defaults silently.** When
+the manifest could not find the unit in the contract it fell back to 24 and
+said nothing, and the wrong ladder was offered with confidence. *&quot;DESIGN_SYSTEM.md
+should state the unit and the ladder in a table the tool can read, so nothing
+gets defaulted silently.&quot;* The fix was in two places: the contract now has a
+shape the tool reads, and the tool reports what it could not read. *Stated,
+2026-09-23.*
+
+&gt; **Detect** any value a tool uses that it did not read from the contract or
+&gt; the code.
+&gt; **Default** show it as inferred, in the interface, and name where it should
+&gt; have come from.
+
+**The vocabulary is the layer components consume.** A picker offers the alias,
+never the primitive it points at: `--t-s-xl`, not `--fig-spacing-xl`. Both
+resolve to 24, but only one is what a component should be bound to. *Stated,
+2026-09-23.*
+
+&gt; **Detect** a token list that contains two names for one value.
+&gt; **Default** keep the one furthest from the literal, and let the project name
+&gt; a layer prefix to force it.
+
+**Feedback on the render stays out of the way.** The hover highlight was a
+filled, animated box and he called it *&quot;a little bit crazy&quot;*; a thin dashed
+outline that only redraws when the element changes was right. A panel beside
+the item is welcome only if it never covers the frame, because every spacing
+judgment is about the neighbour, and covering the neighbour removes the
+thing being judged. *Observed, 2026-09-23.*
 
 ---
 

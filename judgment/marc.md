@@ -1,6 +1,6 @@
 # How Marc judges design
 
-Last updated: 2026-09-18
+Last updated: 2026-09-23
 
 A working file, not a diary. Each entry is meant to be **predictive**: when you
 hit the situation on the left, this is what he will want, and why. Use it to
@@ -253,6 +253,35 @@ are never new requirements. They are the same rule, unheld. *Observed.*
 **Colleague reactions are design input, relayed without ceremony.** "My
 colleague doesn't like the gold" is a real constraint, not a suggestion to
 evaluate. *Observed.*
+
+**A tool that cannot read a value says so. Nothing defaults silently.** When
+the manifest could not find the unit in the contract it fell back to 24 and
+said nothing, and the wrong ladder was offered with confidence. *"DESIGN_SYSTEM.md
+should state the unit and the ladder in a table the tool can read, so nothing
+gets defaulted silently."* The fix was in two places: the contract now has a
+shape the tool reads, and the tool reports what it could not read. *Stated,
+2026-09-23.*
+
+> **Detect** any value a tool uses that it did not read from the contract or
+> the code.
+> **Default** show it as inferred, in the interface, and name where it should
+> have come from.
+
+**The vocabulary is the layer components consume.** A picker offers the alias,
+never the primitive it points at: `--t-s-xl`, not `--fig-spacing-xl`. Both
+resolve to 24, but only one is what a component should be bound to. *Stated,
+2026-09-23.*
+
+> **Detect** a token list that contains two names for one value.
+> **Default** keep the one furthest from the literal, and let the project name
+> a layer prefix to force it.
+
+**Feedback on the render stays out of the way.** The hover highlight was a
+filled, animated box and he called it *"a little bit crazy"*; a thin dashed
+outline that only redraws when the element changes was right. A panel beside
+the item is welcome only if it never covers the frame, because every spacing
+judgment is about the neighbour, and covering the neighbour removes the
+thing being judged. *Observed, 2026-09-23.*
 
 ---
 
