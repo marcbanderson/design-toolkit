@@ -3,6 +3,11 @@
 A toolkit for running design work with Claude Code, between Figma and a
 codebase. One repo, pulled into any project.
 
+**See it:** [the web view](https://marcbanderson.github.io/design-toolkit/),
+every skill, agent and executable with what it does, and
+[the overlay demo](https://marcbanderson.github.io/design-toolkit/demo/), where
+you change a sample screen with tokens only.
+
 It exists because a designer's standards get hand-carried into every session as
 pasted prompts, and a pasted prompt is a literal. This makes them tokens:
 written once, applied everywhere, improved in one place.
@@ -93,7 +98,7 @@ the same for anyone, the criteria are not.
 
 `docs/index.html` is one self-contained page: every skill, agent and executable
 with what it does and its full source, plus the judgment file rendered as prose.
-Open it in a browser, or through GitHub Pages. Rebuild after a change with
+It is served at https://marcbanderson.github.io/design-toolkit/ by GitHub Pages. Rebuild after a change with
 `python3 docs/build.py`; add `--vision` to include the vision
 record section, which is left out of the committed copy because that file is
 not in this repo.
@@ -173,8 +178,9 @@ In the dev build, and only the dev build:
 Send to session writes `.toolkit/inbox/<stamp>-overlay.md`, which is local
 only. The standing rule in `claude-md-section.md` says what a session does with
 it. `overlay/demo.html` is a sample screen with seeded defects to try it on, and
-`docs/demo/` is the same page for anyone viewing the repo: preview and export
-work there, apply needs the server.
+`docs/demo/` is the same page for anyone viewing the repo, at
+https://marcbanderson.github.io/design-toolkit/demo/: preview and export work
+there, apply needs the server.
 
 ## The architecture
 
