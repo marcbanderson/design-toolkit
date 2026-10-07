@@ -1,6 +1,6 @@
 # How Marc judges design
 
-Last updated: 2026-09-23
+Last updated: 2026-10-07
 
 A working file, not a diary. Each entry is meant to be **predictive**: when you
 hit the situation on the left, this is what he will want, and why. Use it to
@@ -48,8 +48,38 @@ gaps first. *Observed across 17 messages, every project.*
 > **Detect** any rendered gap that is not a simple fraction of the body line.
 > **Default** snap to the nearest fraction, rounding up on a tie.
 
-**Tight reads as broken, loose reads as unfinished.** "Squished" is his most
-common word for a defect. He has never once asked for less space. *Observed.*
+**Tight reads as broken, loose reads as unfinished, and a floating label reads
+as ruined.** "Squished" is his most common word for a defect, but more space is
+not the safe default. On 2026-10-06 a pass that pushed sections to 40 and list
+rows to 16, while pulling a section title to 16 from its own content, drew "I
+think you have ruined a lot of spacing." What he objects to in both directions
+is the same thing: the gaps stop saying what belongs to what. *Stated.*
+
+**His existing spacing is the contract.** A screen he has already laid out is
+not raw material for a ladder. Read its values, keep its proportions, and change
+only what a stated rule or a measured defect requires. When a pass and his
+source disagree, the source wins. *Stated, 2026-10-06, after the pass above was
+restored node by node from his file.*
+
+**Spacing rules he has stated, in force:**
+- Group, then space apart, at every scale, from screen sections down to an icon
+  and its label. *"That goes for big clusters all the way down to small ones."*
+- A label is never looser to its own content than sections are to each other.
+  In his Q4 source a section title sits 24 from its content and sections are 24
+  apart; the title's own padding carries part of that.
+- A field or composer and the pills under it are two controls: 16 apart, never
+  8. *"the pills under the prompt input are way too close"*, *"the pills are too
+  close to the search. Apply that fix everywhere."*
+- A list of actions in a sheet is one set: tiles 8 apart, a destructive action
+  24 below the set, no dividers. Far-apart rows *"don't really look clickable."*
+- List rows keep the source density (8 top and bottom in his Q4 lists). Do not
+  raise rows to a floor the source does not use.
+- Repeated items line up: card names and descriptions cap at two lines and the
+  description keeps a fixed two-line height, so the grade or tag below sits in
+  the same place on every card.
+- A component change can move things on screens you did not touch. After any
+  change that makes a component taller, render the screens that use it and look
+  for collisions (*"look at the t-score collision"*).
 
 **He notices weight before size.** A wrong font weight gets flagged; a size one
 step off often does not. *Observed.*
@@ -74,6 +104,109 @@ choice needs opens inside the chosen option, not below the control. *Stated,
 2026-09-17.*
 
 ---
+
+## What "livelier", "more approachable" and "fun" mean
+
+For him, at the layout stage, energy comes from the content and from
+confidence, never from decoration: he did not reach for gradients, illustration,
+more hues or playful copy. Every entry below was earned by a correction on the
+TunnlAi Q4 refresh, 2026-10-03. One project so far: treat the Defaults as strong
+priors and confirm on the next.
+
+**Silence about a dimension is not a preference.** *"I do consider things like
+animation and whatnot, but not when I'm doing initial layout, so don't take my
+lack of description of animation to mean that I don't want it."* *Stated,
+2026-10-04.* He works in phases: layout, hierarchy and content first, motion
+later. Motion is a lever for liveliness he will pull in its own pass (see the
+motion-as-pacing entries in `ai-design-vision.md`). Never record "he didn't ask
+for X" as "he doesn't want X"; record it as "not yet in scope", and raise motion
+when a layout is settled rather than leaving it out of the system.
+
+**The object is the personality.** *"If you're talking about cards, you should
+probably have little images of the cards there. That's a way to make these
+components interesting and the design interesting."* And: *"actual pictures in
+the screens, not just placeholders."* *Stated.*
+
+> **Detect** a card, player or set named in text with no thumbnail or headshot
+> in the same row or group; an initials avatar where a real photo exists (the
+> TunnlAi repo has 63 in `static/headshots`).
+> **Default** card art at its own small radius (4), never the UI's large radius;
+> player headshot as a rounded square (about 18% of its size), never a circle.
+> Never show a near-match card: the wrong parallel is a fabricated fact.
+
+**Movement and magnitude are drawn, not written.** *"Using icons from our library
+or little up arrows and down arrows as well to indicate movement is a good way
+to make it interesting."* *Stated.* The infographic set that followed (diverging
+bars, progress segments, a dot grid) was accepted. *Observed.*
+
+> **Detect** a change, a count against a total, or a comparison of two values
+> expressed only as text.
+> **Default** library Rise/Fall icon in the direction colour (after the number in
+> a right-aligned column, leading it in running text); comparison as bars from
+> zero; part of a whole as segments; a count against a prior as a dot grid. Only
+> from data that exists.
+
+**Confident type, not airy type.** *"The typefaces all seem too thin."* *"The
+fewer the sizes the better, can everything be 17?"* *Stated.* Muse-style
+Regular and Medium read as weak to him in DM Sans.
+
+> **Detect** running text below 500; more than five sizes on a screen; two sizes
+> within 3px of each other.
+> **Default** 500 floor, 600 for content, one size per job.
+
+**Approachable means it reads at a glance.** *"I look at these screens and don't
+know what information is important."* *"The metadata gets lost as it's the same
+color, weight, and size as the description."* A number pulled into its own
+column beside its sentence was *"hard to read"*. *Stated.*
+
+> **Detect** an explanation set at the same role as the fact it explains;
+> metadata sharing a run or a style with a sentence; secondary and tertiary text
+> less than about 15 L* apart; a number separated from its sentence.
+> **Default** four levels, each meaning one thing: answer, takeaway, fact,
+> context. Metadata on its own line in tertiary, or as structured stats (number
+> primary, label tertiary). Two parallel items that each hold a figure and a name
+> stack full width rather than splitting into halves.
+
+**Lead with judgment, not inventory.** *"This app is not about managing a
+collection, but about being the true resource for building a collection and
+understanding where the user should invest."* The hero of an AI product is the
+desk's insight with its evidence, not a balance. And the way in stays in reach:
+the prompt input *"needs to be fully visible on the phone when the user lands."*
+*Stated.* Which insight leads is composition: **Ask, do not assume.**
+
+> **Detect** a screen whose largest element is a total or a list rather than a
+> read; an input whose bottom edge sits below the fold or under a floating bar.
+> **Default** insight sentence plus the two figures that prove it; measure the
+> input against the fold before calling it done.
+
+**One function, one look.** *"I don't like that in dark mode the prompt input is
+the same color as the cards on some of the screens. Same look different
+function."* *Stated.* Colour gets energy by having a job: navy came to mean "ask
+the desk", green and red mean market direction and nothing else.
+
+> **Detect** an input or primary action sharing a fill token with a content
+> card; a hue doing two jobs on one screen.
+> **Default** a dedicated token for the input surface; when two things look
+> alike, change the one whose function is rarer.
+
+**Platform chrome is a reference, not a design surface.** *"Tab bar should be
+native iOS, so in the designs it's just a reference, no tokens (but my icons)."*
+*Stated, 2026-10-06.* System components (tab bar, keyboard, sheets' grabber,
+status bar) stay native; only what TunnlAi owns inside them, its icons, is
+designed. Do not tokenise or restyle native chrome.
+
+**Judge a direction on the real job.** Generic rows got *"more realistic in terms
+of content, and the fact that the ui is based on users asking questions"*.
+*Stated.* A style direction shown on placeholder content has not been tested.
+
+> **Detect** an exploration built on generic or invented content.
+> **Default** build it on the product's core flow with real content from the
+> existing frames.
+
+The spacing half of "approachable" is already above and in the rhythm rule:
+*"we group and then we space apart from the next group... from big clusters all
+the way down to small ones."* Three separate "crammed" corrections in one session
+were all the same failure: a frame whose children shared one gap.
 
 ## How he decides
 
