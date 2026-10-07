@@ -103,6 +103,47 @@ guardrails list; the same grammar he had already set on the conversation row.*
 choice needs opens inside the chosen option, not below the control. *Stated,
 2026-09-17.*
 
+**Component grammar he has set (TunnlAi, October 2026), in force:**
+- **One function, one look.** Chips are for choosing; read-only values are
+  quiet neutral tags; navy only means "selected" while editing. A summary of
+  picks in navy chips "feels a little bit crazy".
+- **A suggested prompt has one treatment everywhere:** the grey chip with the
+  AI sparkle, living with the composer (under it, or above it when it is
+  pinned to the bottom). Never a prompt chip inside a content module next to a
+  full-size button. Once a conversation has started, follow-ups stay inside
+  the answer, never parked above the input.
+- **Editing text is a field you tap into,** not an "Edit" button. A repeated
+  edit action is a pencil icon button; add is the same button with a plus. A
+  one-off AI action with no clear icon (Regenerate) keeps its word, as the
+  action on the section title.
+- **Stats are tiles with one anatomy:** a value over a one-line caption, equal
+  widths, green or red only for market moves. Never a mix of price-with-chip,
+  change-as-value and count-with-chip in one row.
+- **Repeated items align regardless of content.** Card names cap at two lines
+  and the box always holds two lines, so the grade, tag or value below lands
+  in the same place on every card or row. Ungraded shows "Raw", never blank.
+- **Show the thing you name, in the same shape every time.** Card art is
+  card-shaped with a small radius; player avatars are rounded squares; a
+  repeatable insight visual is one card-shaped tile (card, player, or headline
+  figure), never a custom chart per insight.
+- **Empty states stay inside the app:** real header and tab bar, no tab pills
+  before there is anything to switch between, one primary action plus a
+  "why" link, no chat to distract from the one thing to do.
+- **Scrolling pill rows run off the right screen edge;** the screen edge cuts
+  the last pill, never the margin.
+- **Where an X goes:** in the header corner it closes a screen; beside a
+  docked field it only dismisses the keyboard.
+- **Link rows that lead to another page** sit 24 off the content above, with a
+  rule after them at equal space each side; they never share a form's field
+  rhythm.
+- **Leaving a flow is always possible.** "Finish Later" in the header, back on
+  every step but the first, progress resumes from Home. One bottom button that
+  follows state ("Skip" outlined when nothing is picked, "Next" navy when
+  something is); where there are two real outcomes the primary sits in the
+  bottom slot where Next always was.
+- **Copy says TunnlAi, not metaphors.** "The desk" confused him; insider
+  jargon is flagged before it ships.
+
 ---
 
 ## What "livelier", "more approachable" and "fun" mean
