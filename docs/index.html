@@ -152,11 +152,11 @@ td code { font-size: 14px; }
     <p class="lede">A designer's standards, written once and pulled into every project. Nine skills hold the methods, two agents keep the sweeps out of the thread, two executables make the checks repeatable, and one judgment file holds what the system has learned about how Marc decides.</p>
     <ul class="facts">
       <li><b>9</b> skills</li>
-      <li><b>2</b> agents</li>
+      <li><b>4</b> agents</li>
       <li><b>4</b> executables</li>
-      <li><b>21</b> commits</li>
-      <li>last commit <b>2026-09-22</b> 684944f  Manifest follows var() chains and prefers the alias layer; a Navigate mode</li>
-      <li>built 2026-09-23</li>
+      <li><b>24</b> commits</li>
+      <li>last commit <b>2026-10-07</b> a9fbff3  judgment: component grammar from the TunnlAi October review</li>
+      <li>built 2026-11-14</li>
     </ul>
   </header>
 
@@ -165,7 +165,7 @@ td code { font-size: 14px; }
       <li><a href="#judgment">Judgment</a></li>
       
       <li><a href="#skills">Skills<span class="count">9</span></a></li>
-      <li><a href="#agents">Agents<span class="count">2</span></a></li>
+      <li><a href="#agents">Agents<span class="count">4</span></a></li>
       <li><a href="#tools">Executables<span class="count">4</span></a></li>
       <li><a href="#rules">Standing rules<span class="count">11</span></a></li>
       <li><a href="#templates">Templates</a></li>
@@ -227,9 +227,9 @@ td code { font-size: 14px; }
 <h3>How an entry earns its place</h3>
 <p><q>A rule that produces a number fires. A rule that produces a sentiment does not.</q> So each entry that can be made executable carries a Rule in his words, a Detect that can actually be run, and a Default so no judgment is needed to apply it. The loop: he corrects one case, the rule is extracted rather than the fix, a detector is written, the detector finds the whole class, he confirms on the cheapest second case, and the result is verified by measurement. One correction covered twelve screens that way.</p>
 </div>
-      <details class="src"><summary>Read judgment/marc.md<span class="len">344 lines</span></summary><pre><code># How Marc judges design
+      <details class="src"><summary>Read judgment/marc.md<span class="len">518 lines</span></summary><pre><code># How Marc judges design
 
-Last updated: 2026-09-23
+Last updated: 2026-10-07
 
 A working file, not a diary. Each entry is meant to be **predictive**: when you
 hit the situation on the left, this is what he will want, and why. Use it to
@@ -277,8 +277,38 @@ gaps first. *Observed across 17 messages, every project.*
 &gt; **Detect** any rendered gap that is not a simple fraction of the body line.
 &gt; **Default** snap to the nearest fraction, rounding up on a tie.
 
-**Tight reads as broken, loose reads as unfinished.** &quot;Squished&quot; is his most
-common word for a defect. He has never once asked for less space. *Observed.*
+**Tight reads as broken, loose reads as unfinished, and a floating label reads
+as ruined.** &quot;Squished&quot; is his most common word for a defect, but more space is
+not the safe default. On 2026-10-06 a pass that pushed sections to 40 and list
+rows to 16, while pulling a section title to 16 from its own content, drew &quot;I
+think you have ruined a lot of spacing.&quot; What he objects to in both directions
+is the same thing: the gaps stop saying what belongs to what. *Stated.*
+
+**His existing spacing is the contract.** A screen he has already laid out is
+not raw material for a ladder. Read its values, keep its proportions, and change
+only what a stated rule or a measured defect requires. When a pass and his
+source disagree, the source wins. *Stated, 2026-10-06, after the pass above was
+restored node by node from his file.*
+
+**Spacing rules he has stated, in force:**
+- Group, then space apart, at every scale, from screen sections down to an icon
+  and its label. *&quot;That goes for big clusters all the way down to small ones.&quot;*
+- A label is never looser to its own content than sections are to each other.
+  In his Q4 source a section title sits 24 from its content and sections are 24
+  apart; the title&#x27;s own padding carries part of that.
+- A field or composer and the pills under it are two controls: 16 apart, never
+  8. *&quot;the pills under the prompt input are way too close&quot;*, *&quot;the pills are too
+  close to the search. Apply that fix everywhere.&quot;*
+- A list of actions in a sheet is one set: tiles 8 apart, a destructive action
+  24 below the set, no dividers. Far-apart rows *&quot;don&#x27;t really look clickable.&quot;*
+- List rows keep the source density (8 top and bottom in his Q4 lists). Do not
+  raise rows to a floor the source does not use.
+- Repeated items line up: card names and descriptions cap at two lines and the
+  description keeps a fixed two-line height, so the grade or tag below sits in
+  the same place on every card.
+- A component change can move things on screens you did not touch. After any
+  change that makes a component taller, render the screens that use it and look
+  for collisions (*&quot;look at the t-score collision&quot;*).
 
 **He notices weight before size.** A wrong font weight gets flagged; a size one
 step off often does not. *Observed.*
@@ -302,7 +332,151 @@ guardrails list; the same grammar he had already set on the conversation row.*
 choice needs opens inside the chosen option, not below the control. *Stated,
 2026-09-17.*
 
+**Component grammar he has set (TunnlAi, October 2026), in force:**
+- **One function, one look.** Chips are for choosing; read-only values are
+  quiet neutral tags; navy only means &quot;selected&quot; while editing. A summary of
+  picks in navy chips &quot;feels a little bit crazy&quot;.
+- **A suggested prompt has one treatment everywhere:** the grey chip with the
+  AI sparkle, living with the composer (under it, or above it when it is
+  pinned to the bottom). Never a prompt chip inside a content module next to a
+  full-size button. Once a conversation has started, follow-ups stay inside
+  the answer, never parked above the input.
+- **Editing text is a field you tap into,** not an &quot;Edit&quot; button. A repeated
+  edit action is a pencil icon button; add is the same button with a plus. A
+  one-off AI action with no clear icon (Regenerate) keeps its word, as the
+  action on the section title.
+- **Stats are tiles with one anatomy:** a value over a one-line caption, equal
+  widths, green or red only for market moves. Never a mix of price-with-chip,
+  change-as-value and count-with-chip in one row.
+- **Repeated items align regardless of content.** Card names cap at two lines
+  and the box always holds two lines, so the grade, tag or value below lands
+  in the same place on every card or row. Ungraded shows &quot;Raw&quot;, never blank.
+- **Show the thing you name, in the same shape every time.** Card art is
+  card-shaped with a small radius; player avatars are rounded squares; a
+  repeatable insight visual is one card-shaped tile (card, player, or headline
+  figure), never a custom chart per insight.
+- **Empty states stay inside the app:** real header and tab bar, no tab pills
+  before there is anything to switch between, one primary action plus a
+  &quot;why&quot; link, no chat to distract from the one thing to do.
+- **Scrolling pill rows run off the right screen edge;** the screen edge cuts
+  the last pill, never the margin.
+- **Where an X goes:** in the header corner it closes a screen; beside a
+  docked field it only dismisses the keyboard.
+- **Link rows that lead to another page** sit 24 off the content above, with a
+  rule after them at equal space each side; they never share a form&#x27;s field
+  rhythm.
+- **Leaving a flow is always possible.** &quot;Finish Later&quot; in the header, back on
+  every step but the first, progress resumes from Home. One bottom button that
+  follows state (&quot;Skip&quot; outlined when nothing is picked, &quot;Next&quot; navy when
+  something is); where there are two real outcomes the primary sits in the
+  bottom slot where Next always was.
+- **Copy says TunnlAi, not metaphors.** &quot;The desk&quot; confused him; insider
+  jargon is flagged before it ships.
+
 ---
+
+## What &quot;livelier&quot;, &quot;more approachable&quot; and &quot;fun&quot; mean
+
+For him, at the layout stage, energy comes from the content and from
+confidence, never from decoration: he did not reach for gradients, illustration,
+more hues or playful copy. Every entry below was earned by a correction on the
+TunnlAi Q4 refresh, 2026-10-03. One project so far: treat the Defaults as strong
+priors and confirm on the next.
+
+**Silence about a dimension is not a preference.** *&quot;I do consider things like
+animation and whatnot, but not when I&#x27;m doing initial layout, so don&#x27;t take my
+lack of description of animation to mean that I don&#x27;t want it.&quot;* *Stated,
+2026-10-04.* He works in phases: layout, hierarchy and content first, motion
+later. Motion is a lever for liveliness he will pull in its own pass (see the
+motion-as-pacing entries in `ai-design-vision.md`). Never record &quot;he didn&#x27;t ask
+for X&quot; as &quot;he doesn&#x27;t want X&quot;; record it as &quot;not yet in scope&quot;, and raise motion
+when a layout is settled rather than leaving it out of the system.
+
+**The object is the personality.** *&quot;If you&#x27;re talking about cards, you should
+probably have little images of the cards there. That&#x27;s a way to make these
+components interesting and the design interesting.&quot;* And: *&quot;actual pictures in
+the screens, not just placeholders.&quot;* *Stated.*
+
+&gt; **Detect** a card, player or set named in text with no thumbnail or headshot
+&gt; in the same row or group; an initials avatar where a real photo exists (the
+&gt; TunnlAi repo has 63 in `static/headshots`).
+&gt; **Default** card art at its own small radius (4), never the UI&#x27;s large radius;
+&gt; player headshot as a rounded square (about 18% of its size), never a circle.
+&gt; Never show a near-match card: the wrong parallel is a fabricated fact.
+
+**Movement and magnitude are drawn, not written.** *&quot;Using icons from our library
+or little up arrows and down arrows as well to indicate movement is a good way
+to make it interesting.&quot;* *Stated.* The infographic set that followed (diverging
+bars, progress segments, a dot grid) was accepted. *Observed.*
+
+&gt; **Detect** a change, a count against a total, or a comparison of two values
+&gt; expressed only as text.
+&gt; **Default** library Rise/Fall icon in the direction colour (after the number in
+&gt; a right-aligned column, leading it in running text); comparison as bars from
+&gt; zero; part of a whole as segments; a count against a prior as a dot grid. Only
+&gt; from data that exists.
+
+**Confident type, not airy type.** *&quot;The typefaces all seem too thin.&quot;* *&quot;The
+fewer the sizes the better, can everything be 17?&quot;* *Stated.* Muse-style
+Regular and Medium read as weak to him in DM Sans.
+
+&gt; **Detect** running text below 500; more than five sizes on a screen; two sizes
+&gt; within 3px of each other.
+&gt; **Default** 500 floor, 600 for content, one size per job.
+
+**Approachable means it reads at a glance.** *&quot;I look at these screens and don&#x27;t
+know what information is important.&quot;* *&quot;The metadata gets lost as it&#x27;s the same
+color, weight, and size as the description.&quot;* A number pulled into its own
+column beside its sentence was *&quot;hard to read&quot;*. *Stated.*
+
+&gt; **Detect** an explanation set at the same role as the fact it explains;
+&gt; metadata sharing a run or a style with a sentence; secondary and tertiary text
+&gt; less than about 15 L* apart; a number separated from its sentence.
+&gt; **Default** four levels, each meaning one thing: answer, takeaway, fact,
+&gt; context. Metadata on its own line in tertiary, or as structured stats (number
+&gt; primary, label tertiary). Two parallel items that each hold a figure and a name
+&gt; stack full width rather than splitting into halves.
+
+**Lead with judgment, not inventory.** *&quot;This app is not about managing a
+collection, but about being the true resource for building a collection and
+understanding where the user should invest.&quot;* The hero of an AI product is the
+desk&#x27;s insight with its evidence, not a balance. And the way in stays in reach:
+the prompt input *&quot;needs to be fully visible on the phone when the user lands.&quot;*
+*Stated.* Which insight leads is composition: **Ask, do not assume.**
+
+&gt; **Detect** a screen whose largest element is a total or a list rather than a
+&gt; read; an input whose bottom edge sits below the fold or under a floating bar.
+&gt; **Default** insight sentence plus the two figures that prove it; measure the
+&gt; input against the fold before calling it done.
+
+**One function, one look.** *&quot;I don&#x27;t like that in dark mode the prompt input is
+the same color as the cards on some of the screens. Same look different
+function.&quot;* *Stated.* Colour gets energy by having a job: navy came to mean &quot;ask
+the desk&quot;, green and red mean market direction and nothing else.
+
+&gt; **Detect** an input or primary action sharing a fill token with a content
+&gt; card; a hue doing two jobs on one screen.
+&gt; **Default** a dedicated token for the input surface; when two things look
+&gt; alike, change the one whose function is rarer.
+
+**Platform chrome is a reference, not a design surface.** *&quot;Tab bar should be
+native iOS, so in the designs it&#x27;s just a reference, no tokens (but my icons).&quot;*
+*Stated, 2026-10-06.* System components (tab bar, keyboard, sheets&#x27; grabber,
+status bar) stay native; only what TunnlAi owns inside them, its icons, is
+designed. Do not tokenise or restyle native chrome.
+
+**Judge a direction on the real job.** Generic rows got *&quot;more realistic in terms
+of content, and the fact that the ui is based on users asking questions&quot;*.
+*Stated.* A style direction shown on placeholder content has not been tested.
+
+&gt; **Detect** an exploration built on generic or invented content.
+&gt; **Default** build it on the product&#x27;s core flow with real content from the
+&gt; existing frames.
+
+The spacing half of &quot;approachable&quot; is already above and in the rhythm rule:
+*&quot;we group and then we space apart from the next group... from big clusters all
+the way down to small ones.&quot;* Three separate &quot;crammed&quot; corrections in one session
+were all the same failure: a frame whose children shared one gap.
 
 ## How he decides
 
@@ -1904,9 +2078,9 @@ code is a new drift, not a repair.
   <p class="does">Runs the designer&#x27;s own tuning-pass brief, made permanent: tighten what is loose, loosen what is cramped, line up what is off, and bind every spacing, colour and type value to a Figma variable and a matching code token. The working rule is group first, then stack: decide which adjacent pairs read as one thing, set them at the group value, and let the group enter the block stack. Fixes go on the component so every instance inherits them, in Figma first and then mirrored to code in the same session.</p>
   <dl class="kv"><div><dt>When</dt><dd>When the designer asks for a tuning pass, a spacing pass, a rhythm pass, or says things look squished, cramped, tight or loose.</dd></div><div><dt>Produces</dt><dd>A list of what changed and where, in both Figma and code, with no composition changed and no literal introduced.</dd></div><div><dt>Holds</dt><dd><q>&quot;This is not a redesign&quot; is the binding constraint.</q></dd></div></dl>
   <p class="calls"><span class="lbl">Calls</span><ul class="chips"><li>design-contract</li></ul></p>
-  <details class="src"><summary>Read skills/rhythm-pass/SKILL.md<span class="len">96 lines</span></summary><pre><code>---
+  <details class="src"><summary>Read skills/rhythm-pass/SKILL.md<span class="len">257 lines</span></summary><pre><code>---
 name: rhythm-pass
-description: Tighten spacing, alignment and hierarchy across a project without redesigning it, and bind every value to a token. Use when the designer asks for a tuning pass, a spacing pass, a rhythm pass, or says things look squished, cramped, tight or loose.
+description: Tune spacing, alignment and hierarchy across a project without redesigning it, by grouping what reads as one thing and then spacing groups apart at every scale, and bind every value to a token. Use when the designer asks for a tuning pass, a spacing pass, a rhythm pass, or says things look squished, cramped, tight or loose.
 ---
 
 # Rhythm pass
@@ -1963,6 +2137,159 @@ Legend, Stats, Section Head, Carousel at a flat 12. The correct result is not
 &quot;set them all to 24&quot;. It is: group Chart with Legend at 8, group Section Head
 with Carousel at 12, then stack the four resulting blocks at 24.
 
+## Group, then space apart, at every scale
+
+His own words, and the rule that governs the two sections above: **&quot;We group
+and then we space apart from the next group. And that goes for big clusters all
+the way down to small ones.&quot;** (2026-10-03.)
+
+It is recursive. Ask &quot;what reads as one thing&quot; at every level of the tree: the
+screen&#x27;s sections, a module&#x27;s label against its content, the blocks inside the
+content, a chart against its legend, a figure against its caption. Every level
+gets the same treatment: tight inside, clearly apart outside.
+
+**The &quot;space apart&quot; half is the one that gets skipped.** Grouping pulls things
+together and removing doubled padding takes space out, so a pass that only does
+the first half leaves the screen tighter than it found it. That is the failure
+he reports as &quot;crammed&quot; or &quot;squished&quot;.
+
+**And the opposite failure is real too.** On 2026-10-06 he compared a passed
+screen with his untouched source and said: &quot;I think you have ruined a lot of
+spacing.&quot; The pass had pushed sections to 40 and list rows to 16 while pulling a
+section title to 16 from its own content, so nothing read as belonging to its
+label. Rules that follow from it:
+
+- **His existing spacing is the baseline, not raw material.** Before changing a
+  screen, render the source and keep its proportions unless a Detect check
+  fails on it. Match the source&#x27;s head-to-content and section values rather
+  than importing a ladder from another project.
+- **A label is never looser to its own content than the gap that separates
+  sections is tight.** If head-to-content is 16, sections at 40 make the head
+  read as floating; the source had 24 and 24 with the head&#x27;s own padding.
+- **List rows keep the source&#x27;s density.** Do not raise row padding to a floor
+  the source does not use.
+- Do not &quot;take the larger step&quot; by default. Take the source&#x27;s step.
+
+## Detect: measurable, not a sentiment
+
+A rule that produces a sentiment does not fire. Run these on every screen you
+touch, before and after, and do not call the pass done with an unexplained
+violation.
+
+1. **Flat stack.** A vertical frame with 4 or more children of different kinds
+   (not a list of repeated rows) and no auto-layout group among them. That is
+   a flat gap across unrelated things.
+2. **Weak spread.** At every nesting level, the gap between groups must be at
+   least **1.5x** the gap inside them, target 2x to 3x. A 12 stack holding 8
+   groups fails. (A ladder like 8/16/24/40 cannot give 2x at every step: 24 in
+   40 is 1.67x and passes.)
+3. **Under the floor.** A row with less than the contract&#x27;s row padding (16
+   unless the contract says otherwise), a block gap inside a module below 24,
+   a section gap below the contract&#x27;s section value.
+4. **Doubled space.** A bottom padding that adds to the parent&#x27;s gap, or a
+   control&#x27;s own space stacked on a section gap. Remove one, then re-check 2
+   and 3 so the removal did not leave the stack tight.
+
+5. **Two thoughts in one section.** A section that holds two headlines, or two
+   separate calls to action, is two sections squeezed together. Split it and
+   stack the halves at the section step. (Collection / Insights held the market
+   read and &quot;Your top three cards are still the book&quot; at 24; they read as one
+   run-on block until split to 40.)
+6. **Label too close to what it labels.** A label, kicker or question over a
+   block (chips, cards, stats, rows) sits at the head step (16), not 8. Only a
+   field label over its single input stays at 8.
+7. **Questions stacked as if they were fields.** Separate questions in a form
+   or profile (Bio, Category, Athletes, Card Types) are sections: they stack at
+   the section step, not the block step.
+8. **An action floating off what it acts on.** A button or pill row that acts
+   on the block above it groups with that block at 16; a 24 gap makes it read as
+   a new block.
+9. **A fixed-height empty container.** An empty chip area or list that keeps a
+   fixed height leaves a hole that reads as broken. It hugs, or hides when empty.
+
+Checks 5 to 9 are judgment on top of the script: render the screen and look
+for them. They are the ones the designer reports as &quot;still too compact&quot; after
+every number is on the ladder.
+
+10. **Pills crowding a field.** A search or text field, or a prompt composer,
+    and the pill row under it (sort, scope, picked chips, suggested prompts)
+    are two controls, not one: 16 between them, never 8. Grouping them at the
+    &quot;inside a group&quot; value is the mistake; they are related controls, not one
+    thought. (Stated, 2026-10-06, on Player Detail / Catalog: &quot;the pills are
+    too close to the search. Apply that fix everywhere.&quot;)
+
+Two placements that are easy to get wrong:
+
+- **A tab row controls the content under it.** Group tabs with their content
+  (tabs, then the content at the module step, 24 in the 8/16/24/40 ladder),
+  and let that group enter the screen stack. A tab row 40 off its own content
+  reads as a separate section.
+- **A divider is part of the gap, not an addition to it.** Where a line
+  separates sections, use the module step on each side (24 + line + 24), not
+  the section step (40 + line + 40 reads as a hole).
+
+The check, for a `use_figma` call (pass the screen frame as `root`). It does
+not descend into instances (component internals and native chrome are not the
+screen&#x27;s spacing), skips the screen shell (header, body, bars stacked at 0),
+and accepts a 0 gap where every child owns its own space (padding of 16 or
+more, or a Section Head that owns the space beneath it):
+
+```js
+const issues=[]; const al=n=&gt;n.type===&#x27;FRAME&#x27;&amp;&amp;n.layoutMode===&#x27;VERTICAL&#x27;;
+const walk=(n,acc=[])=&gt;{ if(al(n)) acc.push(n); if(&#x27;children&#x27; in n &amp;&amp; n.type!==&#x27;INSTANCE&#x27;) for(const c of n.children) walk(c,acc); return acc; };
+const owns=k=&gt;/Divider/.test(k.name)||((&#x27;paddingTop&#x27; in k)&amp;&amp;(k.paddingTop&gt;=16||k.paddingBottom&gt;=16))||/Section Head|Row|Item/.test(k.name); // dividers are neutral
+for (const f of walk(root)) { const kids=f.children.filter(c=&gt;c.visible!==false&amp;&amp;c.layoutPositioning!==&#x27;ABSOLUTE&#x27;);
+  if (kids.some(k=&gt;/Page Header|Tab Bar|Action Bar/.test(k.name)) &amp;&amp; kids.some(k=&gt;k.name===&#x27;Body&#x27;)) continue; // screen shell
+  const names=new Set(kids.map(k=&gt;k.name.replace(/\s*\d+$/,&#x27;&#x27;)));
+  if (kids.length&gt;=4 &amp;&amp; names.size&gt;=3 &amp;&amp; !kids.some(k=&gt;al(k)&amp;&amp;k.children.length&gt;=2)) issues.push(`flat: ${f.name} gap ${f.itemSpacing}`);
+  if (f.itemSpacing===0 &amp;&amp; kids.length&gt;1 &amp;&amp; !(kids.slice(0,-1).every(owns)||kids.slice(1).every(owns))) issues.push(`zero gap without owned space: ${f.name}`);
+  const controlGroup = kids.length===2 &amp;&amp; /Pill Row|Tabs|Search|Segment|Section Head/.test(kids[0].name); // a control and the content it controls
+  if (!controlGroup) for (const k of kids) if (al(k) &amp;&amp; k.children.length&gt;=2 &amp;&amp; k.itemSpacing&gt;0 &amp;&amp; f.itemSpacing&gt;0 &amp;&amp; f.itemSpacing &lt; 1.5*k.itemSpacing) issues.push(`spread: ${f.name} ${f.itemSpacing} vs ${k.name} ${k.itemSpacing}`);
+  if (/Row/.test(f.name) &amp;&amp; f.paddingTop&gt;0 &amp;&amp; f.paddingTop&lt;16) issues.push(`row floor: ${f.name} ${f.paddingTop}`); }
+return issues;
+```
+
+More checks, from his corrections on 2026-10-06:
+
+11. **Label floats.** For every section title (or kicker, or field label) that
+    heads content, measure title-bottom to content-top and compare it with the
+    gap between that section and the next. If the label&#x27;s gap is the smaller of
+    the two by less than half, fine; if sections are more than about 1.5x the
+    label gap *and* the label gap is below the source&#x27;s value, the label reads as
+    floating. Restore the source&#x27;s label gap before touching section gaps.
+12. **Rows loosened.** Any list row whose vertical padding is larger than the
+    source&#x27;s for that list. Rows are density, not air.
+13. **Actions that do not read as a set.** Sheet or menu actions separated by
+    more than the group step, or by dividers, read as unrelated and unclickable.
+    Group at 8, destructive 24 below.
+14. **Collision after a component change.** After editing a component that
+    changes its height, render each parent row that holds it and compare
+    `node.height` with the tallest child. A parent that kept its old height
+    (stale auto-layout or a clipping frame) hides or overlaps content. Fix by
+    re-hugging; turn off clipping on rows that do not need it.
+
+## Process: the source is the baseline
+
+These are the process failures behind the 2026-10-06 regression. They are rules.
+
+1. **Render the source first.** Before any pass on a screen he has laid out,
+   screenshot it and read its gaps. If an untouched original exists (a
+   duplicated file keeps node IDs), compare against it per node.
+2. **Never hand an agent a ladder.** Twice, agents given a number ladder applied
+   it uniformly: once too tight, once too loose. Give them the source values,
+   the spread rule and the Detect checks, and have them report deviations from
+   the source, not conformance to a ladder.
+3. **No new wrapper frames to fake grouping.** Group with the containers the
+   design already has. A pass that adds &quot;Tab content&quot;, &quot;Content&quot;, &quot;Head group&quot;
+   wrappers changes structure the designer did not draw, and every later
+   restore has to dissolve them.
+4. **Judge on a side-by-side render at matched width** (source next to result),
+   not on a property list. The final report names which screens were looked at
+   and which were checked by property only.
+5. **Restore beats re-tune.** If he says spacing was ruined and the source
+   exists, restore it node by node and keep only the changes he asked for by
+   name; do not try to tune toward it by eye.
+
 ## The air belongs to the component
 
 the designer&#x27;s fix for tight spacing is structural, not visual. A section title owns the
@@ -1985,6 +2312,14 @@ And the amount is always a token, never a number typed on a screen.
 - Every value you touched resolves to a variable in Figma and a token in code.
 - No literal was introduced. A literal is a defect, not a shortcut.
 - No composition changed. If you think one should, it is a note, not an edit.
+- The Detect checks report zero violations, or each remaining one is listed
+  with the reason it stays.
+- Every deviation from his source is listed with the rule or the measured
+  defect that required it. A change list that only tightens skipped the &quot;space
+  apart&quot; half; one that loosens labels, sections and rows together imported a
+  ladder. Both are failures.
+- Source and result were rendered side by side at matched width, and the report
+  says which screens were looked at.
 - Both places agree. A Figma fix left unmirrored is the drift this skill exists
   to remove.
 
@@ -2241,6 +2576,134 @@ If the scan is running long, narrow the scope and say what you narrowed, rather
 than returning a partial report that reads as complete. An honest &quot;phases 1 and
 2 only, phase 3 not run&quot; is worth more than a full-looking report with a silent
 gap in it.
+</code></pre></details>
+</article>
+<article class="entry" id="agent-figma-builder">
+  <header class="entry-head">
+    <h3>figma-builder<span class="badge">agent</span></h3>
+    <p class="tagline">Builds or updates Figma pages from a running build, conventions built in</p>
+  </header>
+  <p class="does">Captures the build at the frame width, then draws each state, a work-through frame, a Components section and a title block on one page, with sections per row, layers named by role and every value bound to a token. It returns what it built, any shared component it touched, and the differences it could not close.</p>
+  <dl class="kv"><div><dt>Runs</dt><dd><a href="#skill-figma-use, figma-generate-design">/figma-use, figma-generate-design</a></dd></div><div><dt>Why an agent</dt><dd>A Figma page costs dozens of scripts and screenshots, and conventions restated in every brief drift between agents. One page per agent runs in parallel without conflicts.</dd></div><div><dt>Model</dt><dd>inherit</dd></div><div><dt>Has</dt><dd><ul class="chips"><li>Read/Grep/Glob/Bash</li><li>Skill</li><li>Figma MCP (session, use_figma, screenshot, metadata, design system search)</li></ul></dd></div></dl>
+  <details class="src"><summary>Read agents/figma-builder.md<span class="len">68 lines</span></summary><pre><code>---
+name: figma-builder
+description: &quot;Builds or updates Figma pages from a running build, in its own context, with the designer&#x27;s file conventions built in. Use whenever a Figma page needs to be created or brought up to date with code: a new prototype iteration, a flow&#x27;s states, a work-through frame, or a sweep that touches a whole Figma page. Run one per page or page group, in parallel, never two on the same page.\\n\\nExamples:\\n\\n- User: \&quot;Update the Figma now.\&quot;\\n  Assistant: \&quot;Launching figma-builder agents, one per page, so the Figma output stays out of our thread.\&quot;\\n\\n- User: \&quot;Build out version G in Figma.\&quot;\\n  Assistant: \&quot;Running figma-builder on the V1 · G page.\&quot;&quot;
+tools: Read, Grep, Glob, Bash, Skill, mcp__plugin_figma_figma__create_session, mcp__plugin_figma_figma__use_figma, mcp__plugin_figma_figma__get_screenshot, mcp__plugin_figma_figma__get_metadata, mcp__plugin_figma_figma__search_design_system, mcp__plugin_figma_figma__get_libraries, mcp__plugin_figma_figma__get_variable_defs
+---
+
+You build Figma pages that document a running build. Load the `figma:figma-use`
+and `figma:figma-generate-design` skills before your first `use_figma` call.
+
+## Why you exist
+
+Building a Figma page costs dozens of scripts, screenshots and node reads. None
+of that is the answer the designer wants, and conventions restated in every
+brief drift between agents. You carry the conventions and absorb the cost.
+
+## Before you build
+
+1. Read the project contract (`DESIGN_CONTRACT.md`, `DESIGN_SYSTEM.md`, or the
+   design section of `CLAUDE.md`) and the spec your brief names. The contract
+   wins over this file.
+2. Capture the build at the design frame&#x27;s width (Playwright or Chrome) for every
+   state you will draw, and use the captures only as a reference. Never place a
+   screenshot of the UI in the deliverable.
+3. Find the shared components and variables the file already has, and reuse
+   them. Never redraw what exists as an instance.
+
+## File conventions
+
+- **One page per brief.** Touch only the page or page group you were given.
+  Shared components live where the contract says; if you must change one, say so
+  in your result, because other pages use it.
+- **Sections per row,** named after the row heading, with transparent fill.
+  Frames sit in flow order inside them.
+- **Every layer is named by its role** (&quot;Label · Step 2&quot;, &quot;Annotation · Why&quot;),
+  never &quot;Frame 12&quot; or &quot;Text&quot;. Labels and annotations are grouped with the frame
+  they describe.
+- **A Components section** on the page holds the page&#x27;s own component sets, with
+  every state the flow uses.
+- **A work-through frame** per flow: one long frame showing the complete
+  conversation or journey from start to finish, beside its states.
+- **A title block** that lists every frame on the page.
+- **Tokens only.** Every fill, stroke, radius, gap and text style is bound to a
+  variable or style. A raw value is a defect unless you say why it is exempt.
+- **Portable.** Nothing depends on another page&#x27;s hidden layers or a library the
+  contract does not name, so the page can move to another file.
+- **Copy is the build&#x27;s copy,** character for character. Fictional data only.
+  No em dashes. Never put a client or company name in page, frame or layer names
+  unless the contract allows it.
+
+## Checking your work
+
+Put each finished frame beside its capture at the same width and look. Fix what
+differs. Report a difference you could not fix; never call it matched.
+
+## What you must return
+
+```
+Built
+  &lt;page&gt;: &lt;sections, and the frames in each&gt;
+Changed outside the page
+  &lt;shared components touched, or &quot;none&quot;&gt;
+Known differences
+  &lt;frame&gt;   &lt;what differs from the build&gt;   &lt;why&gt;
+Stale copy found
+  &lt;any old value you saw that the build no longer has&gt;
+```
+
+No screenshots, no node dumps, no narration of what you tried.
+</code></pre></details>
+</article>
+<article class="entry" id="agent-prototype-walker">
+  <header class="entry-head">
+    <h3>prototype-walker<span class="badge">agent</span></h3>
+    <p class="tagline">Runs a prototype&#x27;s walk scripts and returns pass or fail lines</p>
+  </header>
+  <p class="does">Runs the committed walks in tests/walks across every route on the dev server already running, and sorts each failure into a regression, a stale walk (which it repairs and reruns) or unclear.</p>
+  <dl class="kv"><div><dt>Runs</dt><dd><a href="#skill-walk scripts in the repo">/walk scripts in the repo</a></dd></div><div><dt>Why an agent</dt><dd>Regression walks across several iterations fill a context window with logs, and a stale walk reports false failures. The agent keeps walks current and returns only the verdicts.</dd></div><div><dt>Model</dt><dd>sonnet</dd></div><div><dt>Has</dt><dd><ul class="chips"><li>Read/Grep/Glob/Bash</li><li>Write/Edit inside the walks folder</li></ul></dd></div></dl>
+  <details class="src"><summary>Read agents/prototype-walker.md<span class="len">42 lines</span></summary><pre><code>---
+name: prototype-walker
+description: &quot;Runs a prototype&#x27;s walk scripts across every route or iteration and returns one pass or fail line per check, in its own context. Use before pushing a prototype, after a change that touches shared flow code, or whenever a regression check across more than one iteration is needed. Also use to write or repair a walk when the behaviour it checks has changed.\\n\\nExamples:\\n\\n- User: \&quot;Push it.\&quot;\\n  Assistant: \&quot;Running prototype-walker across every iteration first, then pushing.\&quot;\\n\\n- User: \&quot;Did that change break the other versions?\&quot;\\n  Assistant: \&quot;Launching prototype-walker on all routes.\&quot;&quot;
+model: sonnet
+tools: Read, Grep, Glob, Bash, Write, Edit
+---
+
+You run a prototype&#x27;s regression walks and report what passed and what failed.
+
+## Where walks live
+
+Walks are committed in the repo, in `tests/walks/` unless the project says
+otherwise. If you find walks only in a temporary or scratchpad folder, move them
+into the repo and say so. Only write or edit files inside the walks folder.
+
+## How to run
+
+1. Use the dev server that is already running. Never start, stop or restart it.
+   If none is running, say so and stop.
+2. Run every walk headless at the design frame&#x27;s width.
+3. When a walk fails, decide which it is before reporting:
+   - **Regression:** the build no longer does what the spec says.
+   - **Stale walk:** the behaviour changed on purpose (check the spec and recent
+     changes) and the walk did not. Fix the walk, rerun it, and report it as
+     repaired, not as a pass you found.
+   - **Unclear:** you cannot tell. Report it as unclear with the evidence.
+
+## What you must return
+
+```
+Ran
+  &lt;walks, routes, width, and the server URL&gt;
+Failed
+  &lt;route&gt;   &lt;check&gt;   &lt;what happened&gt;   &lt;regression | unclear&gt;
+Repaired walks
+  &lt;walk&gt;   &lt;what changed in the behaviour&gt;
+Passed
+  &lt;count per route&gt;
+```
+
+No screenshots, no logs, no DOM. A route you did not run never appears under
+Passed.
 </code></pre></details>
 </article></div>
     </section>
@@ -3225,7 +3688,7 @@ server.listen(opt.port, &quot;127.0.0.1&quot;, () =&gt; {
         <p>Appended to <code>~/.claude/CLAUDE.md</code> by the installer, so they bind every session on the machine whether or not a skill is invoked.</p>
       </header>
       <ol class="rules"><li>**Find the project&#x27;s contract first.** Read it before changing anything, and never create a second one beside it.</li><li>**Figma is authored first, code follows, in the same session.** A fix that exists in only one place is new drift, not a repair.</li><li>**Never claim done, live, or shipped without running `ship-check`.** Name the artifact the designer is looking at, confirm it contains the change, and say what was not exercised.</li><li>**Never answer a visual question with a number.** Put the renders side by side at matched width and look.</li><li>**Measure the result before reporting it.** A change that reasons correctly can still render wrong.</li><li>**A raw value in a styling position is a defect.** Bind it, or say why it is exempt.</li><li>**Spacing is hierarchical, never uniform.** Group first, then stack; a flat gap between unrelated blocks is the failure mode even when the value is on scale.</li><li>**Delegate the sweep, keep the judgment.** Send work touching more than three files, two screens or a whole Figma page to a read-only subagent, and keep the decision in the main conversation.</li><li>**Read narrowly.** Grep for the selector and read the lines around it; never dump a Figma subtree or screenshot a full page for one property.</li><li>**Return narrowly.** A script that produces findings prints the findings, not the data it derived them from.</li><li>**Say the number, not the list.** &quot;862 raw values, mostly gap and height&quot; beats 862 lines.</li></ol>
-      <details class="src"><summary>Read claude-md-section.md<span class="len">76 lines</span></summary><pre><code>
+      <details class="src"><summary>Read claude-md-section.md<span class="len">114 lines</span></summary><pre><code>
 ## Design workflow
 
 A personal toolkit of skills lives in `~/.claude/skills/`: `design-contract`,
@@ -3237,9 +3700,13 @@ every project. These are not optional suggestions, they are how design work runs
 file (`DESIGN_SYSTEM.md`, `DESIGN_CONTRACT.md`, a design section in `CLAUDE.md`).
 Read it before changing anything, and never create a second one beside it.
 
-**Figma is authored first, code follows, in the same session.** Never change code
-without the change existing in Figma, and never leave a Figma change unmirrored.
-A fix that exists in only one place is new drift, not a repair.
+**Which side leads is decided per project, so ask.** Some projects are authored
+in Figma first; others are explored in code, with Figma documenting the result.
+At the start of a project, or whenever the contract does not say, ask the designer which
+side leads and record the answer under Source of truth in the contract. Whichever
+leads, the other side is mirrored, in the same session or in a batch when the designer
+says to hold. A change that exists in only one place, with no mirror scheduled,
+is drift, not a repair.
 
 **Never claim done, live, or shipped without running `ship-check`.** Name the
 artifact the designer is looking at, confirm it contains the change, and say plainly what
@@ -3253,6 +3720,28 @@ looks right&quot;. Put the renders side by side at matched width and look.
 **Measure the result before reporting it.** A change that reasons correctly can
 still render wrong. Where a value has a target, check the rendered value against
 the target rather than trusting the edit.
+
+**A changed fact is swept everywhere before it is done.** When a count, name or
+figure changes (12 companies becomes 25), search code, copy constants, static
+files, docs and every Figma page for the old value, spelled-out words included
+(&quot;Twelve&quot;), and fix every hit in the same pass. A stale mention someone else
+finds later is a verification failure.
+
+**Walk a new flow in words before building it.** Before building a new flow, or
+a new iteration of one, write it as numbered turns: what the product says, what
+the user picks, what happens next, with the branches. Build once the designer agrees.
+A correction to flow logic costs a sentence here and a rebuild later.
+
+**Checks that run more than once live in the repo.** Walk scripts, regression
+checks and test harnesses are committed beside the code (for example
+`tests/walks/`) and updated in the same change as the behaviour they check.
+Never leave them in a session scratchpad, which is deleted. A check that has
+drifted from the code reports false failures, which is worse than no check.
+
+**Prototype iterations switch features in one table.** When a prototype grows
+lettered or numbered iterations, each one&#x27;s features (steps, landing, checkpoints)
+are set in one map from iteration to flags, never in comparisons scattered
+through components. A new iteration is then one new row.
 
 **A raw value in a styling position is a defect.** Not a shortcut. Bind it, or
 say why it is exempt.
@@ -3284,8 +3773,20 @@ a megabyte. None of it was the answer the designer wanted.
 
 **Delegate the sweep, keep the judgment.** Send work to a subagent when it will
 touch more than three files, more than two screens, or a whole Figma page.
-`token-auditor` and `figma-parity` exist for exactly this and are read-only.
-What comes back is the finding list, and that is what belongs in the thread.
+`token-auditor` and `figma-parity` are read-only sweeps; `figma-builder` builds or
+updates Figma pages from a running build; `prototype-walker` runs a prototype&#x27;s
+walk scripts and returns pass or fail lines. What comes back is the finding
+list, and that is what belongs in the thread.
+
+**Delegation is the default, never a request.** The designer should not have to ask for
+a subagent. When work meets the thresholds above, delegate it unprompted and say
+so in one line. A long brief that restates the project&#x27;s conventions is a sign
+the conventions belong in an agent definition instead.
+
+**A background agent is sized and reported on.** Give each one a scope it can
+finish in one pass: one Figma page or page group, never two agents on the same
+page. Report where long-running agents stand without being asked, and relay
+each result when it lands.
 
 Do not delegate the decision that follows. the designer wants the judgment in the main
 conversation where he can argue with it.
@@ -3313,7 +3814,7 @@ twenty lines.
 <article class="entry compact">
   <header class="entry-head"><h3>DESIGN_CONTRACT.md<span class="badge">template</span></h3></header>
   <p class="does">The slow-changing rules of a project: source of truth and mirror direction, where the work runs, rhythm ladder, type ramp and permitted weights, token layers and dialect, component inventory, copy rules, and a Settled / Open / Owed decisions log.</p>
-  <details class="src"><summary>Read templates/DESIGN_CONTRACT.md<span class="len">94 lines</span></summary><pre><code># Design contract
+  <details class="src"><summary>Read templates/DESIGN_CONTRACT.md<span class="len">96 lines</span></summary><pre><code># Design contract
 
 The rules of this project. Slow-changing. What is **true** here.
 
@@ -3330,8 +3831,10 @@ Two contracts in one repo is worse than none.
 
 - Figma file: `&lt;url&gt;` (key `&lt;key&gt;`)
 - Default page: `&lt;name&gt;` (`&lt;node id&gt;`)
-- Direction: Figma is authored first. Code follows. Never change code without
-  the change existing in Figma, and never leave a Figma change unmirrored.
+- Direction: `&lt;Figma leads | code leads&gt;`, as the designer set it on `&lt;date&gt;`.
+  The leading side is where changes are authored; the other side mirrors them,
+  in the same session or in a batch the designer schedules. Ask if this is
+  blank.
 
 ## Where the work runs
 

@@ -10,9 +10,13 @@ every project. These are not optional suggestions, they are how design work runs
 file (`DESIGN_SYSTEM.md`, `DESIGN_CONTRACT.md`, a design section in `CLAUDE.md`).
 Read it before changing anything, and never create a second one beside it.
 
-**Figma is authored first, code follows, in the same session.** Never change code
-without the change existing in Figma, and never leave a Figma change unmirrored.
-A fix that exists in only one place is new drift, not a repair.
+**Which side leads is decided per project, so ask.** Some projects are authored
+in Figma first; others are explored in code, with Figma documenting the result.
+At the start of a project, or whenever the contract does not say, ask the designer which
+side leads and record the answer under Source of truth in the contract. Whichever
+leads, the other side is mirrored, in the same session or in a batch when the designer
+says to hold. A change that exists in only one place, with no mirror scheduled,
+is drift, not a repair.
 
 **Never claim done, live, or shipped without running `ship-check`.** Name the
 artifact the designer is looking at, confirm it contains the change, and say plainly what
@@ -26,6 +30,28 @@ looks right". Put the renders side by side at matched width and look.
 **Measure the result before reporting it.** A change that reasons correctly can
 still render wrong. Where a value has a target, check the rendered value against
 the target rather than trusting the edit.
+
+**A changed fact is swept everywhere before it is done.** When a count, name or
+figure changes (12 companies becomes 25), search code, copy constants, static
+files, docs and every Figma page for the old value, spelled-out words included
+("Twelve"), and fix every hit in the same pass. A stale mention someone else
+finds later is a verification failure.
+
+**Walk a new flow in words before building it.** Before building a new flow, or
+a new iteration of one, write it as numbered turns: what the product says, what
+the user picks, what happens next, with the branches. Build once the designer agrees.
+A correction to flow logic costs a sentence here and a rebuild later.
+
+**Checks that run more than once live in the repo.** Walk scripts, regression
+checks and test harnesses are committed beside the code (for example
+`tests/walks/`) and updated in the same change as the behaviour they check.
+Never leave them in a session scratchpad, which is deleted. A check that has
+drifted from the code reports false failures, which is worse than no check.
+
+**Prototype iterations switch features in one table.** When a prototype grows
+lettered or numbered iterations, each one's features (steps, landing, checkpoints)
+are set in one map from iteration to flags, never in comparisons scattered
+through components. A new iteration is then one new row.
 
 **A raw value in a styling position is a defect.** Not a shortcut. Bind it, or
 say why it is exempt.
@@ -57,8 +83,20 @@ a megabyte. None of it was the answer the designer wanted.
 
 **Delegate the sweep, keep the judgment.** Send work to a subagent when it will
 touch more than three files, more than two screens, or a whole Figma page.
-`token-auditor` and `figma-parity` exist for exactly this and are read-only.
-What comes back is the finding list, and that is what belongs in the thread.
+`token-auditor` and `figma-parity` are read-only sweeps; `figma-builder` builds or
+updates Figma pages from a running build; `prototype-walker` runs a prototype's
+walk scripts and returns pass or fail lines. What comes back is the finding
+list, and that is what belongs in the thread.
+
+**Delegation is the default, never a request.** The designer should not have to ask for
+a subagent. When work meets the thresholds above, delegate it unprompted and say
+so in one line. A long brief that restates the project's conventions is a sign
+the conventions belong in an agent definition instead.
+
+**A background agent is sized and reported on.** Give each one a scope it can
+finish in one pass: one Figma page or page group, never two agents on the same
+page. Report where long-running agents stand without being asked, and relay
+each result when it lands.
 
 Do not delegate the decision that follows. the designer wants the judgment in the main
 conversation where he can argue with it.

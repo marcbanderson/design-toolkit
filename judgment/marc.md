@@ -413,6 +413,12 @@ evidence, then do what he says. Twice is arguing. *Observed.*
 
 ## How he wants to work
 
+**Which side leads depends on the project.** *"Whether I work in Figma first or
+code first is dependent on the particular project I'm working on. Maybe it's
+just something to confirm with me."* On prototypes explored in code he held
+Figma until the code settled, then had it documented in one batch. Ask at the
+start and record the answer in the contract. *Stated, 2026-11-14.*
+
 **Context first, direction after.** *"I don't want you to make the prototype by
 yourself. I will guide you to make it, I just need you to have proper context."*
 Do not open with a menu of options. Become informed, then wait. *Stated.*

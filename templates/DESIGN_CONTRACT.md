@@ -15,8 +15,10 @@ Two contracts in one repo is worse than none.
 
 - Figma file: `<url>` (key `<key>`)
 - Default page: `<name>` (`<node id>`)
-- Direction: Figma is authored first. Code follows. Never change code without
-  the change existing in Figma, and never leave a Figma change unmirrored.
+- Direction: `<Figma leads | code leads>`, as the designer set it on `<date>`.
+  The leading side is where changes are authored; the other side mirrors them,
+  in the same session or in a batch the designer schedules. Ask if this is
+  blank.
 
 ## Where the work runs
 

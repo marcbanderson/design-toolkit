@@ -135,6 +135,31 @@
     "Skill",
     "Figma MCP (use_figma, get_variable_defs, get_metadata)"
    ]
+  },
+  {
+   "name": "figma-builder",
+   "tagline": "Builds or updates Figma pages from a running build, conventions built in",
+   "does": "Captures the build at the frame width, then draws each state, a work-through frame, a Components section and a title block on one page, with sections per row, layers named by role and every value bound to a token. It returns what it built, any shared component it touched, and the differences it could not close.",
+   "why": "A Figma page costs dozens of scripts and screenshots, and conventions restated in every brief drift between agents. One page per agent runs in parallel without conflicts.",
+   "runs": "figma-use, figma-generate-design",
+   "model": "inherit",
+   "tools": [
+    "Read/Grep/Glob/Bash",
+    "Skill",
+    "Figma MCP (session, use_figma, screenshot, metadata, design system search)"
+   ]
+  },
+  {
+   "name": "prototype-walker",
+   "tagline": "Runs a prototype's walk scripts and returns pass or fail lines",
+   "does": "Runs the committed walks in tests/walks across every route on the dev server already running, and sorts each failure into a regression, a stale walk (which it repairs and reruns) or unclear.",
+   "why": "Regression walks across several iterations fill a context window with logs, and a stale walk reports false failures. The agent keeps walks current and returns only the verdicts.",
+   "runs": "walk scripts in the repo",
+   "model": "sonnet",
+   "tools": [
+    "Read/Grep/Glob/Bash",
+    "Write/Edit inside the walks folder"
+   ]
   }
  ],
  "tools": [
