@@ -67,12 +67,13 @@ run "cp '$SRC/overlay/overlay.js' '$DEST/tools/overlay.js'"
 SRC_J="$SRC/judgment/$JUDGMENT.md"
 [ -e "$SRC_J" ] || { echo "No judgment file: $SRC_J" >&2
   echo "Available: $(ls "$SRC/judgment" | sed 's/\.md$//' | tr '\n' ' ')" >&2; exit 1; }
-if [ -e "$DEST/design-judgment.md" ]; then
-  echo "  keeping existing design-judgment.md (it accumulates; not overwritten)"
+if [ -e "$DEST/design-judgments.md" ]; then
+  echo "  keeping existing design-judgments.md (it accumulates; not overwritten)"
 else
-  say "install judgment/$JUDGMENT.md as design-judgment.md"
-  run "cp '$SRC_J' '$DEST/design-judgment.md'"
+  say "install judgment/$JUDGMENT.md as design-judgments.md"
+  run "cp '$SRC_J' '$DEST/design-judgments.md'"
 fi
+[ -e "$DEST/design-judgment.md" ] && echo "  note: design-judgment.md (singular) is the old name; design-judgments.md is the one read now"
 
 # ── the enforcement section, appended once ─────────────────────────────────
 MARK="## Design workflow"

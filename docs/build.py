@@ -9,7 +9,7 @@
 summary.json holds the per-skill, agent and tool summaries and the vision
 themes; edit it when a skill changes, or regenerate it with a session.
 """
-import json, os, sys, html, subprocess, datetime
+import json, os, re, sys, html, subprocess, datetime
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -123,9 +123,18 @@ for th in V.get("themes", []):
     themes_html += f'''<li><h4>{e(th["title"])}</h4><p>{e(th.get("thesis",""))}</p>{q}</li>'''
 threads_html = "".join(f"<li>{e(t)}</li>" for t in V.get("open_threads", []))
 
+J_TEXT = raw("judgment/marc.md")
+_m = re.search(r"Last updated: ([0-9-]+)", J_TEXT)
+J_UPDATED = _m.group(1) if _m else "unknown"
+_p1 = J_TEXT.split("# Part 2")[0]
+n_rules = len(re.findall(r"^- \*\*[A-Z]{1,2}[0-9]+[a-z]?\.", _p1, re.M))
+
 # ---------- Judgment blurb (written in the main thread, from judgment/marc.md) ----------
 judgment_html = '''
 <p class="lede">The toolkit keeps one personal file, and this is what it says. Every line in it is marked <b>Stated</b>, his words, or <b>Observed</b>, a pattern inferred from repeated choices, and an Observed entry is never promoted to a Stated one. The file is meant to be predictive: when a situation comes up, this is what he will want, and why.</p>
+
+<h3>Two parts</h3>
+<p><b>Part 1 holds the rules he has ruled,</b> worded for any product, each with an id and the date and kind of project it came from. Most recently, from work on agent workflows: a single-choice step moves on when picked; a typed request gets the agent's reading of it back rather than a form to re-confirm; a note given at confirmation starts the work instead of asking again; and a human check reviews the full set the agent works from, not the summary it will produce. <b>Part 2 is how he judges,</b> the predictive criteria below.</p>
 
 <h3>How he reads a screen</h3>
 <p><b>Vertical spacing is the first thing he sees.</b> Before hierarchy, before colour, before copy. If something is wrong and nobody knows what, the gaps are checked first. Tight reads as broken, loose reads as unfinished, and in seven weeks he has never once asked for less space. "Squished" is his most common word for a defect.</p>
@@ -355,7 +364,7 @@ td code {{ font-size: 14px; }}
     <section id="judgment">
       <header>
         <h2>What the system understands about how Marc judges design</h2>
-        <p>Drawn from <code>judgment/marc.md</code>, the toolkit's one personal layer. Last updated 2026-09-18.</p>
+        <p>Drawn from <code>judgment/marc.md</code>, the toolkit's one personal layer, published from <code>~/.claude/design-judgments.md</code> by <code>tools/publish-judgment</code> with client names replaced. {n_rules} ruled rules in Part 1. Last updated {e(J_UPDATED)}.</p>
       </header>
       <div class="judgment">{judgment_html}</div>
       {details("Read judgment/marc.md", raw("judgment/marc.md"))}
@@ -412,7 +421,7 @@ td code {{ font-size: 14px; }}
         <thead><tr><th>Changes</th><th>File</th><th>Holds</th></tr></thead>
         <tbody>
           <tr><td>never</td><td><code>~/.claude/CLAUDE.md</code></td><td>The rules that bind every session</td></tr>
-          <tr><td>rarely</td><td><code>~/.claude/design-judgment.md</code></td><td>How this designer decides</td></tr>
+          <tr><td>rarely</td><td><code>~/.claude/design-judgments.md</code></td><td>How this designer decides</td></tr>
           <tr><td>occasionally</td><td>the project's contract</td><td>What is true in this project</td></tr>
           <tr><td>every session</td><td>the project's <code>STATUS.md</code></td><td>Where the work is right now</td></tr>
         </tbody>

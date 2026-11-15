@@ -62,7 +62,7 @@ Three things worth knowing about how updates propagate:
   propagate on their own; only new ones need this.
 
 Re-running is always safe. It backs up anything it would replace and never
-overwrites `design-judgment.md`, because that file accumulates and is the one
+overwrites `design-judgments.md`, because that file accumulates and is the one
 part worth more than everything around it.
 
 ## Contributing back
@@ -191,7 +191,7 @@ none of it gets trusted.
 | Changes | File | Scope |
 | --- | --- | --- |
 | Never | `~/.claude/CLAUDE.md` | The rules that bind every session |
-| Rarely | `~/.claude/design-judgment.md` | How this designer decides |
+| Rarely | `~/.claude/design-judgments.md` | How this designer decides |
 | Occasionally | the project's contract | What is true in this project |
 | Every session | the project's `STATUS.md` | Where the work is right now |
 
