@@ -12,7 +12,7 @@ every value and the reason survives being moved to a different scale.
 After Josef Müller-Brockmann, *Grid Systems in Graphic Design*. His grid is not a
 set of measurements, it is a derivation: field depth is a count of text lines,
 and the vertical distance between fields is one or more blank lines (p.11, p.57).
-The unit is the line, not the millimetre.
+The unit is the line, not the millimeter.
 
 ---
 

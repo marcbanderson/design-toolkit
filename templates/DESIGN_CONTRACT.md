@@ -26,7 +26,7 @@ Two contracts in one repo is worse than none.
 - Local: `<command, port, and whether it needs a database>`
 - Deployed: `<url>`, from `<branch>` via `<service>`
 - If it cannot run locally, say so here and name the fallback.
-- Note any lookalike surface that is **not** this project. A neighbouring
+- Note any lookalike surface that is **not** this project. A neighboring
   checkout serving the same-looking app on a nearby port will pass a check
   falsely, and someone will hit it.
 
@@ -63,7 +63,7 @@ blocks.
 - Code tokens: `<file, and the naming layers>`
 - Dialect, so the audit does not rediscover it: `<what a bound value looks like
   here, and what is legitimately exempt>`
-- Rule: every spacing, radius, colour and type value is bound. A literal is a
+- Rule: every spacing, radius, color and type value is bound. A literal is a
   defect, not a shortcut.
 
 ## Component inventory

@@ -95,7 +95,7 @@ function fileForHref(href) {
   return hits.length === 1 ? hits[0] : null;
 }
 function selectorRegex(sel) {
-  // CSSOM normalises selector text; match the authored form with loose whitespace
+  // CSSOM normalizes selector text; match the authored form with loose whitespace
   const esc = sel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s*([>+~,])\s*/g, "\\s*$1\\s*").replace(/\s+/g, "\\s+");
   return new RegExp("(^|[}\\s;])(" + esc + ")\\s*\\{", "g");
 }

@@ -15,7 +15,7 @@ conversation, and the conversation ends.
 
 `STATUS.md` at the repo root is that file.
 
-## The organising principle: rate of change, not topic
+## The organizing principle: rate of change, not topic
 
 This is why it is a separate file rather than a section in the contract.
 

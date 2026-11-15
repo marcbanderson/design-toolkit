@@ -131,56 +131,34 @@ n_rules = len(re.findall(r"^- \*\*[A-Z]{1,2}[0-9]+[a-z]?\.", _p1, re.M))
 
 # ---------- Judgment blurb (written in the main thread, from judgment/marc.md) ----------
 judgment_html = '''
-<p class="lede">The toolkit keeps one personal file, and this is what it says. Every line in it is marked <b>Stated</b>, his words, or <b>Observed</b>, a pattern inferred from repeated choices, and an Observed entry is never promoted to a Stated one. The file is meant to be predictive: when a situation comes up, this is what he will want, and why.</p>
+<p class="lede">The toolkit keeps one personal file, and this is what it says. It has two parts. <b>Part 1</b> holds the __N__ rules he has ruled, worded so they apply to any product. <b>Part 2</b> holds how he judges: predictive criteria, each marked <b>Stated</b> (his words) or <b>Observed</b> (a pattern inferred from repeated choices), and an Observed entry is never promoted to Stated. The point is that work comes back right the first time.</p>
 
-<h3>Two parts</h3>
-<p><b>Part 1 holds the rules he has ruled,</b> worded for any product, each with an id and the date and kind of project it came from. Most recently, from work on agent workflows: a single-choice step moves on when picked; a typed request gets the agent's reading of it back rather than a form to re-confirm; a note given at confirmation starts the work instead of asking again; and a human check reviews the full set the agent works from, not the summary it will produce. <b>Part 2 is how he judges,</b> the predictive criteria below.</p>
+<h3>The rules</h3>
+<p>Part 1 covers actions and controls, surfaces, lists, spacing, type, color, motion, states and copy, conversation, forms, charts, navigation, accessibility and how design files are built. A few show its character. <b>Each fact has one home</b>: a second encoding of the same meaning is cut, even when it is accessible. <b>Copy follows capability</b>: a page never advertises what does not run. <b>Aim for one filled button per surface.</b> <b>A guided flow shows its whole length and can always be left.</b></p>
+<p>A large share is about AI shown honestly. An inference lives inside the element it is about, never in a new card. AI never overwrites what a person wrote. What an agent does on its own is split by risk: reading and reporting needs no setting, while anything that changes the user's work or reaches other people is opt-in and can be undone. The newest rules come from agent workflows: a single-choice step moves on when picked; a typed request gets the agent's reading of it back rather than a form to re-confirm; a note given at confirmation starts the work instead of asking again; and a human check reviews the full set the agent works from, not the summary it will produce.</p>
 
 <h3>How he reads a screen</h3>
-<p><b>Vertical spacing is the first thing he sees.</b> Before hierarchy, before colour, before copy. If something is wrong and nobody knows what, the gaps are checked first. Tight reads as broken, loose reads as unfinished, and in seven weeks he has never once asked for less space. "Squished" is his most common word for a defect.</p>
-<p>He notices weight before size. A wrong font weight gets flagged; a size one step off often does not. And a number that looks confident but is wrong is worse than a blank: a fabricated 0.0, a dash where a word belongs, a zero standing in for an absent value.</p>
-<p>In a list, every row is one height and one grammar. The options of one control are one object. A field that a choice needs opens inside the chosen option, not below the control.</p>
+<p><b>Vertical spacing is the first thing he sees,</b> before hierarchy, color or copy. Tight reads as broken and loose reads as unfinished, but more space is not a safe default: a pass that pushed everything apart drew <q>I think you have ruined a lot of spacing.</q> What he objects to in both directions is the same thing, gaps that stop saying what belongs together. A screen he has already laid out is the contract; change only what a rule or a measured defect requires.</p>
+<p>He notices weight before size. A number that looks confident but is wrong is worse than a blank. And <b>one function, one look</b>: <q>Same look different function</q> is a defect, so a color earns its energy by having a single job.</p>
 
 <h3>Where spacing comes from</h3>
-<p><b>Spacing is derived from the type, never chosen beside it.</b> This is the deepest rule he holds about systems, and he arrived at it twice: once by eye, once by argument. The unit is the line-height of body text, and every vertical distance is a count of it. The ladder he picked by eye over weeks of corrections turned out to be clean fractions of his 24px line, with no remainder. He had the relation before he had the words for it.</p>
-<figure class="ladder" aria-label="The rhythm ladder as fractions of a 24px body line">
-  <div class="rung"><span class="px">4</span><span class="fr">1/6 u</span><i style="--h:4px"></i></div>
-  <div class="rung"><span class="px">8</span><span class="fr">1/3 u</span><i style="--h:8px"></i></div>
-  <div class="rung"><span class="px">12</span><span class="fr">1/2 u</span><i style="--h:12px"></i></div>
-  <div class="rung"><span class="px">16</span><span class="fr">2/3 u</span><i style="--h:16px"></i></div>
-  <div class="rung on"><span class="px">24</span><span class="fr">1 u</span><i style="--h:24px"></i></div>
-  <div class="rung"><span class="px">32</span><span class="fr">4/3 u</span><i style="--h:32px"></i></div>
-  <div class="rung"><span class="px">48</span><span class="fr">2 u</span><i style="--h:48px"></i></div>
-  <figcaption>u is the body line, 24px. This page is set on the same ladder.</figcaption>
-</figure>
-<p>Three consequences follow, and he expects them held. The type ramp is the primary decision and the spacing scale is derived from it; when the two disagree, the type wins and the spacing moves. The unit must be composite, so the fractions land on whole numbers, which turns the leading decision into "pick the ratio that lands the unit on a divisible number". And density is an index shift, not a multiplier: each role moves one step along the shared ladder, so one token scale serves dense, default and loose.</p>
-<p>The same day he extended it to corners without being prompted: <q>why are our radiuses 6, 10 and 12? Shouldn't we do 8, 12, 16?</q> Expect any remaining eye-picked scale to get the same question.</p>
+<p><b>Spacing is derived from the type, never chosen beside it.</b> The unit is the body line height, and every vertical distance is a fraction of it. The ladder he picked by eye over weeks, 8, 12, 16, 24 and 32, turned out to be exact fractions of his 24px line, so the type ramp is the primary decision and the spacing follows. To bind two things, move the next thing away; never pull the pair tighter. In a product's reading flow he uses two distances and no middle rungs, which leave everything looking evenly related. Whether that holds on a long read surface is still open, and marked as a question rather than a rule.</p>
 
-<h3>How he groups things</h3>
-<p><b>To bind two things, move the next thing away. Never pull the pair tighter.</b> This is the sharpest correction he has given, because the rule was already written down and still got broken. When a relationship needs to read as closer, increase the distance to everything else.</p>
-<p>In the reading flow he uses no middle rungs. On the frames he reworked by hand, the content stack runs at exactly two distances: bound, at 1/6 u, and separate, at 1 u, with 2 u between blocks. The middle rungs still exist, but only inside components. A flat 12 makes everything equally related, so nothing groups.</p>
-<p>A button is an action, not a continuation of the text above it. It gets a full unit, never the tight inside-a-group rung. The air belongs to the component, as padding on the component, so it travels to every screen instead of being retyped per layout. And scale moves with content density while the ratio does not: a sparse screen runs 1 u inside and 2 u between, a dense one 1/3 u and 1 u, both roughly a 2 to 3x differential.</p>
+<h3>What “livelier” means</h3>
+<p>Energy comes from content and confidence, never decoration. <b>The object is the personality</b>: show the thing you name, as a real image. Movement and magnitude are drawn with arrows, bars and segments, not written. Type is confident rather than airy, with as few sizes as possible. And silence about a dimension is not a preference: <q>don't take my lack of description of animation to mean that I don't want it.</q></p>
 
 <h3>How he decides</h3>
-<p>Craft on principle, positioning on business need, and he does not confuse the two. A spacing question gets a rule. Whether a button says "Join the beta" or "Get in touch" gets reasoned from what the business wants from the visitor.</p>
-<p><b>An aesthetic judgment is not finished until it is portable.</b> Three times in a month he moved from "I like this" to "state it as a rule that works on someone else's scale". When he approves something, the next question is "can that be a rule", so the rule is offered before he asks.</p>
-<p>He looks for the structural cause, not the numeric fix. Given a list of off-scale heights he did not ask which token to snap them to; he asked whether the height should exist at all: <q>if it's a height, it might be a 'hug' in figma that is defined by top and bottom margins, or content within.</q> He was right, and the fix was to delete the value. Retirement over deprecation: when an option is wrong he removes it so it cannot be reached. A metric is never an answer to a visual question. He will take a concern seriously and then decide; push back once with evidence, then do what he says.</p>
+<p>Craft questions get a principle; positioning questions get reasoned from what the business needs, and he does not confuse the two. <b>An aesthetic judgment is not finished until it is portable</b>, so when he approves something, the rule is offered before he asks. He looks for the structural cause rather than the numeric fix, and often the fix is deleting a value rather than tokenizing it. A borrowed pattern is judged by what it accomplishes here: <q>What is this accomplishing?</q> When he hands over a reference frame, the build matches it rather than interpreting it. Push back once, with evidence, then do what he says.</p>
 
-<h3>How he wants to work</h3>
-<p><q>I don't want you to make the prototype by yourself. I will guide you to make it, I just need you to have proper context.</q> Context first, direction after; no opening menu of options. Seeing beats describing: the dominant feedback mode is a screenshot with an annotation, and the loop that matters is intent to something he can look at. He tells a rule once and expects it held. Colleague reactions are design input, relayed without ceremony.</p>
+<h3>How he works, and what counts as done</h3>
+<p>Context first, direction after: become informed, then wait. Seeing beats describing. He states a rule once and expects it held; the repeated frustrations are never new requirements, they are the same rule unheld. Whether Figma or code leads depends on the project, so it is asked at the start. <b>Done means verified against the thing on his screen,</b> not committed or pushed, with every gap named before he finds it.</p>
 
-<h3>What he counts as done</h3>
-<p>Both places, same session: a fix in code that is not in Figma is new drift. Verified against the artifact he is looking at, not committed, not pushed, not merged. And gaps named rather than discovered: he would far rather be told the DELETE path is unexercised than find it himself in a screenshot.</p>
+<h3>Color</h3>
+<p>Marc has a degree of color vision deficiency. Two series must differ in lightness, not only hue, and the pair is measured rather than eyeballed. A color change made to pass a contrast rule is still a design change, so it gets asked, not flagged afterward.</p>
 
-<h3>Colour</h3>
-<p>Marc has a degree of colour vision deficiency. Two series in a chart must differ in lightness, not only in hue. This is a requirement, not a preference.</p>
-
-<h3>Where the system stops</h3>
-<p>Some entries have no detector and never will, and recognising them is the point. Composition: what goes on a screen, in what order, and what gets cut. When to break a rule, which he does deliberately and usually rightly. Whether a thing is beautiful. Positioning copy. For these the instruction is plain: <b>ask, do not assume.</b> A system that claims to have learned them has started guessing confidently.</p>
-
-<h3>How an entry earns its place</h3>
-<p><q>A rule that produces a number fires. A rule that produces a sentiment does not.</q> So each entry that can be made executable carries a Rule in his words, a Detect that can actually be run, and a Default so no judgment is needed to apply it. The loop: he corrects one case, the rule is extracted rather than the fix, a detector is written, the detector finds the whole class, he confirms on the cheapest second case, and the result is verified by measurement. One correction covered twelve screens that way.</p>
-'''
+<h3>Ask, do not assume</h3>
+<p>Some judgments have no detector and never will: composition, when to break a rule, whether a thing is beautiful, and positioning copy. <q>A rule that produces a number fires. A rule that produces a sentiment does not.</q> Everything that can be made executable carries a rule, a way to detect it and a default. Everything else stays his, and a system that claims to have learned it has started guessing confidently.</p>
+'''.replace("__N__", str(n_rules))
 
 VISION_SECTION = f'''<section id="vision">
       <header>
@@ -415,7 +393,7 @@ td code {{ font-size: 14px; }}
     <section id="architecture">
       <header>
         <h2>Architecture</h2>
-        <p>Files are organised by rate of change, not by topic. A fast-changing fact inside a slow-changing document makes the whole document look stale, and then none of it gets trusted.</p>
+        <p>Files are organized by rate of change, not by topic. A fast-changing fact inside a slow-changing document makes the whole document look stale, and then none of it gets trusted.</p>
       </header>
       <div class="tbl"><table>
         <thead><tr><th>Changes</th><th>File</th><th>Holds</th></tr></thead>

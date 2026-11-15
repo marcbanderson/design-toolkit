@@ -42,7 +42,7 @@
  *
  * --tokens exists because a token system cannot be checked in the mode you
  * designed in. Six aliases once resolved correctly in Light and Dark while both
- * brand palettes silently rendered the default palette's colours.
+ * brand palettes silently rendered the default palette's colors.
  */
 const { spawn } = require("child_process");
 const fs = require("fs"), os = require("os"), path = require("path");

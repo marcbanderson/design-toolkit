@@ -1,6 +1,6 @@
 # Marc's design judgments
 
-_Last updated: 2026-11-14 (Part 1: K37 to K39 and Q6 to Q8, from the V1 agent prototypes (a market data product))_
+_Last updated: 2026-11-15 (American spelling; Both places timing follows which side leads)_
 
 One file for how Marc decides design, in two parts. Read it before proposing a
 layout or a component in any project, and treat it as the starting position. A
@@ -32,7 +32,7 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 
 - **P1. Aim for one filled button per surface.** Allowed: more than one when each marks an empty option side by side and none competes with another.
 - **P2. Aim for no dark scrim behind a dialog; the page fades back.** Allowed: a scrim where what sits behind would compete with the decision, such as media playing.
-- **P3. Minimise the navigation items that expand; start from the desire that nothing expands.** Allowed: one nested level under a section parent whose children are places people move between often.
+- **P3. Minimize the navigation items that expand; start from the desire that nothing expands.** Allowed: one nested level under a section parent whose children are places people move between often.
 - **P4. Aim for no dashed edges; an empty slot is a plain tinted tile with a plus.** Allowed: a drop target may be dashed, because it is where you put something.
 - **P5. Aim for fade over travel in the product.** Allowed: marketing sections may rise as they fade. Where the product does travel, it is a short rise as the element fades in. (a creator platform, 2026-10-27)
 - **P6. In a conversation, aim for suggestions at the end of the newest answer only.** Allowed: on an empty start, they sit with the input.
@@ -58,7 +58,7 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 - **B3. A guided flow stays inside the app's shell**: it is a page with the navigation, not a trap.
 - **B4. Onboarding exists until anything is added, then it is gone**, by subtraction, and never comes back.
 - **B5. A setup checklist retires once filled**; a nearly done one becomes a banner.
-- **B6. Never draw a gate the code does not have.** Optional steps read optional; not started is muted, never an error colour.
+- **B6. Never draw a gate the code does not have.** Optional steps read optional; not started is muted, never an error color.
 - **B7. Order belongs to the person**: setup steps are not numbered or gated; a dependency is told as a consequence.
 - **B8. Order steps by cause, and put the payoff after what makes it feel like theirs.**
 - **B9. As state advances, the primary becomes the next act**; skipping is never the loudest control.
@@ -124,7 +124,7 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 - **E2. A capped scrolling list shows a partial last row**, so it reads as scrollable.
 - **E3. Browsable strips run past the edge rather than wrapping; a slot grid wraps at the same size.**
 - **E4. Row actions end flush with the word they replace**, not at the hover plate's overhang.
-- **E5. Rows centre on the glyphs, not the line boxes** (fonts with tall ascenders sit high in their boxes).
+- **E5. Rows center on the glyphs, not the line boxes** (fonts with tall ascenders sit high in their boxes).
 - **E6. Rows keep the source's density**; a working queue may step denser than the house rhythm.
 - **E7. Files, once added, look like files** (a type icon) on the same row spacing.
 - **E8. Aim for a library's filter as left-aligned underline tabs above the content**, the line on the rule. Allowed: filters on the right where the layout calls for it.
@@ -138,7 +138,7 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 - **F4. A content column and a side panel sit wider apart than any gap inside either**, so they read as two things.
 - **F5. The page title clears the back control** with a smaller gap above it and a larger one under it, the same everywhere.
 - **F6. Text beside an avatar is one unit**: a strong name line over a lighter line one size down, a tight gap from the avatar and centred on it.
-- **F7. Two controls of different heights in one row centre on each other**; one radio group's options are one height.
+- **F7. Two controls of different heights in one row center on each other**; one radio group's options are one height.
 - **F8. A height that falls out of content hugs; an empty container hugs or hides.**
 - **F9. Spacing derives from type: the unit is the body line**, and line heights are whole relations to it.
 - **F10. Spacing comes from a fixed ladder derived from the body line, and nothing sits between its steps**; blocks take the steps one looser than tight.
@@ -156,24 +156,24 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 - **G8. A person's name never truncates**; the rest of the line gives way. Inside a fixed-width control it truncates with an ellipsis and the full name stays available. (a creator platform, 2026-11-01)
 - **G9. No widows in two-line text**; balance the wrap.
 - **G10. A line-count target is met by cutting copy, never by widening the column.**
-- **G11. In a meta line a count is strong in the primary text colour and its words stay muted.**
-- **G12. Names in data tables are the primary text colour at the reading weight, underlined on hover and focus, never coloured.**
+- **G11. In a meta line a count is strong in the primary text color and its words stay muted.**
+- **G12. Names in data tables are the primary text color at the reading weight, underlined on hover and focus, never colored.**
 - **G13. The heaviest weight is for display only**: a landing headline, the one question a guided flow asks. Titles inside the product stay one step lighter.
 - **G14. A name that is a row in a list takes the body weight of that list, not the heading weight**; heavier names are for names that head something.
 
-## Colour
+## Color
 
-- **H1. Every measurement binds to a token**: colour, gap, padding, radius, blur, offset. A value with no token gets one added; binding straight to a raw palette step is a bypass. Named exemptions only (device chrome, content geometry).
+- **H1. Every measurement binds to a token**: color, gap, padding, radius, blur, offset. A value with no token gets one added; binding straight to a raw palette step is a bypass. Named exemptions only (device chrome, content geometry).
 - **H2. Components are drawn once and bound to mode-aware tokens**; dark keeps the same energy, it is not a recolouring.
 - **H3. A screen counts as done only once checked in light and dark.**
-- **H4. Each colour has one job, fixed before styling starts.**
+- **H4. Each color has one job, fixed before styling starts.**
 - **H5. Decoration carries no meaning and needs no contrast bar, but it reads as variation and is stable per object.**
-- **H6. A link in running text is the link colour plus an underline; a linked row name is plain, underlined on hover.**
+- **H6. A link in running text is the link color plus an underline; a linked row name is plain, underlined on hover.**
 - **H7. Text someone must read to decide is muted, never disabled.**
 - **H8. A progression is one hue at stepped values, never the status family; normal is neutral, never a warning.**
-- **H9. Two colours that a colour-blind reader cannot tell apart are never the only difference between states; an accent colour is never body text.**
+- **H9. Two colors that a color-blind reader cannot tell apart are never the only difference between states; an accent color is never body text.**
 - **H10. Contrast is measured against the worst ground, not the page.**
-- **H11. A colour change made for contrast is a design change: raise it, never swap silently.**
+- **H11. A color change made for contrast is a design change: raise it, never swap silently.**
 - **H12. An exception is scoped by the surface condition, never by a list of screens.**
 
 ## Motion
@@ -191,7 +191,7 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 - **I11. If motion exists only to hide a layout change, change the structure instead.**
 - **I12. Under reduced motion a live value still updates, and auto-cycling stops.**
 - **I13. Motion is its own later pass; silence about it during layout is not a preference.**
-- **I14. A change of state moves what persists: an element keeps its identity and travels between its two states (position, size, colour); crossfading whole screens is not motion.** Showcase motion also needs a camera that moves with intent. (marcbanderson-site, 2026-10-25: "The elements didn't animate from one position to another")
+- **I14. A change of state moves what persists: an element keeps its identity and travels between its two states (position, size, color); crossfading whole screens is not motion.** Showcase motion also needs a camera that moves with intent. (marcbanderson-site, 2026-10-25: "The elements didn't animate from one position to another")
 - **I15. Clicking through never flickers**: one screen in the DOM at a time, no overlapping exit crossfade, and only content that arrives after a screen is up fades in; what is there on arrival appears at once. (a market data product, 2026-11-09)
 - **I16. Interpretation of what the user is typing waits until they have finished**: nothing is shown mid-sentence; the product reconciles the whole request first, states the goal, then adds the details. (a market data product, 2026-11-09)
 - **I17. What the user has already read never moves because an input below it changed size**; reserve the space for the largest state of a sequence, and re-anchor only when new content arrives. (a market data product, 2026-11-10)
@@ -204,7 +204,7 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 - **J3. A refusal, a gap and a failure are three states with three wordings; a fault never dresses as a decline.**
 - **J4. When processing input fails, keep the input**; nobody enters it twice.
 - **J5. A failed load never reads as empty.**
-- **J6. Partial output is kept and labelled; actions that need a finished result are withheld.**
+- **J6. Partial output is kept and labeled; actions that need a finished result are withheld.**
 - **J7. A no-results state carries no warning glyph.**
 - **J8. An off state says how to turn it on.**
 - **J9. When a sequence ends, the next step is said as an instruction.**
@@ -213,18 +213,18 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 - **J12. Name things plainly; never a metaphor.**
 - **J13. No corny reveal copy, no invented counts, no date on a draft.**
 - **J14. No pronoun the system does not store.**
-- **J15. Words shown to an author are the author's meaning, not the system's state**; never organise by an internal taxonomy.
+- **J15. Words shown to an author are the author's meaning, not the system's state**; never organize by an internal taxonomy.
 - **J16. One act, one word, everywhere.**
 - **J17. Times and dates use the reader's locale and language form. When something will happen (more becomes available, an item is removed, a grace period ends) is a date or a clock time, never a countdown** ("Permanently deleted on 28 October", not "7 days"). English writes the month first with an ordinal ("November 3rd"); other languages take their own form. (a creator platform, 2026-11-01)
 - **J18. Optional content with nothing to show is absent, not filled.**
-- **J19. An absent image is drawn as an absence (a monogram), never a grey box.**
+- **J19. An absent image is drawn as an absence (a monogram), never a gray box.**
 
 ## AI shown honestly
 
 - **K1. An AI disclosure is one sentence, defined once, printed word for word everywhere; a badge is a marker, not the disclosure.**
 - **K2. The disclosure comes at an AI persona's first introduction, before anything is asked, and travels to every card.**
 - **K28. A platform host never answers the subject matter**; it helps with setup and answers a fixed FAQ, matched by meaning. (a creator platform, 2026-11-01)
-- **K29. The logging notice is never personalised; the line that tells a member the creator will see a declined question is a separate sentence and names the creator.** (a creator platform, 2026-11-01)
+- **K29. The logging notice is never personalized; the line that tells a member the creator will see a declined question is a separate sentence and names the creator.** (a creator platform, 2026-11-01)
 - **K30. Reading aloud by an AI voice is disclosed the first time it is turned on.** (a creator platform, 2026-11-01)
 - **K3. Never spend prose on "I am an AI"**: the disclosure lives with the face.
 - **K4. Every voice gets an avatar and a name before it speaks; the speaker row returns only when the speaker changes.**
@@ -245,7 +245,7 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 - **K19. A statement about data handling says only what is true of every provider.**
 - **K20. A control presented as a setting must be enforced.**
 - **K21. Uncertainty is admitted**: a spoken turn shows what was heard; no evidence returns "cannot vouch".
-- **K31. When an answer draws on what the product remembers about the user, their past work or their organisation, the answer itself says so**, naming each remembered value with its scope, and each can be changed or left out for that answer. Shown only when memory shaped the result; never applied silently. (a market data product, 2026-11-09) Any question that offers to remember something (where it applies, for me, my firm) always includes declining it ("Don't save"), and a declined item is never shown as remembered. (a market data product, 2026-11-10)
+- **K31. When an answer draws on what the product remembers about the user, their past work or their organization, the answer itself says so**, naming each remembered value with its scope, and each can be changed or left out for that answer. Shown only when memory shaped the result; never applied silently. (a market data product, 2026-11-09) Any question that offers to remember something (where it applies, for me, my firm) always includes declining it ("Don't save"), and a declined item is never shown as remembered. (a market data product, 2026-11-10)
 - **K32. What an agent does on its own is split by risk and said plainly**: reading and reporting is stated as harmless and needs no setting; anything that changes the user's work or reaches other people is opt-in per action, visible wherever the agent appears, and revocable in one tap from each place it shows, with every self-made change carrying Undo. (a market data product, 2026-11-09)
 - **K33. Containers (conversations, projects) are places the user goes into, never inputs to new work; a container never nests inside another. Reuse happens with the things made inside them (artifacts).** (a market data product, 2026-11-09)
 - **K34. A conversation turn is a response followed by one to five numbered options**; actions, scope choices, approvals and next steps are all options in one pattern, never buttons, menus or chips scattered through the reply. (a market data product, 2026-11-09)
@@ -259,7 +259,7 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 ## Limits and money
 
 - **L1. A usage limit is shown as a share of one allowance, never a cap, dollars, tokens or a split.**
-- **L2. A meter shows what is left, labelled as left.**
+- **L2. A meter shows what is left, labeled as left.**
 - **L3. Cost differences are stated as direction, never magnitude.**
 - **L4. A cost note appears only where cost is not already visible.**
 - **L5. At a hard limit the input is replaced by the explanation, routed to whoever can lift it.**
@@ -274,7 +274,7 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 - **M4c. A conversation has two left edges only**: the composer's (where message icons, the composer, options cards and the Goal Card start) and one message-content indent after the icon (text, cards, lines); user messages align to the composer's right edge. (a market data product, 2026-11-10)
 - **M4b. Inside a card, every label and line starts on the title's left edge**; a state highlight may bleed past the text edge, never move it. (a market data product, 2026-11-09)
 - **M5. One speaker's consecutive output is one message with hierarchy; finished steps stay as a record without their actions.**
-- **M6. A refusal is labelled in words, with no warning colour and a way forward. A turn nobody spoke has no avatar; a platform turn (a crisis line) is a card.**
+- **M6. A refusal is labeled in words, with no warning color and a way forward. A turn nobody spoke has no avatar; a platform turn (a crisis line) is a card.**
 - **M7. An answer reads: speaker, answer, qualifiers, support, onward, housekeeping.**
 - **M8. Disagreement is reported with names.**
 - **M9. A note or offer shows once, when relevant, then is remembered.**
@@ -320,9 +320,9 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 ## Accessibility
 
 - **R1. Every link and action takes the pointer cursor** (in a native desktop window, see DT5).
-- **R2. Every button variant, quiet included, has one focus ring at one consistent offset.** The focus ring is the text colour in both themes, never the accent. (a creator platform, 2026-11-01)
+- **R2. Every button variant, quiet included, has one focus ring at one consistent offset.** The focus ring is the text color in both themes, never the accent. (a creator platform, 2026-11-01)
 - **R3.** See KB8.
-- **R4. When a small size cannot carry a colour signal, words do.**
+- **R4. When a small size cannot carry a color signal, words do.**
 - **R5. A gesture is never the only way; a glyph keeps one meaning per screen.**
 - **R6.** See KB11.
 - **R7.** See KB14.
@@ -330,15 +330,15 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 ## Charts
 
 - **S1. A chart earns its place from the data the user has**; one category becomes a sentence.
-- **S2. Several lines are named at their ends and keyed; a lone point gets a dot; a time series has no wash; a change shows arrow, sign and colour, and a flat one says "No change"; empty and loading tiles take the page surface.**
-- **S3. A ranked scale uses a convention people know (gold, silver, bronze), with lightness between neighbours.**
+- **S2. Several lines are named at their ends and keyed; a lone point gets a dot; a time series has no wash; a change shows arrow, sign and color, and a flat one says "No change"; empty and loading tiles take the page surface.**
+- **S3. A ranked scale uses a convention people know (gold, silver, bronze), with lightness between neighbors.**
 
 ## Building (design files and components)
 
 - **T1. A component holds its full state space, or it is only a picture.**
 - **T2. Repeated use earns a component; some things are containers.**
 - **T3. A component taken from production keeps the job and takes the look from the system.**
-- **T4. A new screen extends what passed review; a rebuild that drops a reviewed behaviour is a regression.**
+- **T4. A new screen extends what passed review; a rebuild that drops a reviewed behavior is a regression.**
 - **T5. A proposal is shown drawn, today against the proposal, in both themes, at the frame width; a visual question is never answered with a number.**
 - **T6. A build is reviewed at the design frame's width; an overlay pins to its frame.**
 - **T7. Design file structure**: auto layout where it encodes a relationship, spacing bound, instance never redraw, scroll set by what the screen is, wrappers carry no fill and do not clip, frames bare in flow-order bands, superseded frames to an archive.
@@ -353,14 +353,14 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 - **NT2.** Aim for no toast on a save; an automatic save reports where it happened, as a fact (C16). Allowed: a save whose effect lands somewhere off the page.
 - **NT3.** A failure is never a toast. It stays in place until it is resolved: a form message, an inline error state, a turn notice, or the item's own row.
 - **NT4.** A toast carries at most one action, Undo. The same undo stays available somewhere that does not expire. A toast offers it only for acts that are not confirmed in place (C5): archive, move, a bulk act.
-- **NT5.** A toast sits at the bottom centre of the content area, clear of the navigation, and above the composer or dock where there is one. On a phone it runs full width inside the page gutter, above the dock.
+- **NT5.** A toast sits at the bottom center of the content area, clear of the navigation, and above the composer or dock where there is one. On a phone it runs full width inside the page gutter, above the dock.
 - **NT6.** One toast at a time; a new one replaces the old, and they never stack.
 - **NT7.** A toast leaves on its own after a short time, held while the pointer or focus is on it; one carrying Undo stays until the person's next act on the page.
 - **NT8.** A toast is a polite status, announced once. Focus never moves to it, and it carries the one Close X (C13).
 - **NT9.** A toast is one past-tense sentence naming the object and the count: "Moved 3 documents to Trash." No "Success", no exclamation mark, no icon in place of words.
-- **NT10.** A toast wears the floating-card dress (the card surface, the subtle edge, the floating shadow, the card radius) and no status colour.
+- **NT10.** A toast wears the floating-card dress (the card surface, the subtle edge, the floating shadow, the card radius) and no status color.
 - **NT11.** Aim for no notification inbox. What waits on a person lives on its object (the row, the gap), and anything that must reach them away from the product goes by email (EM8).
-- **NT12.** Aim for no count badges in the navigation. Allowed: one plain number after the label of the navigation item whose page holds decisions waiting on this person, hidden at zero, never a coloured dot.
+- **NT12.** Aim for no count badges in the navigation. Allowed: one plain number after the label of the navigation item whose page holds decisions waiting on this person, hidden at zero, never a colored dot.
 - **NT13.** See C17.
 
 ### Permissions and consent
@@ -368,8 +368,8 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 - **PC1.** See C15.
 - **PC2.** An act someone could do once something changes (a plan, a seat, an admin's switch) shows with one sentence naming who or what enables it ("Ask your admin to turn this on."), or is replaced by that sentence.
 - **PC3.** "Contact your admin" appears only when the person has an admin. Otherwise it reads Contact support, and the copy never mentions an admin they do not have.
-- **PC4.** Someone who can view but not edit sees values as text, never as a greyed form.
-- **PC5.** A role is a neutral tag in words on the person's row; roles are never colour-coded against each other.
+- **PC4.** Someone who can view but not edit sees values as text, never as a grayed form.
+- **PC5.** A role is a neutral tag in words on the person's row; roles are never color-coded against each other.
 - **PC6.** Consent comes before the act it covers, in the same view as the button that agrees to it, as plain sentences of what the act may and may not do.
 - **PC7.** The button is the agreement: no "I agree" checkbox where the confirming button can carry the consent.
 - **PC8.** Wherever a user's words will reach a named person, the line saying so sits with the control that sends them, never only in Settings.
@@ -384,10 +384,10 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 - **BL2.** The button that charges says the amount ("Confirm and pay $96"); every other price follows L6.
 - **BL3.** Aim for plans compared as columns of one table: price in its own row, the current plan marked by a ring and the words "Current plan", never by a different fill (D7). Allowed: with only two plans, two cards side by side.
 - **BL4.** An upgrade is offered only where the user meets what their plan lacks (a gated page, a reached limit), as a secondary or quiet action, once per place and then remembered. It is never a modal on arrival.
-- **BL6.** Paid content is marked in words in its meta line ("for subscribers"), never by a lock or a colour alone, and the marker hides for a user who already has access.
+- **BL6.** Paid content is marked in words in its meta line ("for subscribers"), never by a lock or a color alone, and the marker hides for a user who already has access.
 - **BL7.** Seats read as one figure, "6 of 10 seats in use". A pending invitee is a user row reading "Invited, not yet signed in", and going over capacity is an error naming how many seats are left, shown before sending.
 - **BL8.** A failed payment is an attention banner on every page until it is fixed, with "Update payment method". It also shows on the billing row.
-- **BL9.** Cancelling is one visible press and a destructive modal that says the date access ends. No retention offer or extra step sits between them, and afterwards the row reads "Ends on {date}" with Resume.
+- **BL9.** Canceling is one visible press and a destructive modal that says the date access ends. No retention offer or extra step sits between them, and afterwards the row reads "Ends on {date}" with Resume.
 - **BL10.** A plan switch that charges shows, in its confirm, the exact amount due today and the recurring amount after it.
 - **BL11.** Subscription state is a sentence-case tag (Active, Free trial, Cancellation scheduled, Payment past due), with a dated line under it ("Renews on November 3rd"). Dates in a status line read in the reader's language's own form: an ordinal day in English ("November 3rd") and each other language's own form.
 - **BL12.** Aim for invoices and receipts to stay in the payment provider's portal, behind one quiet "Manage billing". Allowed: an in-product invoice table once users ask for one.
@@ -395,8 +395,8 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 ### Emails
 
 - **EM1.** One email shell for every email the product sends, in light and dark.
-- **EM2.** Emails flip with the mail app: light by default (the primary text colour on white), with a dark version the client uses when it is in dark mode, declared with color-scheme.
-- **EM3.** The email button is the primary button for the mode the email shows in, at the product's button radius, built as a padded inline-styled link. It is never an accent colour.
+- **EM2.** Emails flip with the mail app: light by default (the primary text color on white), with a dark version the client uses when it is in dark mode, declared with color-scheme.
+- **EM3.** The email button is the primary button for the mode the email shows in, at the product's button radius, built as a padded inline-styled link. It is never an accent color.
 - **EM4.** One action per email, with its URL repeated as plain text under the button.
 - **EM5.** Every email has a plain-text part with the same words in the same order and the URL on its own line.
 - **EM7.** Email type requests the product's typeface and falls back to the system stack, never to another named face. Heading, body and footnote follow the product's levels with the footnote muted, spacing stays on the scale, and the layout is one column at a width mail clients render reliably.
@@ -419,18 +419,18 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 ### Desktop apps
 
 - **DT8.** A floating overlay carries its own surface and never trusts the backdrop: a translucent plate with a hairline that follows the mode. It sits in a corner, never takes focus, never covers the field it writes into, and its readouts yield to an open panel.
-- **DT2.** Aim for every desktop app to follow the OS appearance in light and dark. Allowed: a surface whose job is judging colour in media (an authoring app's viewer and timeline) is dark only.
+- **DT2.** Aim for every desktop app to follow the OS appearance in light and dark. Allowed: a surface whose job is judging color in media (an authoring app's viewer and timeline) is dark only.
 - **DT3.** The page draws the title bar at the height the OS measures: window buttons at the start, then the app's name and view switcher, the avatar at the end opening Settings, and an empty draggable bar on front-door screens. The brand line sits under it as the line between chrome and content.
 - **DT4.** Every action is in the native menu bar with its standard accelerator, and in the command box. Single-letter keys and Space belong to the page and carry no menu accelerator. Undo names the step.
 - **DT5.** Inside a native desktop window, buttons and controls keep the arrow cursor, as the OS does. A link that leaves the app shows the hand.
 - **DT6.** Each window has a minimum size at which nothing overlaps, set per app; panels scroll inside themselves, the window never scrolls, and a window reopens where it was left.
 - **DT7.** An app that keeps running with its window closed shows a monochrome template icon in the menu bar, with Quit in its menu. It never posts a system notification the user did not ask for; finished work waits in the app.
-- **DT11.** Status in the desktop apps has a word or a shape, never hue alone. A task that could not start leaves a mark, and "In progress" is not the primary's colour.
+- **DT11.** Status in the desktop apps has a word or a shape, never hue alone. A task that could not start leaves a mark, and "In progress" is not the primary's color.
 - **DT12.** Every desktop app ships every locale the product supports, and all of them follow the one language setting the person chose.
 
 ### Marketing pages
 
-- **MK1.** Aim for one content width per page, with prose at a reading measure and colour grounds running full bleed behind it. Allowed: proof cards may run wider than the content column.
+- **MK1.** Aim for one content width per page, with prose at a reading measure and color grounds running full bleed behind it. Allowed: proof cards may run wider than the content column.
 - **MK2.** A section is a lockup, then its content. Heading and body sit tight as one unit, and the lockup sits a full block apart from the content; the hero lockup takes larger steps of the same relationship.
 - **MK3.** Fewer sections, no headline-only sections, and below the fold is a tour, not a website. Show rather than tell. Media takes the large radius and the soft tinted shadow (D8).
 - **MK4.** The marquee fills at least the first screen. It says what this is at its head and where to go at its foot, and it sits side by side so the conversation has room. When the hero carries the mark, the nav does not.
@@ -444,14 +444,14 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 ### Legal pages
 
 - **LG1.** Privacy and Terms each have one canonical URL, shared by every app. The other paths redirect to it.
-- **LG2.** A legal page is a prose page: a plain page at a reading measure, body at the reading size, section headings and subsections on the product's levels with a clear step between them. No hero, no colour ground, no eyebrow.
+- **LG2.** A legal page is a prose page: a plain page at a reading measure, body at the reading size, section headings and subsections on the product's levels with a clear step between them. No hero, no color ground, no eyebrow.
 - **LG3.** Under the title, one level down, sits "Last updated {date}" in the locale's date format (J17), with the version beside it.
 - **LG4.** A long document opens with a contents list of in-page links, and every heading can be linked to.
 - **LG5.** Legal text shows in its governing language in every locale, with one line in the interface language saying that language governs. The chrome around it is translated.
 - **LG6.** A placeholder legal page is never public or linked. "Coming Soon" never ships.
 - **LG7.** The agreement is the one modal with no close. Its only exits are the agree primary and a Sign out secondary.
 - **LG8.** The agree button stays enabled. Pressing it with something missing names what is missing, under that field.
-- **LG9.** The agreement follows the system: the checkbox fills with the primary colour, the link is the link colour underlined, and labels are sentence case ("I agree", not "I Agree").
+- **LG9.** The agreement follows the system: the checkbox fills with the primary color, the link is the link color underlined, and labels are sentence case ("I agree", not "I Agree").
 - **LG10.** Changed terms open with a short summary of what changed, above the full text, and the gate asks again.
 - **LG11.** The version and date someone accepted can be found in Settings.
 - **LG12.** A legal link inside a form opens without losing the form.
@@ -461,7 +461,7 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 - **AD1.** A list compared down the page is a table; a list read one item at a time is a list row. Three or more facts that line up from row to row make a table.
 - **AD2.** Aim for the whole row as the hit target, with the name as its link to the detail page, styled per G12. Allowed: a record read beside the list opens in a side drawer.
 - **AD3.** Every admin list is paged on the server at one fixed page size. The filter bar sits a block apart above it and the pager is start-aligned under it. Filters, sort and page all live in the URL.
-- **AD4.** A table opens in a default order, newest first. Only columns with a meaningful order sort. A sortable header is a button with aria-sort. Direction shows by chevron and weight, never colour.
+- **AD4.** A table opens in a default order, newest first. Only columns with a meaningful order sort. A sortable header is a button with aria-sort. Direction shows by chevron and weight, never color.
 - **AD5.** Numbers align to the end of their column in tabular figures, and the header aligns with them. A unit goes in the header ("Spend, USD"), not in every cell.
 - **AD6.** Aim for absolute dates in table cells, in the locale's format, in a `<time datetime>`. The exact date and time show on hover and focus. One time zone per page, said once beside the count ("All times in UTC"). Allowed: an activity feed uses relative time ("3 hours ago") for recent items.
 - **AD7.** An ID in a table is a copyable line cut to a short prefix. The full ID is its accessible name. It is set in the interface typeface and is never the row's name.
@@ -476,7 +476,7 @@ decisions go in `~/.claude/design-decisions.md`, not here.
   - a modal confirm that states the count.
 - **AD14.** Each table state has one form, and the header row stays in every one of them.
   - An empty table is one start-aligned empty state in the body's place, saying what would fill it.
-  - A missing cell reads "None" or "Not set" in the muted text colour, never a dash.
+  - A missing cell reads "None" or "Not set" in the muted text color, never a dash.
   - Loading is skeleton rows in the table's own columns.
   - A failed load says so and never reads as empty (J5).
 
@@ -504,11 +504,11 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 - **KB1.** Every app's first focusable element is "Skip to content". It shows on focus and lands on the page's h1.
 - **KB2.** One h1 per page, the page title. Section titles are h2 and row group heads h3. The level follows the visible hierarchy, never the size wanted.
 - **KB3.** Landmarks are fixed per shell:
-  - the navigation is a labelled nav;
+  - the navigation is a labeled nav;
   - content is main;
-  - a filter bar is search or a labelled group;
-  - a pager is a labelled nav;
-  - a stat or metric card is a labelled section.
+  - a filter bar is search or a labeled group;
+  - a pager is a labeled nav;
+  - a stat or metric card is a labeled section.
 - **KB4.** On a route change, focus moves to the new page's h1 and the title is announced.
 - **KB5.** Focus has one rule per surface:
   - a plate focuses its first field;
@@ -567,7 +567,7 @@ way on 2026-09-18.
 ### How he reads a screen
 
 **Vertical spacing is the first thing he sees.** Before hierarchy, before
-colour, before copy. If something is wrong and you do not know what, check the
+color, before copy. If something is wrong and you do not know what, check the
 gaps first. *Observed across 17 messages, every project.*
 
 > **Detect** any rendered gap that is not a simple fraction of the body line.
@@ -632,7 +632,7 @@ choice needs opens inside the chosen option, not below the control. *Stated,
 - **One function, one look.** Chips are for choosing; read-only values are
   quiet neutral tags; navy only means "selected" while editing. A summary of
   picks in navy chips "feels a little bit crazy".
-- **A suggested prompt has one treatment everywhere:** the grey chip with the
+- **A suggested prompt has one treatment everywhere:** the gray chip with the
   AI sparkle, living with the composer (under it, or above it when it is
   pinned to the bottom). Never a prompt chip inside a content module next to a
   full-size button. Once a conversation has started, follow-ups stay inside
@@ -707,7 +707,7 @@ bars, progress segments, a dot grid) was accepted. *Observed.*
 
 > **Detect** a change, a count against a total, or a comparison of two values
 > expressed only as text.
-> **Default** library Rise/Fall icon in the direction colour (after the number in
+> **Default** library Rise/Fall icon in the direction color (after the number in
 > a right-aligned column, leading it in running text); comparison as bars from
 > zero; part of a whole as segments; a count against a prior as a dot grid. Only
 > from data that exists.
@@ -747,7 +747,7 @@ the prompt input *"needs to be fully visible on the phone when the user lands."*
 
 **One function, one look.** *"I don't like that in dark mode the prompt input is
 the same color as the cards on some of the screens. Same look different
-function."* *Stated.* Colour gets energy by having a job: navy came to mean "ask
+function."* *Stated.* Color gets energy by having a job: navy came to mean "ask
 the desk", green and red mean market direction and nothing else.
 
 > **Detect** an input or primary action sharing a fill token with a content
@@ -759,7 +759,7 @@ the desk", green and red mean market direction and nothing else.
 native iOS, so in the designs it's just a reference, no tokens (but my icons)."*
 *Stated, 2026-10-06.* System components (tab bar, keyboard, sheets' grabber,
 status bar) stay native; only what the app owns inside them, its icons, is
-designed. Do not tokenise or restyle native chrome.
+designed. Do not tokenize or restyle native chrome.
 
 **Judge a direction on the real job.** Generic rows got *"more realistic in terms
 of content, and the fact that the ui is based on users asking questions"*.
@@ -803,7 +803,7 @@ The unit is the line-height of body text, and every vertical distance is a count
 of it. Not the font size, the line-height, because what separates two things is
 measured in lines of the text it separates. From Muller-Brockmann, whose grid
 defines field depth as a number of text lines and the gap between fields as one
-or more blank lines. The unit is the line, not the millimetre.
+or more blank lines. The unit is the line, not the millimeter.
 
 The proof that he already believed it: the ladder he chose by eye over weeks of
 corrections, 8 / 12 / 16 / 24 / 32, turns out to be exactly 1/3, 1/2, 2/3, 1 and
@@ -1005,7 +1005,7 @@ are never new requirements. They are the same rule, unheld. *Observed.*
 "take my current website to generate the look and feel" and do "slight cleanup",
 a new layout was rejected: *"I wanted you to bring over the layout from my
 existing site to use as the basis of this website."* Carry over the structure,
-navigation and signature moves (here, the reel front and centre, the name across
+navigation and signature moves (here, the reel front and center, the name across
 the page), then improve what is underneath: code, content model, accessibility.
 Read "cleanup" as cleanup, not redesign. *Stated* (marcbanderson-site, 2026-10-23).
 
@@ -1039,15 +1039,17 @@ resolve to 24, but only one is what a component should be bound to. *Stated,
 filled, animated box and he called it *"a little bit crazy"*; a thin dashed
 outline that only redraws when the element changes was right. A panel beside
 the item is welcome only if it never covers the frame, because every spacing
-judgment is about the neighbour, and covering the neighbour removes the
+judgment is about the neighbor, and covering the neighbor removes the
 thing being judged. *Observed, 2026-09-23.*
 
 ---
 
 ### What he counts as done
 
-**Both places, same session.** A fix in code that is not in Figma is new drift.
-*Stated, and it is the standing rule.*
+**Both places.** A fix in code that is not in Figma, or the reverse, is new
+drift. When the mirror happens depends on which side leads (see How he wants
+to work): the same session, or a batch he schedules. *Stated; timing revised
+2026-11-14.*
 
 **Verified against the artifact he is looking at.** Not committed, not pushed,
 not merged. The thing on his screen. *Observed across seven weeks and it is the
@@ -1059,21 +1061,21 @@ having him find it costs the claim its credibility. *Observed.*
 
 ---
 
-### Accessibility and colour
+### Accessibility and color
 
 **Lightness and value separation, not hue separation.** Marc has a degree of
-colour vision deficiency. In charts especially, two series must differ in
+color vision deficiency. In charts especially, two series must differ in
 lightness, not only in hue. This is a requirement. *Stated.*
 
 **Measure the pair, do not eyeball it.** Convert to relative luminance and
 report the difference. Under about 10 points is separated by hue alone,
 whatever it looks like on your screen. On this project every positive/negative
 pair came in under 10, the worst at 2.5, and two of those pairs were defined in
-Figma itself, so tokenising the code faithfully would have propagated the
+Figma itself, so tokenizing the code faithfully would have propagated the
 problem rather than fixed it. **Where a hue-only pair lives upstream, the fix
 is upstream.** *Observed 2026-09-21.*
 
-**A colour change to satisfy a contrast rule is still a design change.** It
+**A color change to satisfy a contrast rule is still a design change.** It
 gets asked, not flagged afterwards. Raising a failing pair is right; changing
 the swatch without asking is not. *Correction, 2026-09-21.*
 
@@ -1081,7 +1083,7 @@ the swatch without asking is not. *Correction, 2026-09-21.*
 
 ### Ask, do not assume
 
-These have no detector and never will. Recognising them is the point.
+These have no detector and never will. Recognizing them is the point.
 
 - **Composition.** What goes on a screen, in what order, and what gets cut.
 - **When to break a rule.** He does it deliberately and the result is usually

@@ -89,9 +89,9 @@ editing one is not yours to do, and the damage is quiet because a rewritten
 entry still looks authoritative.
 
 - **Never change the wording of someone else's decision**, including tightening
-  it, summarising it, or fixing what looks like an error. Their phrasing is the
+  it, summarizing it, or fixing what looks like an error. Their phrasing is the
   record. If you think it is wrong, say so to the designer and leave the file alone.
-- **Never change a "Decided by".** Not to add yourself, not to generalise it to
+- **Never change a "Decided by".** Not to add yourself, not to generalize it to
   the team.
 - **Never delete or overwrite one because it was superseded.** Add a new row
   that says what changed and when, and leave theirs standing. The pair is the

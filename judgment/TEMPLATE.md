@@ -35,7 +35,7 @@ Capture from three moments, in order of value:
 
 Mark every entry **Stated** (their words, quoted) or **Observed** (inferred from
 repeated choices). Never promote an Observed to a Stated. Quoting them verbatim
-matters more than summarising them well, because the phrasing carries the
+matters more than summarizing them well, because the phrasing carries the
 criterion.
 
 Merge into an existing entry rather than adding a near-duplicate. This file
@@ -66,7 +66,7 @@ Where a change has to exist before it is real. What has to be verified against
 what. Whether they want gaps named or would rather you only report success.
 
 ### Accessibility and constraints
-Anything that is a requirement rather than a preference. Colour vision, motion
+Anything that is a requirement rather than a preference. Color vision, motion
 sensitivity, a device or viewport that matters more than the others.
 
 ---

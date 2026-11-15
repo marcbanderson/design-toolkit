@@ -110,7 +110,7 @@ not in this repo.
 | `design-contract` | Writes the project's contract, or adopts the file already there |
 | `session-state` | Reads and writes `STATUS.md`, so a restart loses nothing |
 | `decision-log` | Records decisions and gaps, and what they reveal about how the designer judges |
-| `taste-extract` | Recovers a designer's grammar for spacing, type and colour from work they hand-tuned |
+| `taste-extract` | Recovers a designer's grammar for spacing, type and color from work they hand-tuned |
 | `rhythm-model` | Derives spacing from the type rather than choosing it, and sets density |
 | `token-audit` | Finds unbound values in code, in Figma, and checks the two agree |
 | `design-parity` | Puts the build beside its Figma frame at matched width and looks |
@@ -153,7 +153,7 @@ Three rules `cssdiff` enforces that a hand-rolled harness will not:
 
 `--tokens` exists because **a token system cannot be checked in the mode you
 designed in.** Six semantic aliases once resolved correctly in Light and Dark
-while both brand palettes silently rendered the default palette's colours.
+while both brand palettes silently rendered the default palette's colors.
 
 ## The overlay
 
@@ -184,7 +184,7 @@ there, apply needs the server.
 
 ## The architecture
 
-Files are organised by **rate of change**, not by topic. A fast-changing fact
+Files are organized by **rate of change**, not by topic. A fast-changing fact
 inside a slow-changing document makes the whole document look stale, and then
 none of it gets trusted.
 
@@ -224,7 +224,7 @@ because it never measured that property.
 
 **Prove the detector before trusting a clean result.** A scan that silently
 finds nothing is worse than no scan. One pass reported 0 raw values where the
-real number was 862, because BSD grep accepted a `\b` it does not honour.
+real number was 862, because BSD grep accepted a `\b` it does not honor.
 
 **Measure the result, do not trust the reasoning.** Four chip heights were
 reasoned correctly and two still rendered wrong. The reasoning is the

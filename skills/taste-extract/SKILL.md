@@ -1,6 +1,6 @@
 ---
 name: taste-extract
-description: Infer a designer's grammar for spacing, type and colour from screens they have hand-tuned, and write it into the project contract. Use at the start of a project after a calibration set exists, when asked how to apply someone's taste to a new codebase, or when a design system needs rules rather than a copied palette.
+description: Infer a designer's grammar for spacing, type and color from screens they have hand-tuned, and write it into the project contract. Use at the start of a project after a calibration set exists, when asked how to apply someone's taste to a new codebase, or when a design system needs rules rather than a copied palette.
 ---
 
 # Taste extract
@@ -133,7 +133,7 @@ usage tells you what is believed.
 
 ---
 
-## Colour
+## Color
 
 Convert every value to relative luminance and hue before comparing anything.
 Hex strings and names tell you nothing about whether a hierarchy works.
@@ -151,11 +151,11 @@ pair that carries opposite meaning, positive against negative most of all,
 report the lightness difference. A pair separated by under about 10 points of
 luminance is distinguished almost entirely by hue.
 
-That matters generally and it matters more for a designer with colour vision
+That matters generally and it matters more for a designer with color vision
 deficiency, where hue separation alone is not separation. On the project this
-was built from, the chart palette was seven colours in a single hue band
+was built from, the chart palette was seven colors in a single hue band
 separated purely by lightness, which is exactly right, while the positive and
-negative text colours sat 2.5 luminance points apart and differed only in red
+negative text colors sat 2.5 luminance points apart and differed only in red
 against green. The same file contained both the rule and its violation, and only
 measuring found it.
 
@@ -190,7 +190,7 @@ Spacing   two distances in the reading flow, 1/6 u and 1 u, roughly 6x apart.
           Content to action is always the separate value, never the bound one.
 Type      three weights. Steps of at least 1.2x. Aim for three distinct sizes
           per screen. Line-heights share a small multiple with the unit.
-Colour    text and icon hierarchies separate by lightness in one hue family.
+Color    text and icon hierarchies separate by lightness in one hue family.
           Charts separate by lightness, never hue alone. Opposed pairs need
           10+ points of luminance difference.
 ```

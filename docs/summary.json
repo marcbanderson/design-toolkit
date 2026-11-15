@@ -50,7 +50,7 @@
   {
    "name": "rhythm-pass",
    "tagline": "Tighten spacing and hierarchy without redesigning, every value a token",
-   "does": "Runs the designer's own tuning-pass brief, made permanent: tighten what is loose, loosen what is cramped, line up what is off, and bind every spacing, colour and type value to a Figma variable and a matching code token. The working rule is group first, then stack: decide which adjacent pairs read as one thing, set them at the group value, and let the group enter the block stack. Fixes go on the component so every instance inherits them, in Figma first and then mirrored to code in the same session.",
+   "does": "Runs the designer's own tuning-pass brief, made permanent: tighten what is loose, loosen what is cramped, line up what is off, and bind every spacing, color and type value to a Figma variable and a matching code token. The working rule is group first, then stack: decide which adjacent pairs read as one thing, set them at the group value, and let the group enter the block stack. Fixes go on the component so every instance inherits them, in Figma first and then mirrored to code in the same session.",
    "when": "When the designer asks for a tuning pass, a spacing pass, a rhythm pass, or says things look squished, cramped, tight or loose.",
    "produces": "A list of what changed and where, in both Figma and code, with no composition changed and no literal introduced.",
    "rule": "\"This is not a redesign\" is the binding constraint.",
@@ -82,8 +82,8 @@
   },
   {
    "name": "taste-extract",
-   "tagline": "Recover a designer's spacing, type and colour grammar from hand-tuned screens",
-   "does": "Takes three to five screens the designer actively adjusted and records what each distance separates rather than histogramming values, so the output is a grammar (how many distinct distances, the ratio between them, which relationship gets which) instead of a copied vocabulary. Three filters drop gaps that render nothing, runs of identical items, and component internals, and containers are classified by what their children are, never by shape. Type is measured by usage and colour by relative luminance, with a contrast check on opposed pairs treated as a first-class finding.",
+   "tagline": "Recover a designer's spacing, type and color grammar from hand-tuned screens",
+   "does": "Takes three to five screens the designer actively adjusted and records what each distance separates rather than histogramming values, so the output is a grammar (how many distinct distances, the ratio between them, which relationship gets which) instead of a copied vocabulary. Three filters drop gaps that render nothing, runs of identical items, and component internals, and containers are classified by what their children are, never by shape. Type is measured by usage and color by relative luminance, with a contrast check on opposed pairs treated as a first-class finding.",
    "when": "At the start of a project once a calibration set exists, when asked how to apply someone's taste to a new codebase, or when a design system needs rules rather than a copied palette.",
    "produces": "A Grammar section written into the project contract, stated as relationships and fractions of the unit so it survives being moved to another scale.",
    "rule": "A button is never the second half of a lockup. If a shape test and a role test disagree, the role test is right.",
@@ -284,7 +284,7 @@
    },
    {
     "title": "2. Tokens are a contract, and amending the contract is the correct move",
-    "thesis": "Every measurement, colour and type value binds to a token, Figma and code are two serializations of one dictionary, and when the system lacks a value you amend the system rather than hardcode around it.",
+    "thesis": "Every measurement, color and type value binds to a token, Figma and code are two serializations of one dictionary, and when the system lacks a value you amend the system rather than hardcode around it.",
     "quote": "Do you have a full understanding of the design system tokens as well as the design system as it is expressed and tokenized within Figma? The two of those things should be identical so that if a Figma design expresses a space or a color using a token, you have that corresponding token."
    },
    {
@@ -354,13 +354,13 @@
    },
    {
     "title": "16. Surface treatments are a grammar, and the border's job is counting",
-    "thesis": "Each surface treatment is a claim about the object's nature (white plus border marks a peer you act on as a unit, no box for the page's single subject), motifs and placement carry their meaning with them, and friendliness comes from spacing and radius before colour.",
+    "thesis": "Each surface treatment is a claim about the object's nature (white plus border marks a peer you act on as a unit, no box for the page's single subject), motifs and placement carry their meaning with them, and friendliness comes from spacing and radius before color.",
     "quote": "I was unsure what should get treated with a white background and border. This is where I want consistency and a meaningful choice."
    },
    {
-    "title": "17. Corpus is what a persona knows; judgement is how it would act",
-    "thesis": "Judgement tuned on top of a corpus makes the corpus more useful than more content would, and an agent acting on your behalf shows its judgement through a permissions contract that scales with stakes.",
-    "quote": "Right now workflows are just stringing together actions (deterministic actions) that I should also be able to define through conversation, but eventually I should also be able to have a judgement layer help add a POV to the workflows and each workflow step. Don't just 'do this' but do it how Marc would do it."
+    "title": "17. Corpus is what a persona knows; judgment is how it would act",
+    "thesis": "Judgment tuned on top of a corpus makes the corpus more useful than more content would, and an agent acting on your behalf shows its judgment through a permissions contract that scales with stakes.",
+    "quote": "Right now workflows are just stringing together actions (deterministic actions) that I should also be able to define through conversation, but eventually I should also be able to have a judgment layer help add a POV to the workflows and each workflow step. Don't just 'do this' but do it how Marc would do it."
    },
    {
     "title": "Vertical rhythm (added 2026-09-10)",

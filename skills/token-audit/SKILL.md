@@ -28,7 +28,7 @@ skill, on a real project.
 
 **1. A detector that silently finds nothing.** A first pass over his stylesheet
 reported **0** raw values. The real number was **862**. The regex used `\b`,
-which BSD grep accepts and silently does not honour. A clean result that is
+which BSD grep accepts and silently does not honor. A clean result that is
 wrong is worse than no result, because it manufactures the false confidence this
 whole toolkit exists to prevent.
 
@@ -148,7 +148,7 @@ Everything else is reportable. **Component sizes are reportable.** A `height:
 
 ### Near misses are the most valuable finding
 
-A designer's instruction, worth generalising:
+A designer's instruction, worth generalizing:
 
 > "If something is a gap of 10, it should probably be the token for 12, and if
 > it's a value of 9, it should be the token for 8."
@@ -246,7 +246,7 @@ palettes returning identical values is the signature.
 ## Phase 3: reconcile
 
 The audit that neither side can do alone. Pull the Figma variable collections
-and the code token set, normalise the names, and compare:
+and the code token set, normalize the names, and compare:
 
 - **In Figma, missing from code.** A designed value the build cannot express.
 - **In code, missing from Figma.** A value invented in the build. This is the

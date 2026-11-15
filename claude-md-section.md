@@ -44,7 +44,7 @@ A correction to flow logic costs a sentence here and a rebuild later.
 
 **Checks that run more than once live in the repo.** Walk scripts, regression
 checks and test harnesses are committed beside the code (for example
-`tests/walks/`) and updated in the same change as the behaviour they check.
+`tests/walks/`) and updated in the same change as the behavior they check.
 Never leave them in a session scratchpad, which is deleted. A check that has
 drifted from the code reports false failures, which is worse than no check.
 

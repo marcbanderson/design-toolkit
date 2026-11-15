@@ -154,8 +154,8 @@ td code { font-size: 14px; }
       <li><b>9</b> skills</li>
       <li><b>4</b> agents</li>
       <li><b>4</b> executables</li>
-      <li><b id="gh-count">26</b> commits</li>
-      <li>last commit <b id="gh-date">2026-11-14</b> <span id="gh-commit">f590944  Web view: footer reads the latest commit from GitHub; intro counts skills, agents and tools</span></li>
+      <li><b id="gh-count">27</b> commits</li>
+      <li>last commit <b id="gh-date">2026-11-15</b> <span id="gh-commit">e977765  Judgment: publish the current judgments file, scrubbed; install it under the name sessions read</span></li>
       <li>built 2026-11-15</li>
     </ul>
   </header>
@@ -177,62 +177,40 @@ td code { font-size: 14px; }
     <section id="judgment">
       <header>
         <h2>What the system understands about how Marc judges design</h2>
-        <p>Drawn from <code>judgment/marc.md</code>, the toolkit's one personal layer, published from <code>~/.claude/design-judgments.md</code> by <code>tools/publish-judgment</code> with client names replaced. 371 ruled rules in Part 1. Last updated 2026-11-14.</p>
+        <p>Drawn from <code>judgment/marc.md</code>, the toolkit's one personal layer, published from <code>~/.claude/design-judgments.md</code> by <code>tools/publish-judgment</code> with client names replaced. 371 ruled rules in Part 1. Last updated 2026-11-15.</p>
       </header>
       <div class="judgment">
-<p class="lede">The toolkit keeps one personal file, and this is what it says. Every line in it is marked <b>Stated</b>, his words, or <b>Observed</b>, a pattern inferred from repeated choices, and an Observed entry is never promoted to a Stated one. The file is meant to be predictive: when a situation comes up, this is what he will want, and why.</p>
+<p class="lede">The toolkit keeps one personal file, and this is what it says. It has two parts. <b>Part 1</b> holds the 371 rules he has ruled, worded so they apply to any product. <b>Part 2</b> holds how he judges: predictive criteria, each marked <b>Stated</b> (his words) or <b>Observed</b> (a pattern inferred from repeated choices), and an Observed entry is never promoted to Stated. The point is that work comes back right the first time.</p>
 
-<h3>Two parts</h3>
-<p><b>Part 1 holds the rules he has ruled,</b> worded for any product, each with an id and the date and kind of project it came from. Most recently, from work on agent workflows: a single-choice step moves on when picked; a typed request gets the agent's reading of it back rather than a form to re-confirm; a note given at confirmation starts the work instead of asking again; and a human check reviews the full set the agent works from, not the summary it will produce. <b>Part 2 is how he judges,</b> the predictive criteria below.</p>
+<h3>The rules</h3>
+<p>Part 1 covers actions and controls, surfaces, lists, spacing, type, color, motion, states and copy, conversation, forms, charts, navigation, accessibility and how design files are built. A few show its character. <b>Each fact has one home</b>: a second encoding of the same meaning is cut, even when it is accessible. <b>Copy follows capability</b>: a page never advertises what does not run. <b>Aim for one filled button per surface.</b> <b>A guided flow shows its whole length and can always be left.</b></p>
+<p>A large share is about AI shown honestly. An inference lives inside the element it is about, never in a new card. AI never overwrites what a person wrote. What an agent does on its own is split by risk: reading and reporting needs no setting, while anything that changes the user's work or reaches other people is opt-in and can be undone. The newest rules come from agent workflows: a single-choice step moves on when picked; a typed request gets the agent's reading of it back rather than a form to re-confirm; a note given at confirmation starts the work instead of asking again; and a human check reviews the full set the agent works from, not the summary it will produce.</p>
 
 <h3>How he reads a screen</h3>
-<p><b>Vertical spacing is the first thing he sees.</b> Before hierarchy, before colour, before copy. If something is wrong and nobody knows what, the gaps are checked first. Tight reads as broken, loose reads as unfinished, and in seven weeks he has never once asked for less space. "Squished" is his most common word for a defect.</p>
-<p>He notices weight before size. A wrong font weight gets flagged; a size one step off often does not. And a number that looks confident but is wrong is worse than a blank: a fabricated 0.0, a dash where a word belongs, a zero standing in for an absent value.</p>
-<p>In a list, every row is one height and one grammar. The options of one control are one object. A field that a choice needs opens inside the chosen option, not below the control.</p>
+<p><b>Vertical spacing is the first thing he sees,</b> before hierarchy, color or copy. Tight reads as broken and loose reads as unfinished, but more space is not a safe default: a pass that pushed everything apart drew <q>I think you have ruined a lot of spacing.</q> What he objects to in both directions is the same thing, gaps that stop saying what belongs together. A screen he has already laid out is the contract; change only what a rule or a measured defect requires.</p>
+<p>He notices weight before size. A number that looks confident but is wrong is worse than a blank. And <b>one function, one look</b>: <q>Same look different function</q> is a defect, so a color earns its energy by having a single job.</p>
 
 <h3>Where spacing comes from</h3>
-<p><b>Spacing is derived from the type, never chosen beside it.</b> This is the deepest rule he holds about systems, and he arrived at it twice: once by eye, once by argument. The unit is the line-height of body text, and every vertical distance is a count of it. The ladder he picked by eye over weeks of corrections turned out to be clean fractions of his 24px line, with no remainder. He had the relation before he had the words for it.</p>
-<figure class="ladder" aria-label="The rhythm ladder as fractions of a 24px body line">
-  <div class="rung"><span class="px">4</span><span class="fr">1/6 u</span><i style="--h:4px"></i></div>
-  <div class="rung"><span class="px">8</span><span class="fr">1/3 u</span><i style="--h:8px"></i></div>
-  <div class="rung"><span class="px">12</span><span class="fr">1/2 u</span><i style="--h:12px"></i></div>
-  <div class="rung"><span class="px">16</span><span class="fr">2/3 u</span><i style="--h:16px"></i></div>
-  <div class="rung on"><span class="px">24</span><span class="fr">1 u</span><i style="--h:24px"></i></div>
-  <div class="rung"><span class="px">32</span><span class="fr">4/3 u</span><i style="--h:32px"></i></div>
-  <div class="rung"><span class="px">48</span><span class="fr">2 u</span><i style="--h:48px"></i></div>
-  <figcaption>u is the body line, 24px. This page is set on the same ladder.</figcaption>
-</figure>
-<p>Three consequences follow, and he expects them held. The type ramp is the primary decision and the spacing scale is derived from it; when the two disagree, the type wins and the spacing moves. The unit must be composite, so the fractions land on whole numbers, which turns the leading decision into "pick the ratio that lands the unit on a divisible number". And density is an index shift, not a multiplier: each role moves one step along the shared ladder, so one token scale serves dense, default and loose.</p>
-<p>The same day he extended it to corners without being prompted: <q>why are our radiuses 6, 10 and 12? Shouldn't we do 8, 12, 16?</q> Expect any remaining eye-picked scale to get the same question.</p>
+<p><b>Spacing is derived from the type, never chosen beside it.</b> The unit is the body line height, and every vertical distance is a fraction of it. The ladder he picked by eye over weeks, 8, 12, 16, 24 and 32, turned out to be exact fractions of his 24px line, so the type ramp is the primary decision and the spacing follows. To bind two things, move the next thing away; never pull the pair tighter. In a product's reading flow he uses two distances and no middle rungs, which leave everything looking evenly related. Whether that holds on a long read surface is still open, and marked as a question rather than a rule.</p>
 
-<h3>How he groups things</h3>
-<p><b>To bind two things, move the next thing away. Never pull the pair tighter.</b> This is the sharpest correction he has given, because the rule was already written down and still got broken. When a relationship needs to read as closer, increase the distance to everything else.</p>
-<p>In the reading flow he uses no middle rungs. On the frames he reworked by hand, the content stack runs at exactly two distances: bound, at 1/6 u, and separate, at 1 u, with 2 u between blocks. The middle rungs still exist, but only inside components. A flat 12 makes everything equally related, so nothing groups.</p>
-<p>A button is an action, not a continuation of the text above it. It gets a full unit, never the tight inside-a-group rung. The air belongs to the component, as padding on the component, so it travels to every screen instead of being retyped per layout. And scale moves with content density while the ratio does not: a sparse screen runs 1 u inside and 2 u between, a dense one 1/3 u and 1 u, both roughly a 2 to 3x differential.</p>
+<h3>What “livelier” means</h3>
+<p>Energy comes from content and confidence, never decoration. <b>The object is the personality</b>: show the thing you name, as a real image. Movement and magnitude are drawn with arrows, bars and segments, not written. Type is confident rather than airy, with as few sizes as possible. And silence about a dimension is not a preference: <q>don't take my lack of description of animation to mean that I don't want it.</q></p>
 
 <h3>How he decides</h3>
-<p>Craft on principle, positioning on business need, and he does not confuse the two. A spacing question gets a rule. Whether a button says "Join the beta" or "Get in touch" gets reasoned from what the business wants from the visitor.</p>
-<p><b>An aesthetic judgment is not finished until it is portable.</b> Three times in a month he moved from "I like this" to "state it as a rule that works on someone else's scale". When he approves something, the next question is "can that be a rule", so the rule is offered before he asks.</p>
-<p>He looks for the structural cause, not the numeric fix. Given a list of off-scale heights he did not ask which token to snap them to; he asked whether the height should exist at all: <q>if it's a height, it might be a 'hug' in figma that is defined by top and bottom margins, or content within.</q> He was right, and the fix was to delete the value. Retirement over deprecation: when an option is wrong he removes it so it cannot be reached. A metric is never an answer to a visual question. He will take a concern seriously and then decide; push back once with evidence, then do what he says.</p>
+<p>Craft questions get a principle; positioning questions get reasoned from what the business needs, and he does not confuse the two. <b>An aesthetic judgment is not finished until it is portable</b>, so when he approves something, the rule is offered before he asks. He looks for the structural cause rather than the numeric fix, and often the fix is deleting a value rather than tokenizing it. A borrowed pattern is judged by what it accomplishes here: <q>What is this accomplishing?</q> When he hands over a reference frame, the build matches it rather than interpreting it. Push back once, with evidence, then do what he says.</p>
 
-<h3>How he wants to work</h3>
-<p><q>I don't want you to make the prototype by yourself. I will guide you to make it, I just need you to have proper context.</q> Context first, direction after; no opening menu of options. Seeing beats describing: the dominant feedback mode is a screenshot with an annotation, and the loop that matters is intent to something he can look at. He tells a rule once and expects it held. Colleague reactions are design input, relayed without ceremony.</p>
+<h3>How he works, and what counts as done</h3>
+<p>Context first, direction after: become informed, then wait. Seeing beats describing. He states a rule once and expects it held; the repeated frustrations are never new requirements, they are the same rule unheld. Whether Figma or code leads depends on the project, so it is asked at the start. <b>Done means verified against the thing on his screen,</b> not committed or pushed, with every gap named before he finds it.</p>
 
-<h3>What he counts as done</h3>
-<p>Both places, same session: a fix in code that is not in Figma is new drift. Verified against the artifact he is looking at, not committed, not pushed, not merged. And gaps named rather than discovered: he would far rather be told the DELETE path is unexercised than find it himself in a screenshot.</p>
+<h3>Color</h3>
+<p>Marc has a degree of color vision deficiency. Two series must differ in lightness, not only hue, and the pair is measured rather than eyeballed. A color change made to pass a contrast rule is still a design change, so it gets asked, not flagged afterward.</p>
 
-<h3>Colour</h3>
-<p>Marc has a degree of colour vision deficiency. Two series in a chart must differ in lightness, not only in hue. This is a requirement, not a preference.</p>
-
-<h3>Where the system stops</h3>
-<p>Some entries have no detector and never will, and recognising them is the point. Composition: what goes on a screen, in what order, and what gets cut. When to break a rule, which he does deliberately and usually rightly. Whether a thing is beautiful. Positioning copy. For these the instruction is plain: <b>ask, do not assume.</b> A system that claims to have learned them has started guessing confidently.</p>
-
-<h3>How an entry earns its place</h3>
-<p><q>A rule that produces a number fires. A rule that produces a sentiment does not.</q> So each entry that can be made executable carries a Rule in his words, a Detect that can actually be run, and a Default so no judgment is needed to apply it. The loop: he corrects one case, the rule is extracted rather than the fix, a detector is written, the detector finds the whole class, he confirms on the cheapest second case, and the result is verified by measurement. One correction covered twelve screens that way.</p>
+<h3>Ask, do not assume</h3>
+<p>Some judgments have no detector and never will: composition, when to break a rule, whether a thing is beautiful, and positioning copy. <q>A rule that produces a number fires. A rule that produces a sentiment does not.</q> Everything that can be made executable carries a rule, a way to detect it and a default. Everything else stays his, and a system that claims to have learned it has started guessing confidently.</p>
 </div>
-      <details class="src"><summary>Read judgment/marc.md<span class="len">1111 lines</span></summary><pre><code># Marc&#x27;s design judgments
+      <details class="src"><summary>Read judgment/marc.md<span class="len">1113 lines</span></summary><pre><code># Marc&#x27;s design judgments
 
-_Last updated: 2026-11-14 (Part 1: K37 to K39 and Q6 to Q8, from the V1 agent prototypes (a market data product))_
+_Last updated: 2026-11-15 (American spelling; Both places timing follows which side leads)_
 
 One file for how Marc decides design, in two parts. Read it before proposing a
 layout or a component in any project, and treat it as the starting position. A
@@ -264,7 +242,7 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 
 - **P1. Aim for one filled button per surface.** Allowed: more than one when each marks an empty option side by side and none competes with another.
 - **P2. Aim for no dark scrim behind a dialog; the page fades back.** Allowed: a scrim where what sits behind would compete with the decision, such as media playing.
-- **P3. Minimise the navigation items that expand; start from the desire that nothing expands.** Allowed: one nested level under a section parent whose children are places people move between often.
+- **P3. Minimize the navigation items that expand; start from the desire that nothing expands.** Allowed: one nested level under a section parent whose children are places people move between often.
 - **P4. Aim for no dashed edges; an empty slot is a plain tinted tile with a plus.** Allowed: a drop target may be dashed, because it is where you put something.
 - **P5. Aim for fade over travel in the product.** Allowed: marketing sections may rise as they fade. Where the product does travel, it is a short rise as the element fades in. (a creator platform, 2026-10-27)
 - **P6. In a conversation, aim for suggestions at the end of the newest answer only.** Allowed: on an empty start, they sit with the input.
@@ -290,7 +268,7 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 - **B3. A guided flow stays inside the app&#x27;s shell**: it is a page with the navigation, not a trap.
 - **B4. Onboarding exists until anything is added, then it is gone**, by subtraction, and never comes back.
 - **B5. A setup checklist retires once filled**; a nearly done one becomes a banner.
-- **B6. Never draw a gate the code does not have.** Optional steps read optional; not started is muted, never an error colour.
+- **B6. Never draw a gate the code does not have.** Optional steps read optional; not started is muted, never an error color.
 - **B7. Order belongs to the person**: setup steps are not numbered or gated; a dependency is told as a consequence.
 - **B8. Order steps by cause, and put the payoff after what makes it feel like theirs.**
 - **B9. As state advances, the primary becomes the next act**; skipping is never the loudest control.
@@ -356,7 +334,7 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 - **E2. A capped scrolling list shows a partial last row**, so it reads as scrollable.
 - **E3. Browsable strips run past the edge rather than wrapping; a slot grid wraps at the same size.**
 - **E4. Row actions end flush with the word they replace**, not at the hover plate&#x27;s overhang.
-- **E5. Rows centre on the glyphs, not the line boxes** (fonts with tall ascenders sit high in their boxes).
+- **E5. Rows center on the glyphs, not the line boxes** (fonts with tall ascenders sit high in their boxes).
 - **E6. Rows keep the source&#x27;s density**; a working queue may step denser than the house rhythm.
 - **E7. Files, once added, look like files** (a type icon) on the same row spacing.
 - **E8. Aim for a library&#x27;s filter as left-aligned underline tabs above the content**, the line on the rule. Allowed: filters on the right where the layout calls for it.
@@ -370,7 +348,7 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 - **F4. A content column and a side panel sit wider apart than any gap inside either**, so they read as two things.
 - **F5. The page title clears the back control** with a smaller gap above it and a larger one under it, the same everywhere.
 - **F6. Text beside an avatar is one unit**: a strong name line over a lighter line one size down, a tight gap from the avatar and centred on it.
-- **F7. Two controls of different heights in one row centre on each other**; one radio group&#x27;s options are one height.
+- **F7. Two controls of different heights in one row center on each other**; one radio group&#x27;s options are one height.
 - **F8. A height that falls out of content hugs; an empty container hugs or hides.**
 - **F9. Spacing derives from type: the unit is the body line**, and line heights are whole relations to it.
 - **F10. Spacing comes from a fixed ladder derived from the body line, and nothing sits between its steps**; blocks take the steps one looser than tight.
@@ -388,24 +366,24 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 - **G8. A person&#x27;s name never truncates**; the rest of the line gives way. Inside a fixed-width control it truncates with an ellipsis and the full name stays available. (a creator platform, 2026-11-01)
 - **G9. No widows in two-line text**; balance the wrap.
 - **G10. A line-count target is met by cutting copy, never by widening the column.**
-- **G11. In a meta line a count is strong in the primary text colour and its words stay muted.**
-- **G12. Names in data tables are the primary text colour at the reading weight, underlined on hover and focus, never coloured.**
+- **G11. In a meta line a count is strong in the primary text color and its words stay muted.**
+- **G12. Names in data tables are the primary text color at the reading weight, underlined on hover and focus, never colored.**
 - **G13. The heaviest weight is for display only**: a landing headline, the one question a guided flow asks. Titles inside the product stay one step lighter.
 - **G14. A name that is a row in a list takes the body weight of that list, not the heading weight**; heavier names are for names that head something.
 
-## Colour
+## Color
 
-- **H1. Every measurement binds to a token**: colour, gap, padding, radius, blur, offset. A value with no token gets one added; binding straight to a raw palette step is a bypass. Named exemptions only (device chrome, content geometry).
+- **H1. Every measurement binds to a token**: color, gap, padding, radius, blur, offset. A value with no token gets one added; binding straight to a raw palette step is a bypass. Named exemptions only (device chrome, content geometry).
 - **H2. Components are drawn once and bound to mode-aware tokens**; dark keeps the same energy, it is not a recolouring.
 - **H3. A screen counts as done only once checked in light and dark.**
-- **H4. Each colour has one job, fixed before styling starts.**
+- **H4. Each color has one job, fixed before styling starts.**
 - **H5. Decoration carries no meaning and needs no contrast bar, but it reads as variation and is stable per object.**
-- **H6. A link in running text is the link colour plus an underline; a linked row name is plain, underlined on hover.**
+- **H6. A link in running text is the link color plus an underline; a linked row name is plain, underlined on hover.**
 - **H7. Text someone must read to decide is muted, never disabled.**
 - **H8. A progression is one hue at stepped values, never the status family; normal is neutral, never a warning.**
-- **H9. Two colours that a colour-blind reader cannot tell apart are never the only difference between states; an accent colour is never body text.**
+- **H9. Two colors that a color-blind reader cannot tell apart are never the only difference between states; an accent color is never body text.**
 - **H10. Contrast is measured against the worst ground, not the page.**
-- **H11. A colour change made for contrast is a design change: raise it, never swap silently.**
+- **H11. A color change made for contrast is a design change: raise it, never swap silently.**
 - **H12. An exception is scoped by the surface condition, never by a list of screens.**
 
 ## Motion
@@ -423,7 +401,7 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 - **I11. If motion exists only to hide a layout change, change the structure instead.**
 - **I12. Under reduced motion a live value still updates, and auto-cycling stops.**
 - **I13. Motion is its own later pass; silence about it during layout is not a preference.**
-- **I14. A change of state moves what persists: an element keeps its identity and travels between its two states (position, size, colour); crossfading whole screens is not motion.** Showcase motion also needs a camera that moves with intent. (marcbanderson-site, 2026-10-25: &quot;The elements didn&#x27;t animate from one position to another&quot;)
+- **I14. A change of state moves what persists: an element keeps its identity and travels between its two states (position, size, color); crossfading whole screens is not motion.** Showcase motion also needs a camera that moves with intent. (marcbanderson-site, 2026-10-25: &quot;The elements didn&#x27;t animate from one position to another&quot;)
 - **I15. Clicking through never flickers**: one screen in the DOM at a time, no overlapping exit crossfade, and only content that arrives after a screen is up fades in; what is there on arrival appears at once. (a market data product, 2026-11-09)
 - **I16. Interpretation of what the user is typing waits until they have finished**: nothing is shown mid-sentence; the product reconciles the whole request first, states the goal, then adds the details. (a market data product, 2026-11-09)
 - **I17. What the user has already read never moves because an input below it changed size**; reserve the space for the largest state of a sequence, and re-anchor only when new content arrives. (a market data product, 2026-11-10)
@@ -436,7 +414,7 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 - **J3. A refusal, a gap and a failure are three states with three wordings; a fault never dresses as a decline.**
 - **J4. When processing input fails, keep the input**; nobody enters it twice.
 - **J5. A failed load never reads as empty.**
-- **J6. Partial output is kept and labelled; actions that need a finished result are withheld.**
+- **J6. Partial output is kept and labeled; actions that need a finished result are withheld.**
 - **J7. A no-results state carries no warning glyph.**
 - **J8. An off state says how to turn it on.**
 - **J9. When a sequence ends, the next step is said as an instruction.**
@@ -445,18 +423,18 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 - **J12. Name things plainly; never a metaphor.**
 - **J13. No corny reveal copy, no invented counts, no date on a draft.**
 - **J14. No pronoun the system does not store.**
-- **J15. Words shown to an author are the author&#x27;s meaning, not the system&#x27;s state**; never organise by an internal taxonomy.
+- **J15. Words shown to an author are the author&#x27;s meaning, not the system&#x27;s state**; never organize by an internal taxonomy.
 - **J16. One act, one word, everywhere.**
 - **J17. Times and dates use the reader&#x27;s locale and language form. When something will happen (more becomes available, an item is removed, a grace period ends) is a date or a clock time, never a countdown** (&quot;Permanently deleted on 28 October&quot;, not &quot;7 days&quot;). English writes the month first with an ordinal (&quot;November 3rd&quot;); other languages take their own form. (a creator platform, 2026-11-01)
 - **J18. Optional content with nothing to show is absent, not filled.**
-- **J19. An absent image is drawn as an absence (a monogram), never a grey box.**
+- **J19. An absent image is drawn as an absence (a monogram), never a gray box.**
 
 ## AI shown honestly
 
 - **K1. An AI disclosure is one sentence, defined once, printed word for word everywhere; a badge is a marker, not the disclosure.**
 - **K2. The disclosure comes at an AI persona&#x27;s first introduction, before anything is asked, and travels to every card.**
 - **K28. A platform host never answers the subject matter**; it helps with setup and answers a fixed FAQ, matched by meaning. (a creator platform, 2026-11-01)
-- **K29. The logging notice is never personalised; the line that tells a member the creator will see a declined question is a separate sentence and names the creator.** (a creator platform, 2026-11-01)
+- **K29. The logging notice is never personalized; the line that tells a member the creator will see a declined question is a separate sentence and names the creator.** (a creator platform, 2026-11-01)
 - **K30. Reading aloud by an AI voice is disclosed the first time it is turned on.** (a creator platform, 2026-11-01)
 - **K3. Never spend prose on &quot;I am an AI&quot;**: the disclosure lives with the face.
 - **K4. Every voice gets an avatar and a name before it speaks; the speaker row returns only when the speaker changes.**
@@ -477,7 +455,7 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 - **K19. A statement about data handling says only what is true of every provider.**
 - **K20. A control presented as a setting must be enforced.**
 - **K21. Uncertainty is admitted**: a spoken turn shows what was heard; no evidence returns &quot;cannot vouch&quot;.
-- **K31. When an answer draws on what the product remembers about the user, their past work or their organisation, the answer itself says so**, naming each remembered value with its scope, and each can be changed or left out for that answer. Shown only when memory shaped the result; never applied silently. (a market data product, 2026-11-09) Any question that offers to remember something (where it applies, for me, my firm) always includes declining it (&quot;Don&#x27;t save&quot;), and a declined item is never shown as remembered. (a market data product, 2026-11-10)
+- **K31. When an answer draws on what the product remembers about the user, their past work or their organization, the answer itself says so**, naming each remembered value with its scope, and each can be changed or left out for that answer. Shown only when memory shaped the result; never applied silently. (a market data product, 2026-11-09) Any question that offers to remember something (where it applies, for me, my firm) always includes declining it (&quot;Don&#x27;t save&quot;), and a declined item is never shown as remembered. (a market data product, 2026-11-10)
 - **K32. What an agent does on its own is split by risk and said plainly**: reading and reporting is stated as harmless and needs no setting; anything that changes the user&#x27;s work or reaches other people is opt-in per action, visible wherever the agent appears, and revocable in one tap from each place it shows, with every self-made change carrying Undo. (a market data product, 2026-11-09)
 - **K33. Containers (conversations, projects) are places the user goes into, never inputs to new work; a container never nests inside another. Reuse happens with the things made inside them (artifacts).** (a market data product, 2026-11-09)
 - **K34. A conversation turn is a response followed by one to five numbered options**; actions, scope choices, approvals and next steps are all options in one pattern, never buttons, menus or chips scattered through the reply. (a market data product, 2026-11-09)
@@ -491,7 +469,7 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 ## Limits and money
 
 - **L1. A usage limit is shown as a share of one allowance, never a cap, dollars, tokens or a split.**
-- **L2. A meter shows what is left, labelled as left.**
+- **L2. A meter shows what is left, labeled as left.**
 - **L3. Cost differences are stated as direction, never magnitude.**
 - **L4. A cost note appears only where cost is not already visible.**
 - **L5. At a hard limit the input is replaced by the explanation, routed to whoever can lift it.**
@@ -506,7 +484,7 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 - **M4c. A conversation has two left edges only**: the composer&#x27;s (where message icons, the composer, options cards and the Goal Card start) and one message-content indent after the icon (text, cards, lines); user messages align to the composer&#x27;s right edge. (a market data product, 2026-11-10)
 - **M4b. Inside a card, every label and line starts on the title&#x27;s left edge**; a state highlight may bleed past the text edge, never move it. (a market data product, 2026-11-09)
 - **M5. One speaker&#x27;s consecutive output is one message with hierarchy; finished steps stay as a record without their actions.**
-- **M6. A refusal is labelled in words, with no warning colour and a way forward. A turn nobody spoke has no avatar; a platform turn (a crisis line) is a card.**
+- **M6. A refusal is labeled in words, with no warning color and a way forward. A turn nobody spoke has no avatar; a platform turn (a crisis line) is a card.**
 - **M7. An answer reads: speaker, answer, qualifiers, support, onward, housekeeping.**
 - **M8. Disagreement is reported with names.**
 - **M9. A note or offer shows once, when relevant, then is remembered.**
@@ -552,9 +530,9 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 ## Accessibility
 
 - **R1. Every link and action takes the pointer cursor** (in a native desktop window, see DT5).
-- **R2. Every button variant, quiet included, has one focus ring at one consistent offset.** The focus ring is the text colour in both themes, never the accent. (a creator platform, 2026-11-01)
+- **R2. Every button variant, quiet included, has one focus ring at one consistent offset.** The focus ring is the text color in both themes, never the accent. (a creator platform, 2026-11-01)
 - **R3.** See KB8.
-- **R4. When a small size cannot carry a colour signal, words do.**
+- **R4. When a small size cannot carry a color signal, words do.**
 - **R5. A gesture is never the only way; a glyph keeps one meaning per screen.**
 - **R6.** See KB11.
 - **R7.** See KB14.
@@ -562,15 +540,15 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 ## Charts
 
 - **S1. A chart earns its place from the data the user has**; one category becomes a sentence.
-- **S2. Several lines are named at their ends and keyed; a lone point gets a dot; a time series has no wash; a change shows arrow, sign and colour, and a flat one says &quot;No change&quot;; empty and loading tiles take the page surface.**
-- **S3. A ranked scale uses a convention people know (gold, silver, bronze), with lightness between neighbours.**
+- **S2. Several lines are named at their ends and keyed; a lone point gets a dot; a time series has no wash; a change shows arrow, sign and color, and a flat one says &quot;No change&quot;; empty and loading tiles take the page surface.**
+- **S3. A ranked scale uses a convention people know (gold, silver, bronze), with lightness between neighbors.**
 
 ## Building (design files and components)
 
 - **T1. A component holds its full state space, or it is only a picture.**
 - **T2. Repeated use earns a component; some things are containers.**
 - **T3. A component taken from production keeps the job and takes the look from the system.**
-- **T4. A new screen extends what passed review; a rebuild that drops a reviewed behaviour is a regression.**
+- **T4. A new screen extends what passed review; a rebuild that drops a reviewed behavior is a regression.**
 - **T5. A proposal is shown drawn, today against the proposal, in both themes, at the frame width; a visual question is never answered with a number.**
 - **T6. A build is reviewed at the design frame&#x27;s width; an overlay pins to its frame.**
 - **T7. Design file structure**: auto layout where it encodes a relationship, spacing bound, instance never redraw, scroll set by what the screen is, wrappers carry no fill and do not clip, frames bare in flow-order bands, superseded frames to an archive.
@@ -585,14 +563,14 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 - **NT2.** Aim for no toast on a save; an automatic save reports where it happened, as a fact (C16). Allowed: a save whose effect lands somewhere off the page.
 - **NT3.** A failure is never a toast. It stays in place until it is resolved: a form message, an inline error state, a turn notice, or the item&#x27;s own row.
 - **NT4.** A toast carries at most one action, Undo. The same undo stays available somewhere that does not expire. A toast offers it only for acts that are not confirmed in place (C5): archive, move, a bulk act.
-- **NT5.** A toast sits at the bottom centre of the content area, clear of the navigation, and above the composer or dock where there is one. On a phone it runs full width inside the page gutter, above the dock.
+- **NT5.** A toast sits at the bottom center of the content area, clear of the navigation, and above the composer or dock where there is one. On a phone it runs full width inside the page gutter, above the dock.
 - **NT6.** One toast at a time; a new one replaces the old, and they never stack.
 - **NT7.** A toast leaves on its own after a short time, held while the pointer or focus is on it; one carrying Undo stays until the person&#x27;s next act on the page.
 - **NT8.** A toast is a polite status, announced once. Focus never moves to it, and it carries the one Close X (C13).
 - **NT9.** A toast is one past-tense sentence naming the object and the count: &quot;Moved 3 documents to Trash.&quot; No &quot;Success&quot;, no exclamation mark, no icon in place of words.
-- **NT10.** A toast wears the floating-card dress (the card surface, the subtle edge, the floating shadow, the card radius) and no status colour.
+- **NT10.** A toast wears the floating-card dress (the card surface, the subtle edge, the floating shadow, the card radius) and no status color.
 - **NT11.** Aim for no notification inbox. What waits on a person lives on its object (the row, the gap), and anything that must reach them away from the product goes by email (EM8).
-- **NT12.** Aim for no count badges in the navigation. Allowed: one plain number after the label of the navigation item whose page holds decisions waiting on this person, hidden at zero, never a coloured dot.
+- **NT12.** Aim for no count badges in the navigation. Allowed: one plain number after the label of the navigation item whose page holds decisions waiting on this person, hidden at zero, never a colored dot.
 - **NT13.** See C17.
 
 ### Permissions and consent
@@ -600,8 +578,8 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 - **PC1.** See C15.
 - **PC2.** An act someone could do once something changes (a plan, a seat, an admin&#x27;s switch) shows with one sentence naming who or what enables it (&quot;Ask your admin to turn this on.&quot;), or is replaced by that sentence.
 - **PC3.** &quot;Contact your admin&quot; appears only when the person has an admin. Otherwise it reads Contact support, and the copy never mentions an admin they do not have.
-- **PC4.** Someone who can view but not edit sees values as text, never as a greyed form.
-- **PC5.** A role is a neutral tag in words on the person&#x27;s row; roles are never colour-coded against each other.
+- **PC4.** Someone who can view but not edit sees values as text, never as a grayed form.
+- **PC5.** A role is a neutral tag in words on the person&#x27;s row; roles are never color-coded against each other.
 - **PC6.** Consent comes before the act it covers, in the same view as the button that agrees to it, as plain sentences of what the act may and may not do.
 - **PC7.** The button is the agreement: no &quot;I agree&quot; checkbox where the confirming button can carry the consent.
 - **PC8.** Wherever a user&#x27;s words will reach a named person, the line saying so sits with the control that sends them, never only in Settings.
@@ -616,10 +594,10 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 - **BL2.** The button that charges says the amount (&quot;Confirm and pay $96&quot;); every other price follows L6.
 - **BL3.** Aim for plans compared as columns of one table: price in its own row, the current plan marked by a ring and the words &quot;Current plan&quot;, never by a different fill (D7). Allowed: with only two plans, two cards side by side.
 - **BL4.** An upgrade is offered only where the user meets what their plan lacks (a gated page, a reached limit), as a secondary or quiet action, once per place and then remembered. It is never a modal on arrival.
-- **BL6.** Paid content is marked in words in its meta line (&quot;for subscribers&quot;), never by a lock or a colour alone, and the marker hides for a user who already has access.
+- **BL6.** Paid content is marked in words in its meta line (&quot;for subscribers&quot;), never by a lock or a color alone, and the marker hides for a user who already has access.
 - **BL7.** Seats read as one figure, &quot;6 of 10 seats in use&quot;. A pending invitee is a user row reading &quot;Invited, not yet signed in&quot;, and going over capacity is an error naming how many seats are left, shown before sending.
 - **BL8.** A failed payment is an attention banner on every page until it is fixed, with &quot;Update payment method&quot;. It also shows on the billing row.
-- **BL9.** Cancelling is one visible press and a destructive modal that says the date access ends. No retention offer or extra step sits between them, and afterwards the row reads &quot;Ends on {date}&quot; with Resume.
+- **BL9.** Canceling is one visible press and a destructive modal that says the date access ends. No retention offer or extra step sits between them, and afterwards the row reads &quot;Ends on {date}&quot; with Resume.
 - **BL10.** A plan switch that charges shows, in its confirm, the exact amount due today and the recurring amount after it.
 - **BL11.** Subscription state is a sentence-case tag (Active, Free trial, Cancellation scheduled, Payment past due), with a dated line under it (&quot;Renews on November 3rd&quot;). Dates in a status line read in the reader&#x27;s language&#x27;s own form: an ordinal day in English (&quot;November 3rd&quot;) and each other language&#x27;s own form.
 - **BL12.** Aim for invoices and receipts to stay in the payment provider&#x27;s portal, behind one quiet &quot;Manage billing&quot;. Allowed: an in-product invoice table once users ask for one.
@@ -627,8 +605,8 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 ### Emails
 
 - **EM1.** One email shell for every email the product sends, in light and dark.
-- **EM2.** Emails flip with the mail app: light by default (the primary text colour on white), with a dark version the client uses when it is in dark mode, declared with color-scheme.
-- **EM3.** The email button is the primary button for the mode the email shows in, at the product&#x27;s button radius, built as a padded inline-styled link. It is never an accent colour.
+- **EM2.** Emails flip with the mail app: light by default (the primary text color on white), with a dark version the client uses when it is in dark mode, declared with color-scheme.
+- **EM3.** The email button is the primary button for the mode the email shows in, at the product&#x27;s button radius, built as a padded inline-styled link. It is never an accent color.
 - **EM4.** One action per email, with its URL repeated as plain text under the button.
 - **EM5.** Every email has a plain-text part with the same words in the same order and the URL on its own line.
 - **EM7.** Email type requests the product&#x27;s typeface and falls back to the system stack, never to another named face. Heading, body and footnote follow the product&#x27;s levels with the footnote muted, spacing stays on the scale, and the layout is one column at a width mail clients render reliably.
@@ -651,18 +629,18 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 ### Desktop apps
 
 - **DT8.** A floating overlay carries its own surface and never trusts the backdrop: a translucent plate with a hairline that follows the mode. It sits in a corner, never takes focus, never covers the field it writes into, and its readouts yield to an open panel.
-- **DT2.** Aim for every desktop app to follow the OS appearance in light and dark. Allowed: a surface whose job is judging colour in media (an authoring app&#x27;s viewer and timeline) is dark only.
+- **DT2.** Aim for every desktop app to follow the OS appearance in light and dark. Allowed: a surface whose job is judging color in media (an authoring app&#x27;s viewer and timeline) is dark only.
 - **DT3.** The page draws the title bar at the height the OS measures: window buttons at the start, then the app&#x27;s name and view switcher, the avatar at the end opening Settings, and an empty draggable bar on front-door screens. The brand line sits under it as the line between chrome and content.
 - **DT4.** Every action is in the native menu bar with its standard accelerator, and in the command box. Single-letter keys and Space belong to the page and carry no menu accelerator. Undo names the step.
 - **DT5.** Inside a native desktop window, buttons and controls keep the arrow cursor, as the OS does. A link that leaves the app shows the hand.
 - **DT6.** Each window has a minimum size at which nothing overlaps, set per app; panels scroll inside themselves, the window never scrolls, and a window reopens where it was left.
 - **DT7.** An app that keeps running with its window closed shows a monochrome template icon in the menu bar, with Quit in its menu. It never posts a system notification the user did not ask for; finished work waits in the app.
-- **DT11.** Status in the desktop apps has a word or a shape, never hue alone. A task that could not start leaves a mark, and &quot;In progress&quot; is not the primary&#x27;s colour.
+- **DT11.** Status in the desktop apps has a word or a shape, never hue alone. A task that could not start leaves a mark, and &quot;In progress&quot; is not the primary&#x27;s color.
 - **DT12.** Every desktop app ships every locale the product supports, and all of them follow the one language setting the person chose.
 
 ### Marketing pages
 
-- **MK1.** Aim for one content width per page, with prose at a reading measure and colour grounds running full bleed behind it. Allowed: proof cards may run wider than the content column.
+- **MK1.** Aim for one content width per page, with prose at a reading measure and color grounds running full bleed behind it. Allowed: proof cards may run wider than the content column.
 - **MK2.** A section is a lockup, then its content. Heading and body sit tight as one unit, and the lockup sits a full block apart from the content; the hero lockup takes larger steps of the same relationship.
 - **MK3.** Fewer sections, no headline-only sections, and below the fold is a tour, not a website. Show rather than tell. Media takes the large radius and the soft tinted shadow (D8).
 - **MK4.** The marquee fills at least the first screen. It says what this is at its head and where to go at its foot, and it sits side by side so the conversation has room. When the hero carries the mark, the nav does not.
@@ -676,14 +654,14 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 ### Legal pages
 
 - **LG1.** Privacy and Terms each have one canonical URL, shared by every app. The other paths redirect to it.
-- **LG2.** A legal page is a prose page: a plain page at a reading measure, body at the reading size, section headings and subsections on the product&#x27;s levels with a clear step between them. No hero, no colour ground, no eyebrow.
+- **LG2.** A legal page is a prose page: a plain page at a reading measure, body at the reading size, section headings and subsections on the product&#x27;s levels with a clear step between them. No hero, no color ground, no eyebrow.
 - **LG3.** Under the title, one level down, sits &quot;Last updated {date}&quot; in the locale&#x27;s date format (J17), with the version beside it.
 - **LG4.** A long document opens with a contents list of in-page links, and every heading can be linked to.
 - **LG5.** Legal text shows in its governing language in every locale, with one line in the interface language saying that language governs. The chrome around it is translated.
 - **LG6.** A placeholder legal page is never public or linked. &quot;Coming Soon&quot; never ships.
 - **LG7.** The agreement is the one modal with no close. Its only exits are the agree primary and a Sign out secondary.
 - **LG8.** The agree button stays enabled. Pressing it with something missing names what is missing, under that field.
-- **LG9.** The agreement follows the system: the checkbox fills with the primary colour, the link is the link colour underlined, and labels are sentence case (&quot;I agree&quot;, not &quot;I Agree&quot;).
+- **LG9.** The agreement follows the system: the checkbox fills with the primary color, the link is the link color underlined, and labels are sentence case (&quot;I agree&quot;, not &quot;I Agree&quot;).
 - **LG10.** Changed terms open with a short summary of what changed, above the full text, and the gate asks again.
 - **LG11.** The version and date someone accepted can be found in Settings.
 - **LG12.** A legal link inside a form opens without losing the form.
@@ -693,7 +671,7 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 - **AD1.** A list compared down the page is a table; a list read one item at a time is a list row. Three or more facts that line up from row to row make a table.
 - **AD2.** Aim for the whole row as the hit target, with the name as its link to the detail page, styled per G12. Allowed: a record read beside the list opens in a side drawer.
 - **AD3.** Every admin list is paged on the server at one fixed page size. The filter bar sits a block apart above it and the pager is start-aligned under it. Filters, sort and page all live in the URL.
-- **AD4.** A table opens in a default order, newest first. Only columns with a meaningful order sort. A sortable header is a button with aria-sort. Direction shows by chevron and weight, never colour.
+- **AD4.** A table opens in a default order, newest first. Only columns with a meaningful order sort. A sortable header is a button with aria-sort. Direction shows by chevron and weight, never color.
 - **AD5.** Numbers align to the end of their column in tabular figures, and the header aligns with them. A unit goes in the header (&quot;Spend, USD&quot;), not in every cell.
 - **AD6.** Aim for absolute dates in table cells, in the locale&#x27;s format, in a `&lt;time datetime&gt;`. The exact date and time show on hover and focus. One time zone per page, said once beside the count (&quot;All times in UTC&quot;). Allowed: an activity feed uses relative time (&quot;3 hours ago&quot;) for recent items.
 - **AD7.** An ID in a table is a copyable line cut to a short prefix. The full ID is its accessible name. It is set in the interface typeface and is never the row&#x27;s name.
@@ -708,7 +686,7 @@ decisions go in `~/.claude/design-decisions.md`, not here.
   - a modal confirm that states the count.
 - **AD14.** Each table state has one form, and the header row stays in every one of them.
   - An empty table is one start-aligned empty state in the body&#x27;s place, saying what would fill it.
-  - A missing cell reads &quot;None&quot; or &quot;Not set&quot; in the muted text colour, never a dash.
+  - A missing cell reads &quot;None&quot; or &quot;Not set&quot; in the muted text color, never a dash.
   - Loading is skeleton rows in the table&#x27;s own columns.
   - A failed load says so and never reads as empty (J5).
 
@@ -736,11 +714,11 @@ decisions go in `~/.claude/design-decisions.md`, not here.
 - **KB1.** Every app&#x27;s first focusable element is &quot;Skip to content&quot;. It shows on focus and lands on the page&#x27;s h1.
 - **KB2.** One h1 per page, the page title. Section titles are h2 and row group heads h3. The level follows the visible hierarchy, never the size wanted.
 - **KB3.** Landmarks are fixed per shell:
-  - the navigation is a labelled nav;
+  - the navigation is a labeled nav;
   - content is main;
-  - a filter bar is search or a labelled group;
-  - a pager is a labelled nav;
-  - a stat or metric card is a labelled section.
+  - a filter bar is search or a labeled group;
+  - a pager is a labeled nav;
+  - a stat or metric card is a labeled section.
 - **KB4.** On a route change, focus moves to the new page&#x27;s h1 and the title is announced.
 - **KB5.** Focus has one rule per surface:
   - a plate focuses its first field;
@@ -799,7 +777,7 @@ way on 2026-09-18.
 ### How he reads a screen
 
 **Vertical spacing is the first thing he sees.** Before hierarchy, before
-colour, before copy. If something is wrong and you do not know what, check the
+color, before copy. If something is wrong and you do not know what, check the
 gaps first. *Observed across 17 messages, every project.*
 
 &gt; **Detect** any rendered gap that is not a simple fraction of the body line.
@@ -864,7 +842,7 @@ choice needs opens inside the chosen option, not below the control. *Stated,
 - **One function, one look.** Chips are for choosing; read-only values are
   quiet neutral tags; navy only means &quot;selected&quot; while editing. A summary of
   picks in navy chips &quot;feels a little bit crazy&quot;.
-- **A suggested prompt has one treatment everywhere:** the grey chip with the
+- **A suggested prompt has one treatment everywhere:** the gray chip with the
   AI sparkle, living with the composer (under it, or above it when it is
   pinned to the bottom). Never a prompt chip inside a content module next to a
   full-size button. Once a conversation has started, follow-ups stay inside
@@ -939,7 +917,7 @@ bars, progress segments, a dot grid) was accepted. *Observed.*
 
 &gt; **Detect** a change, a count against a total, or a comparison of two values
 &gt; expressed only as text.
-&gt; **Default** library Rise/Fall icon in the direction colour (after the number in
+&gt; **Default** library Rise/Fall icon in the direction color (after the number in
 &gt; a right-aligned column, leading it in running text); comparison as bars from
 &gt; zero; part of a whole as segments; a count against a prior as a dot grid. Only
 &gt; from data that exists.
@@ -979,7 +957,7 @@ the prompt input *&quot;needs to be fully visible on the phone when the user lan
 
 **One function, one look.** *&quot;I don&#x27;t like that in dark mode the prompt input is
 the same color as the cards on some of the screens. Same look different
-function.&quot;* *Stated.* Colour gets energy by having a job: navy came to mean &quot;ask
+function.&quot;* *Stated.* Color gets energy by having a job: navy came to mean &quot;ask
 the desk&quot;, green and red mean market direction and nothing else.
 
 &gt; **Detect** an input or primary action sharing a fill token with a content
@@ -991,7 +969,7 @@ the desk&quot;, green and red mean market direction and nothing else.
 native iOS, so in the designs it&#x27;s just a reference, no tokens (but my icons).&quot;*
 *Stated, 2026-10-06.* System components (tab bar, keyboard, sheets&#x27; grabber,
 status bar) stay native; only what the app owns inside them, its icons, is
-designed. Do not tokenise or restyle native chrome.
+designed. Do not tokenize or restyle native chrome.
 
 **Judge a direction on the real job.** Generic rows got *&quot;more realistic in terms
 of content, and the fact that the ui is based on users asking questions&quot;*.
@@ -1035,7 +1013,7 @@ The unit is the line-height of body text, and every vertical distance is a count
 of it. Not the font size, the line-height, because what separates two things is
 measured in lines of the text it separates. From Muller-Brockmann, whose grid
 defines field depth as a number of text lines and the gap between fields as one
-or more blank lines. The unit is the line, not the millimetre.
+or more blank lines. The unit is the line, not the millimeter.
 
 The proof that he already believed it: the ladder he chose by eye over weeks of
 corrections, 8 / 12 / 16 / 24 / 32, turns out to be exactly 1/3, 1/2, 2/3, 1 and
@@ -1237,7 +1215,7 @@ are never new requirements. They are the same rule, unheld. *Observed.*
 &quot;take my current website to generate the look and feel&quot; and do &quot;slight cleanup&quot;,
 a new layout was rejected: *&quot;I wanted you to bring over the layout from my
 existing site to use as the basis of this website.&quot;* Carry over the structure,
-navigation and signature moves (here, the reel front and centre, the name across
+navigation and signature moves (here, the reel front and center, the name across
 the page), then improve what is underneath: code, content model, accessibility.
 Read &quot;cleanup&quot; as cleanup, not redesign. *Stated* (marcbanderson-site, 2026-10-23).
 
@@ -1271,15 +1249,17 @@ resolve to 24, but only one is what a component should be bound to. *Stated,
 filled, animated box and he called it *&quot;a little bit crazy&quot;*; a thin dashed
 outline that only redraws when the element changes was right. A panel beside
 the item is welcome only if it never covers the frame, because every spacing
-judgment is about the neighbour, and covering the neighbour removes the
+judgment is about the neighbor, and covering the neighbor removes the
 thing being judged. *Observed, 2026-09-23.*
 
 ---
 
 ### What he counts as done
 
-**Both places, same session.** A fix in code that is not in Figma is new drift.
-*Stated, and it is the standing rule.*
+**Both places.** A fix in code that is not in Figma, or the reverse, is new
+drift. When the mirror happens depends on which side leads (see How he wants
+to work): the same session, or a batch he schedules. *Stated; timing revised
+2026-11-14.*
 
 **Verified against the artifact he is looking at.** Not committed, not pushed,
 not merged. The thing on his screen. *Observed across seven weeks and it is the
@@ -1291,21 +1271,21 @@ having him find it costs the claim its credibility. *Observed.*
 
 ---
 
-### Accessibility and colour
+### Accessibility and color
 
 **Lightness and value separation, not hue separation.** Marc has a degree of
-colour vision deficiency. In charts especially, two series must differ in
+color vision deficiency. In charts especially, two series must differ in
 lightness, not only in hue. This is a requirement. *Stated.*
 
 **Measure the pair, do not eyeball it.** Convert to relative luminance and
 report the difference. Under about 10 points is separated by hue alone,
 whatever it looks like on your screen. On this project every positive/negative
 pair came in under 10, the worst at 2.5, and two of those pairs were defined in
-Figma itself, so tokenising the code faithfully would have propagated the
+Figma itself, so tokenizing the code faithfully would have propagated the
 problem rather than fixed it. **Where a hue-only pair lives upstream, the fix
 is upstream.** *Observed 2026-09-21.*
 
-**A colour change to satisfy a contrast rule is still a design change.** It
+**A color change to satisfy a contrast rule is still a design change.** It
 gets asked, not flagged afterwards. Raising a failing pair is right; changing
 the swatch without asking is not. *Correction, 2026-09-21.*
 
@@ -1313,7 +1293,7 @@ the swatch without asking is not. *Correction, 2026-09-21.*
 
 ### Ask, do not assume
 
-These have no detector and never will. Recognising them is the point.
+These have no detector and never will. Recognizing them is the point.
 
 - **Composition.** What goes on a screen, in what order, and what gets cut.
 - **When to break a rule.** He does it deliberately and the result is usually
@@ -1483,7 +1463,7 @@ conversation, and the conversation ends.
 
 `STATUS.md` at the repo root is that file.
 
-## The organising principle: rate of change, not topic
+## The organizing principle: rate of change, not topic
 
 This is why it is a separate file rather than a section in the contract.
 
@@ -1652,9 +1632,9 @@ editing one is not yours to do, and the damage is quiet because a rewritten
 entry still looks authoritative.
 
 - **Never change the wording of someone else&#x27;s decision**, including tightening
-  it, summarising it, or fixing what looks like an error. Their phrasing is the
+  it, summarizing it, or fixing what looks like an error. Their phrasing is the
   record. If you think it is wrong, say so to the designer and leave the file alone.
-- **Never change a &quot;Decided by&quot;.** Not to add yourself, not to generalise it to
+- **Never change a &quot;Decided by&quot;.** Not to add yourself, not to generalize it to
   the team.
 - **Never delete or overwrite one because it was superseded.** Add a new row
   that says what changed and when, and leave theirs standing. The pair is the
@@ -1746,14 +1726,14 @@ should know what it now believes about him.
 <article class="entry" id="skill-taste-extract">
   <header class="entry-head">
     <h3><span class="slash">/</span>taste-extract</h3>
-    <p class="tagline">Recover a designer&#x27;s spacing, type and colour grammar from hand-tuned screens</p>
+    <p class="tagline">Recover a designer&#x27;s spacing, type and color grammar from hand-tuned screens</p>
   </header>
-  <p class="does">Takes three to five screens the designer actively adjusted and records what each distance separates rather than histogramming values, so the output is a grammar (how many distinct distances, the ratio between them, which relationship gets which) instead of a copied vocabulary. Three filters drop gaps that render nothing, runs of identical items, and component internals, and containers are classified by what their children are, never by shape. Type is measured by usage and colour by relative luminance, with a contrast check on opposed pairs treated as a first-class finding.</p>
+  <p class="does">Takes three to five screens the designer actively adjusted and records what each distance separates rather than histogramming values, so the output is a grammar (how many distinct distances, the ratio between them, which relationship gets which) instead of a copied vocabulary. Three filters drop gaps that render nothing, runs of identical items, and component internals, and containers are classified by what their children are, never by shape. Type is measured by usage and color by relative luminance, with a contrast check on opposed pairs treated as a first-class finding.</p>
   <dl class="kv"><div><dt>When</dt><dd>At the start of a project once a calibration set exists, when asked how to apply someone&#x27;s taste to a new codebase, or when a design system needs rules rather than a copied palette.</dd></div><div><dt>Produces</dt><dd>A Grammar section written into the project contract, stated as relationships and fractions of the unit so it survives being moved to another scale.</dd></div><div><dt>Holds</dt><dd><q>A button is never the second half of a lockup. If a shape test and a role test disagree, the role test is right.</q></dd></div></dl>
   <p class="calls"><span class="lbl">Calls</span><ul class="chips"><li>rhythm-model</li><li>the project contract file</li></ul></p>
   <details class="src"><summary>Read skills/taste-extract/SKILL.md<span class="len">200 lines</span></summary><pre><code>---
 name: taste-extract
-description: Infer a designer&#x27;s grammar for spacing, type and colour from screens they have hand-tuned, and write it into the project contract. Use at the start of a project after a calibration set exists, when asked how to apply someone&#x27;s taste to a new codebase, or when a design system needs rules rather than a copied palette.
+description: Infer a designer&#x27;s grammar for spacing, type and color from screens they have hand-tuned, and write it into the project contract. Use at the start of a project after a calibration set exists, when asked how to apply someone&#x27;s taste to a new codebase, or when a design system needs rules rather than a copied palette.
 ---
 
 # Taste extract
@@ -1886,7 +1866,7 @@ usage tells you what is believed.
 
 ---
 
-## Colour
+## Color
 
 Convert every value to relative luminance and hue before comparing anything.
 Hex strings and names tell you nothing about whether a hierarchy works.
@@ -1904,11 +1884,11 @@ pair that carries opposite meaning, positive against negative most of all,
 report the lightness difference. A pair separated by under about 10 points of
 luminance is distinguished almost entirely by hue.
 
-That matters generally and it matters more for a designer with colour vision
+That matters generally and it matters more for a designer with color vision
 deficiency, where hue separation alone is not separation. On the project this
-was built from, the chart palette was seven colours in a single hue band
+was built from, the chart palette was seven colors in a single hue band
 separated purely by lightness, which is exactly right, while the positive and
-negative text colours sat 2.5 luminance points apart and differed only in red
+negative text colors sat 2.5 luminance points apart and differed only in red
 against green. The same file contained both the rule and its violation, and only
 measuring found it.
 
@@ -1943,7 +1923,7 @@ Spacing   two distances in the reading flow, 1/6 u and 1 u, roughly 6x apart.
           Content to action is always the separate value, never the bound one.
 Type      three weights. Steps of at least 1.2x. Aim for three distinct sizes
           per screen. Line-heights share a small multiple with the unit.
-Colour    text and icon hierarchies separate by lightness in one hue family.
+Color    text and icon hierarchies separate by lightness in one hue family.
           Charts separate by lightness, never hue alone. Opposed pairs need
           10+ points of luminance difference.
 ```
@@ -1975,7 +1955,7 @@ every value and the reason survives being moved to a different scale.
 After Josef Müller-Brockmann, *Grid Systems in Graphic Design*. His grid is not a
 set of measurements, it is a derivation: field depth is a count of text lines,
 and the vertical distance between fields is one or more blank lines (p.11, p.57).
-The unit is the line, not the millimetre.
+The unit is the line, not the millimeter.
 
 ---
 
@@ -2223,7 +2203,7 @@ skill, on a real project.
 
 **1. A detector that silently finds nothing.** A first pass over his stylesheet
 reported **0** raw values. The real number was **862**. The regex used `\b`,
-which BSD grep accepts and silently does not honour. A clean result that is
+which BSD grep accepts and silently does not honor. A clean result that is
 wrong is worse than no result, because it manufactures the false confidence this
 whole toolkit exists to prevent.
 
@@ -2343,7 +2323,7 @@ Everything else is reportable. **Component sizes are reportable.** A `height:
 
 ### Near misses are the most valuable finding
 
-A designer&#x27;s instruction, worth generalising:
+A designer&#x27;s instruction, worth generalizing:
 
 &gt; &quot;If something is a gap of 10, it should probably be the token for 12, and if
 &gt; it&#x27;s a value of 9, it should be the token for 8.&quot;
@@ -2441,7 +2421,7 @@ palettes returning identical values is the signature.
 ## Phase 3: reconcile
 
 The audit that neither side can do alone. Pull the Figma variable collections
-and the code token set, normalise the names, and compare:
+and the code token set, normalize the names, and compare:
 
 - **In Figma, missing from code.** A designed value the build cannot express.
 - **In code, missing from Figma.** A value invented in the build. This is the
@@ -2671,7 +2651,7 @@ code is a new drift, not a repair.
     <h3><span class="slash">/</span>rhythm-pass</h3>
     <p class="tagline">Tighten spacing and hierarchy without redesigning, every value a token</p>
   </header>
-  <p class="does">Runs the designer&#x27;s own tuning-pass brief, made permanent: tighten what is loose, loosen what is cramped, line up what is off, and bind every spacing, colour and type value to a Figma variable and a matching code token. The working rule is group first, then stack: decide which adjacent pairs read as one thing, set them at the group value, and let the group enter the block stack. Fixes go on the component so every instance inherits them, in Figma first and then mirrored to code in the same session.</p>
+  <p class="does">Runs the designer&#x27;s own tuning-pass brief, made permanent: tighten what is loose, loosen what is cramped, line up what is off, and bind every spacing, color and type value to a Figma variable and a matching code token. The working rule is group first, then stack: decide which adjacent pairs read as one thing, set them at the group value, and let the group enter the block stack. Fixes go on the component so every instance inherits them, in Figma first and then mirrored to code in the same session.</p>
   <dl class="kv"><div><dt>When</dt><dd>When the designer asks for a tuning pass, a spacing pass, a rhythm pass, or says things look squished, cramped, tight or loose.</dd></div><div><dt>Produces</dt><dd>A list of what changed and where, in both Figma and code, with no composition changed and no literal introduced.</dd></div><div><dt>Holds</dt><dd><q>&quot;This is not a redesign&quot; is the binding constraint.</q></dd></div></dl>
   <p class="calls"><span class="lbl">Calls</span><ul class="chips"><li>design-contract</li></ul></p>
   <details class="src"><summary>Read skills/rhythm-pass/SKILL.md<span class="len">257 lines</span></summary><pre><code>---
@@ -2986,7 +2966,7 @@ approval is not yours to give.
 Check the actual thing, do not infer it. For a deploy, confirm the service
 reports the exact commit that was pushed. For a local server, confirm it is
 serving the directory you edited, and not a sibling repo. That one is real: a
-server running from a neighbouring checkout looked exactly like the app under
+server running from a neighboring checkout looked exactly like the app under
 test and contained none of the work.
 
 **3. Is anything cached between the work and his eyes?**
@@ -3260,7 +3240,7 @@ No screenshots, no node dumps, no narration of what you tried.
   <dl class="kv"><div><dt>Runs</dt><dd><a href="#skill-walk scripts in the repo">/walk scripts in the repo</a></dd></div><div><dt>Why an agent</dt><dd>Regression walks across several iterations fill a context window with logs, and a stale walk reports false failures. The agent keeps walks current and returns only the verdicts.</dd></div><div><dt>Model</dt><dd>sonnet</dd></div><div><dt>Has</dt><dd><ul class="chips"><li>Read/Grep/Glob/Bash</li><li>Write/Edit inside the walks folder</li></ul></dd></div></dl>
   <details class="src"><summary>Read agents/prototype-walker.md<span class="len">42 lines</span></summary><pre><code>---
 name: prototype-walker
-description: &quot;Runs a prototype&#x27;s walk scripts across every route or iteration and returns one pass or fail line per check, in its own context. Use before pushing a prototype, after a change that touches shared flow code, or whenever a regression check across more than one iteration is needed. Also use to write or repair a walk when the behaviour it checks has changed.\\n\\nExamples:\\n\\n- User: \&quot;Push it.\&quot;\\n  Assistant: \&quot;Running prototype-walker across every iteration first, then pushing.\&quot;\\n\\n- User: \&quot;Did that change break the other versions?\&quot;\\n  Assistant: \&quot;Launching prototype-walker on all routes.\&quot;&quot;
+description: &quot;Runs a prototype&#x27;s walk scripts across every route or iteration and returns one pass or fail line per check, in its own context. Use before pushing a prototype, after a change that touches shared flow code, or whenever a regression check across more than one iteration is needed. Also use to write or repair a walk when the behavior it checks has changed.\\n\\nExamples:\\n\\n- User: \&quot;Push it.\&quot;\\n  Assistant: \&quot;Running prototype-walker across every iteration first, then pushing.\&quot;\\n\\n- User: \&quot;Did that change break the other versions?\&quot;\\n  Assistant: \&quot;Launching prototype-walker on all routes.\&quot;&quot;
 model: sonnet
 tools: Read, Grep, Glob, Bash, Write, Edit
 ---
@@ -3280,7 +3260,7 @@ into the repo and say so. Only write or edit files inside the walks folder.
 2. Run every walk headless at the design frame&#x27;s width.
 3. When a walk fails, decide which it is before reporting:
    - **Regression:** the build no longer does what the spec says.
-   - **Stale walk:** the behaviour changed on purpose (check the spec and recent
+   - **Stale walk:** the behavior changed on purpose (check the spec and recent
      changes) and the walk did not. Fix the walk, rerun it, and report it as
      repaired, not as a pass you found.
    - **Unclear:** you cannot tell. Report it as unclear with the evidence.
@@ -3293,7 +3273,7 @@ Ran
 Failed
   &lt;route&gt;   &lt;check&gt;   &lt;what happened&gt;   &lt;regression | unclear&gt;
 Repaired walks
-  &lt;walk&gt;   &lt;what changed in the behaviour&gt;
+  &lt;walk&gt;   &lt;what changed in the behavior&gt;
 Passed
   &lt;count per route&gt;
 ```
@@ -4155,7 +4135,7 @@ function fileForHref(href) {
   return hits.length === 1 ? hits[0] : null;
 }
 function selectorRegex(sel) {
-  // CSSOM normalises selector text; match the authored form with loose whitespace
+  // CSSOM normalizes selector text; match the authored form with loose whitespace
   const esc = sel.replace(/[.*+?^${}()|[\]\\]/g, &quot;\\$&amp;&quot;).replace(/\s*([&gt;+~,])\s*/g, &quot;\\s*$1\\s*&quot;).replace(/\s+/g, &quot;\\s+&quot;);
   return new RegExp(&quot;(^|[}\\s;])(&quot; + esc + &quot;)\\s*\\{&quot;, &quot;g&quot;);
 }
@@ -4330,7 +4310,7 @@ A correction to flow logic costs a sentence here and a rebuild later.
 
 **Checks that run more than once live in the repo.** Walk scripts, regression
 checks and test harnesses are committed beside the code (for example
-`tests/walks/`) and updated in the same change as the behaviour they check.
+`tests/walks/`) and updated in the same change as the behavior they check.
 Never leave them in a session scratchpad, which is deleted. A check that has
 drifted from the code reports false failures, which is worse than no check.
 
@@ -4438,7 +4418,7 @@ Two contracts in one repo is worse than none.
 - Local: `&lt;command, port, and whether it needs a database&gt;`
 - Deployed: `&lt;url&gt;`, from `&lt;branch&gt;` via `&lt;service&gt;`
 - If it cannot run locally, say so here and name the fallback.
-- Note any lookalike surface that is **not** this project. A neighbouring
+- Note any lookalike surface that is **not** this project. A neighboring
   checkout serving the same-looking app on a nearby port will pass a check
   falsely, and someone will hit it.
 
@@ -4475,7 +4455,7 @@ blocks.
 - Code tokens: `&lt;file, and the naming layers&gt;`
 - Dialect, so the audit does not rediscover it: `&lt;what a bound value looks like
   here, and what is legitimately exempt&gt;`
-- Rule: every spacing, radius, colour and type value is bound. A literal is a
+- Rule: every spacing, radius, color and type value is bound. A literal is a
   defect, not a shortcut.
 
 ## Component inventory
@@ -4565,7 +4545,7 @@ Pre-existing defects, so they are never rediscovered as news.
     <section id="architecture">
       <header>
         <h2>Architecture</h2>
-        <p>Files are organised by rate of change, not by topic. A fast-changing fact inside a slow-changing document makes the whole document look stale, and then none of it gets trusted.</p>
+        <p>Files are organized by rate of change, not by topic. A fast-changing fact inside a slow-changing document makes the whole document look stale, and then none of it gets trusted.</p>
       </header>
       <div class="tbl"><table>
         <thead><tr><th>Changes</th><th>File</th><th>Holds</th></tr></thead>
@@ -4693,7 +4673,7 @@ not in this repo.
 | `design-contract` | Writes the project&#x27;s contract, or adopts the file already there |
 | `session-state` | Reads and writes `STATUS.md`, so a restart loses nothing |
 | `decision-log` | Records decisions and gaps, and what they reveal about how the designer judges |
-| `taste-extract` | Recovers a designer&#x27;s grammar for spacing, type and colour from work they hand-tuned |
+| `taste-extract` | Recovers a designer&#x27;s grammar for spacing, type and color from work they hand-tuned |
 | `rhythm-model` | Derives spacing from the type rather than choosing it, and sets density |
 | `token-audit` | Finds unbound values in code, in Figma, and checks the two agree |
 | `design-parity` | Puts the build beside its Figma frame at matched width and looks |
@@ -4736,7 +4716,7 @@ Three rules `cssdiff` enforces that a hand-rolled harness will not:
 
 `--tokens` exists because **a token system cannot be checked in the mode you
 designed in.** Six semantic aliases once resolved correctly in Light and Dark
-while both brand palettes silently rendered the default palette&#x27;s colours.
+while both brand palettes silently rendered the default palette&#x27;s colors.
 
 ## The overlay
 
@@ -4767,7 +4747,7 @@ there, apply needs the server.
 
 ## The architecture
 
-Files are organised by **rate of change**, not by topic. A fast-changing fact
+Files are organized by **rate of change**, not by topic. A fast-changing fact
 inside a slow-changing document makes the whole document look stale, and then
 none of it gets trusted.
 
@@ -4807,7 +4787,7 @@ because it never measured that property.
 
 **Prove the detector before trusting a clean result.** A scan that silently
 finds nothing is worse than no scan. One pass reported 0 raw values where the
-real number was 862, because BSD grep accepted a `\b` it does not honour.
+real number was 862, because BSD grep accepted a `\b` it does not honor.
 
 **Measure the result, do not trust the reasoning.** Four chip heights were
 reasoned correctly and two still rendered wrong. The reasoning is the

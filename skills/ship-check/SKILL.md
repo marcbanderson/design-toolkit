@@ -43,7 +43,7 @@ approval is not yours to give.
 Check the actual thing, do not infer it. For a deploy, confirm the service
 reports the exact commit that was pushed. For a local server, confirm it is
 serving the directory you edited, and not a sibling repo. That one is real: a
-server running from a neighbouring checkout looked exactly like the app under
+server running from a neighboring checkout looked exactly like the app under
 test and contained none of the work.
 
 **3. Is anything cached between the work and his eyes?**
