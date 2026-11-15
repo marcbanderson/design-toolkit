@@ -25,6 +25,10 @@ def raw(rel):
 def git(*args):
     return subprocess.run(["git", "-C", ROOT] + list(args), capture_output=True, text=True).stdout.strip()
 
+def word(n):
+    w = "zero one two three four five six seven eight nine ten eleven twelve".split()
+    return w[n] if n < len(w) else str(n)
+
 last_commit = git("log", "-1", "--format=%h  %s")
 last_date = git("log", "-1", "--format=%ad", "--date=format:%Y-%m-%d")
 n_commits = git("rev-list", "--count", "HEAD")
@@ -323,13 +327,13 @@ td code {{ font-size: 14px; }}
   <header class="mast">
     <p class="eyebrow">design-toolkit</p>
     <h1>Design Toolkit</h1>
-    <p class="lede">A designer's standards, written once and pulled into every project. Nine skills hold the methods, two agents keep the sweeps out of the thread, two executables make the checks repeatable, and one judgment file holds what the system has learned about how Marc decides.</p>
+    <p class="lede">A designer's standards, written once and pulled into every project. {word(len(skills)).capitalize()} skills hold the methods, {word(len(S["agents"]))} agents keep the heavy work out of the thread, {word(len(S["tools"]))} executables make the checks repeatable, and one judgment file holds what the system has learned about how Marc decides.</p>
     <ul class="facts">
       <li><b>{len(skills)}</b> skills</li>
       <li><b>{len(S["agents"])}</b> agents</li>
       <li><b>{len(S["tools"])}</b> executables</li>
-      <li><b>{n_commits}</b> commits</li>
-      <li>last commit <b>{e(last_date)}</b> {e(last_commit)}</li>
+      <li><b id="gh-count">{n_commits}</b> commits</li>
+      <li>last commit <b id="gh-date">{e(last_date)}</b> <span id="gh-commit">{e(last_commit)}</span></li>
       <li>built {datetime.date.today().isoformat()}</li>
     </ul>
   </header>
@@ -423,7 +427,8 @@ td code {{ font-size: 14px; }}
   </main>
 </div>
 '''
-page = "<!doctype html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n" + page.replace("<style>", "</head>\n<body>\n<style>", 1) + "\n</body>\n</html>\n"
+FOOTER_JS = '<script>\n/* The footer is written at build time, before the commit that carries it, so it\n   would always name the previous commit. Read the live values from GitHub and\n   keep the built ones if the request fails. */\n(function () {\n  var api = "https://api.github.com/repos/marcbanderson/design-toolkit/commits?sha=main&per_page=1";\n  fetch(api).then(function (r) {\n    if (!r.ok) throw 0;\n    var link = r.headers.get("Link") || "", m = link.match(/[?&]page=(\\d+)>; rel="last"/);\n    if (m) document.getElementById("gh-count").textContent = m[1];\n    return r.json();\n  }).then(function (c) {\n    if (!c || !c[0]) return;\n    var sha = c[0].sha.slice(0, 7), msg = c[0].commit.message.split("\\n")[0];\n    document.getElementById("gh-commit").textContent = sha + "  " + msg;\n    document.getElementById("gh-date").textContent = c[0].commit.committer.date.slice(0, 10);\n  }).catch(function () {});\n})();\n</script>'
+page = "<!doctype html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n" + page.replace("<style>", "</head>\n<body>\n<style>", 1) + "\n" + FOOTER_JS + "\n</body>\n</html>\n"
 # the title and links belong in head: move everything before <style> up
 head_end = page.index("</head>")
 pre = page[page.index("<title>"):page.index("</head>")]

@@ -149,13 +149,13 @@ td code { font-size: 14px; }
   <header class="mast">
     <p class="eyebrow">design-toolkit</p>
     <h1>Design Toolkit</h1>
-    <p class="lede">A designer's standards, written once and pulled into every project. Nine skills hold the methods, two agents keep the sweeps out of the thread, two executables make the checks repeatable, and one judgment file holds what the system has learned about how Marc decides.</p>
+    <p class="lede">A designer's standards, written once and pulled into every project. Nine skills hold the methods, four agents keep the heavy work out of the thread, four executables make the checks repeatable, and one judgment file holds what the system has learned about how Marc decides.</p>
     <ul class="facts">
       <li><b>9</b> skills</li>
       <li><b>4</b> agents</li>
       <li><b>4</b> executables</li>
-      <li><b>24</b> commits</li>
-      <li>last commit <b>2026-10-07</b> a9fbff3  judgment: component grammar from the TunnlAi October review</li>
+      <li><b id="gh-count">25</b> commits</li>
+      <li>last commit <b id="gh-date">2026-11-14</b> <span id="gh-commit">cc14045  Ask which side leads per project; sweep changed facts; walk flows first; figma-builder and prototype-walker agents</span></li>
       <li>built 2026-11-14</li>
     </ul>
   </header>
@@ -227,7 +227,7 @@ td code { font-size: 14px; }
 <h3>How an entry earns its place</h3>
 <p><q>A rule that produces a number fires. A rule that produces a sentiment does not.</q> So each entry that can be made executable carries a Rule in his words, a Detect that can actually be run, and a Default so no judgment is needed to apply it. The loop: he corrects one case, the rule is extracted rather than the fix, a detector is written, the detector finds the whole class, he confirms on the cheapest second case, and the result is verified by measurement. One correction covered twelve screens that way.</p>
 </div>
-      <details class="src"><summary>Read judgment/marc.md<span class="len">518 lines</span></summary><pre><code># How Marc judges design
+      <details class="src"><summary>Read judgment/marc.md<span class="len">524 lines</span></summary><pre><code># How Marc judges design
 
 Last updated: 2026-10-07
 
@@ -641,6 +641,12 @@ evidence, then do what he says. Twice is arguing. *Observed.*
 ---
 
 ## How he wants to work
+
+**Which side leads depends on the project.** *&quot;Whether I work in Figma first or
+code first is dependent on the particular project I&#x27;m working on. Maybe it&#x27;s
+just something to confirm with me.&quot;* On prototypes explored in code he held
+Figma until the code settled, then had it documented in one batch. Ask at the
+start and record the answer in the contract. *Stated, 2026-11-14.*
 
 **Context first, direction after.** *&quot;I don&#x27;t want you to make the prototype by
 yourself. I will guide you to make it, I just need you to have proper context.&quot;*
@@ -4232,5 +4238,24 @@ one is wrong for how you work, change it rather than working around it.
   </main>
 </div>
 
+<script>
+/* The footer is written at build time, before the commit that carries it, so it
+   would always name the previous commit. Read the live values from GitHub and
+   keep the built ones if the request fails. */
+(function () {
+  var api = "https://api.github.com/repos/marcbanderson/design-toolkit/commits?sha=main&per_page=1";
+  fetch(api).then(function (r) {
+    if (!r.ok) throw 0;
+    var link = r.headers.get("Link") || "", m = link.match(/[?&]page=(\d+)>; rel="last"/);
+    if (m) document.getElementById("gh-count").textContent = m[1];
+    return r.json();
+  }).then(function (c) {
+    if (!c || !c[0]) return;
+    var sha = c[0].sha.slice(0, 7), msg = c[0].commit.message.split("\n")[0];
+    document.getElementById("gh-commit").textContent = sha + "  " + msg;
+    document.getElementById("gh-date").textContent = c[0].commit.committer.date.slice(0, 10);
+  }).catch(function () {});
+})();
+</script>
 </body>
 </html>
